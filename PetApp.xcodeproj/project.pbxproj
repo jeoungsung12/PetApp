@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E49726882D8D296100716594 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E49726872D8D296100716594 /* SnapKit */; };
+		E497268B2D8D296900716594 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E497268A2D8D296900716594 /* Kingfisher */; };
+		E497268E2D8D297700716594 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E497268D2D8D297700716594 /* RxCocoa */; };
+		E49726902D8D297700716594 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E497268F2D8D297700716594 /* RxSwift */; };
+		E49726932D8D298C00716594 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = E49726922D8D298C00716594 /* RxDataSources */; };
+		E49726962D8D299600716594 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = E49726952D8D299600716594 /* Toast */; };
+		E49726992D8D29A000716594 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E49726982D8D29A000716594 /* Alamofire */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E49726502D8D273300716594 /* PetApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +46,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E49726962D8D299600716594 /* Toast in Frameworks */,
+				E49726992D8D29A000716594 /* Alamofire in Frameworks */,
+				E497268E2D8D297700716594 /* RxCocoa in Frameworks */,
+				E497268B2D8D296900716594 /* Kingfisher in Frameworks */,
+				E49726902D8D297700716594 /* RxSwift in Frameworks */,
+				E49726932D8D298C00716594 /* RxDataSources in Frameworks */,
+				E49726882D8D296100716594 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +95,13 @@
 			);
 			name = PetApp;
 			packageProductDependencies = (
+				E49726872D8D296100716594 /* SnapKit */,
+				E497268A2D8D296900716594 /* Kingfisher */,
+				E497268D2D8D297700716594 /* RxCocoa */,
+				E497268F2D8D297700716594 /* RxSwift */,
+				E49726922D8D298C00716594 /* RxDataSources */,
+				E49726952D8D299600716594 /* Toast */,
+				E49726982D8D29A000716594 /* Alamofire */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -107,6 +131,14 @@
 			);
 			mainGroup = E49726472D8D273300716594;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
+				E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
 			projectDirPath = "";
@@ -345,6 +377,95 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.1;
+			};
+		};
+		E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+		E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
+		E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scalessec/Toast-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.1;
+			};
+		};
+		E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E49726872D8D296100716594 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		E497268A2D8D296900716594 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		E497268D2D8D297700716594 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		E497268F2D8D297700716594 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		E49726922D8D298C00716594 /* RxDataSources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
+		};
+		E49726952D8D299600716594 /* Toast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
+			productName = Toast;
+		};
+		E49726982D8D29A000716594 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E49726482D8D273300716594 /* Project object */;
 }
