@@ -1,0 +1,61 @@
+//
+//  ReusableHeaderView.swift
+//  Moving
+//
+//  Created by 정성윤 on 3/21/25.
+//
+
+import UIKit
+import SnapKit
+
+final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
+    private let titleLabel = UILabel()
+    private let spacer = UIView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureView()
+        configureHierarchy()
+        configureLayout()
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+}
+
+extension ReusableHeaderView {
+    
+    private func configureView() {
+        titleLabel.textColor = .customBlack
+        titleLabel.font = .headLine
+        titleLabel.textAlignment = .left
+        
+        spacer.backgroundColor = .customBlack
+    }
+    
+    private func configureHierarchy() {
+        [titleLabel, spacer].forEach {
+            self.addSubview($0)
+        }
+    }
+    
+    private func configureLayout() {
+        titleLabel.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview()
+        }
+        
+        spacer.snp.makeConstraints { make in
+            make.height.equalTo(1)
+            make.leading.equalTo(titleLabel.snp.leading)
+            make.trailing.equalTo(titleLabel.snp.trailing)
+            make.top.equalTo(titleLabel.snp.bottom).offset(4)
+        }
+    }
+    
+    func configure(_ title: String) {
+        titleLabel.text = title
+    }
+}
