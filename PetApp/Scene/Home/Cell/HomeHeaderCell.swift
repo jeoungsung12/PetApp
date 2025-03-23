@@ -26,7 +26,7 @@ final class HomeHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override func configureView() {
         //TODO: Timer
-        posterImageView.image = UIImage(named: "poster6")
+        posterImageView.image = UIImage(named: ["poster1","poster2","poster3","poster4","poster5","poster6"].randomElement() ?? "poster1")
         posterImageView.backgroundColor = .customLightGray
         posterImageView.contentMode = .scaleToFill
     }

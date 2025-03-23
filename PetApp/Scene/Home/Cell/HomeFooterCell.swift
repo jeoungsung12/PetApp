@@ -25,11 +25,12 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.layer.cornerRadius = 60
         thumbImageview.backgroundColor = .customLightGray
         
-        titleLabel.textColor = .customBlack
-        titleLabel.font = .mediumBold
+        titleLabel.textColor = .customLightGray
+        titleLabel.font = .mediumRegular
         
-        subTitleLabel.textColor = .customLightGray
-        subTitleLabel.font = .mediumRegular
+        subTitleLabel.textColor = .customBlack
+        subTitleLabel.font = .largeBold
+        subTitleLabel.numberOfLines = 2
         
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = .left
@@ -64,7 +65,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     
     func configure(_ model: HomeEntity) {
         titleLabel.text = model.shelter
-        subTitleLabel.text = model.hashTag
+        subTitleLabel.text = model.description
         
         //TODO: 임시
         thumbImageview.image = UIImage(named: model.thumbImage)

@@ -117,6 +117,7 @@ extension HomeViewController {
         collectionView.register(HomeFooterCell.self, forCellWithReuseIdentifier: HomeFooterCell.id)
         collectionView.register(HomeEtcCell.self, forCellWithReuseIdentifier: HomeEtcCell.id)
     }
+    
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
             self.createSectionLayout(HomeSectionType.allCases[sectionIndex])
@@ -142,7 +143,7 @@ extension HomeViewController {
             
             section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = .groupPagingCentered
-            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 0, bottom: 24, trailing: 0)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 24, trailing: 0)
             
         case .middle, .footer:
             groupSize = type == .middle

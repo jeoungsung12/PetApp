@@ -46,7 +46,7 @@ extension HomeSection: SectionModelType {
 final class HomeMockData {
     static let data: [HomeSection] = [
         HomeSection(title: "", items: Array(repeating: .init(data: HomeEntity(description: "푸들\n2023(년생) 3.82(kg)")), count: 6)),
-        HomeSection(title: "🚨 도움이 필요해요!", items: Array(repeating: .init(data: HomeEntity(description: "푸들\n2023(년생) 3.82(kg)")), count: 10)),
+        HomeSection(title: "도움이 필요해요 🚨", items: Array(repeating: .init(data: HomeEntity(description: "푸들\n2023(년생) 3.82(kg)")), count: 10)),
         HomeSection(title: "", items: [.init(data: HomeEntity(description: ""))]),
         HomeSection(title: "", items: [.init(data: HomeEntity(description: ""))]),
         HomeSection(title: "따스한 손길이\n필요한 친구들 🐾", items: Array(repeating: .init(data: HomeEntity(description: "푸들\n2023(년생) 3.82(kg)")), count: 5))
