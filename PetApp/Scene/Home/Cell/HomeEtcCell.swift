@@ -32,7 +32,7 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
     }
     
     override func configureView() {
-        adsImageView.image = UIImage(named: "poster6")
+        adsImageView.image = UIImage(named: "Ads")
         adsImageView.backgroundColor = .clear
         adsImageView.contentMode = .scaleAspectFill
         adsImageView.clipsToBounds = true

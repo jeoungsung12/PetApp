@@ -14,6 +14,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     private let descriptionLabel = UILabel()
     private let shelterLabel = UILabel()
     private let hashTagLabel = UILabel()
+    private let statusLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,10 +51,19 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         [shelterLabel, hashTagLabel].forEach {
             $0.textAlignment = .left
         }
+        
+        statusLabel.text = "보호중"
+        statusLabel.clipsToBounds = true
+        statusLabel.font = .mediumSemibold
+        statusLabel.layer.cornerRadius = 10
+        statusLabel.textColor = .customWhite
+        statusLabel.backgroundColor = .point
+        statusLabel.textAlignment = .center
+        statusLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMaxYCorner]
     }
     
     override func configureHierarchy() {
-        [thumbImageview, descriptionLabel, shelterLabel, hashTagLabel].forEach {
+        [thumbImageview, statusLabel, descriptionLabel, shelterLabel, hashTagLabel].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -62,6 +72,13 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.height.equalToSuperview().dividedBy(1.5)
+        }
+        
+        statusLabel.snp.makeConstraints { make in
+            make.top.equalTo(thumbImageview.snp.top)
+            make.trailing.equalTo(thumbImageview.snp.trailing)
+            make.width.equalTo(50)
+            make.height.equalTo(25)
         }
         
         descriptionLabel.snp.makeConstraints { make in
@@ -88,9 +105,9 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         
         //TODO: 임시
         thumbImageview.image = UIImage(named: model.thumbImage)
-//        if let url = URL(string: model.thumbImage) {
-//            thumbImageview.kf.setImage(with: url)
-//        }
+        //        if let url = URL(string: model.thumbImage) {
+        //            thumbImageview.kf.setImage(with: url)
+        //        }
     }
     
 }

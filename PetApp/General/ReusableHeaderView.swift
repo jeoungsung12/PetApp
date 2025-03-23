@@ -24,7 +24,7 @@ final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
 }
 
 extension ReusableHeaderView {
