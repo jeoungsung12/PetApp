@@ -10,6 +10,12 @@
 DataDreamRouter.swift
 OpenSquareRouter.swift
 
+# macOS 시스템 파일 무시
+.DS_Store
+
+# Xcode 사용자 설정 파일 무시
+*.xcuserstate
+
 ## User settings
 xcuserdata/
 
