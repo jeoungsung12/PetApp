@@ -12,7 +12,7 @@ extension UIViewController {
     func setNavigation(
         title: String? = nil,
         backTitle: String? = nil,
-        backImage: UIImage? = .arrowImage,
+        backImage: UIImage? = .arrowLeft,
         color: UIColor = .point
     ) {
         guard let navigationBar = navigationController?.navigationBar else { return }

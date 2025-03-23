@@ -11,6 +11,7 @@ import SnapKit
 final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
     private let titleLabel = UILabel()
     private let spacer = UIView()
+    private let moreBtn = UIButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,10 +36,18 @@ extension ReusableHeaderView {
         titleLabel.numberOfLines = 2
         
         spacer.backgroundColor = .customBlack
+        
+        moreBtn.setTitle("더보기", for: .normal)
+        moreBtn.setTitleColor(.customLightGray, for: .normal)
+        moreBtn.setImage(.arrowRight, for: .normal)
+        moreBtn.titleLabel?.font = .largeBold
+        moreBtn.tintColor = .customLightGray
+        
+        moreBtn.semanticContentAttribute = .forceRightToLeft
     }
     
     private func configureHierarchy() {
-        [titleLabel, spacer].forEach {
+        [titleLabel, spacer, moreBtn].forEach {
             self.addSubview($0)
         }
     }
@@ -53,6 +62,11 @@ extension ReusableHeaderView {
             make.leading.equalTo(titleLabel.snp.leading)
             make.trailing.equalTo(titleLabel.snp.trailing)
             make.top.equalTo(titleLabel.snp.bottom).offset(4)
+        }
+        
+        moreBtn.snp.makeConstraints { make in
+            make.trailing.equalToSuperview()
+            make.bottom.equalTo(titleLabel.snp.bottom)
         }
     }
     

@@ -41,7 +41,7 @@ final class IconLabelView: BaseView {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
+            make.centerX.equalToSuperview().offset(20)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualToSuperview().inset(12)
             make.trailing.lessThanOrEqualToSuperview().inset(12)
