@@ -21,7 +21,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override func configureView() {
         thumbImageview.clipsToBounds = true
-        thumbImageview.contentMode = .scaleToFill
+        thumbImageview.contentMode = .scaleAspectFill
         thumbImageview.layer.cornerRadius = 60
         thumbImageview.backgroundColor = .customLightGray
         
@@ -63,12 +63,14 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     }
     
     func configure(_ model: HomeEntity) {
-        titleLabel.text = model.title
-        subTitleLabel.text = model.category
+        titleLabel.text = model.shelter
+        subTitleLabel.text = model.hashTag
         
-        if let url = URL(string: model.thumbImage) {
-            thumbImageview.kf.setImage(with: url)
-        }
+        //TODO: 임시
+        thumbImageview.image = UIImage(named: model.thumbImage)
+//        if let url = URL(string: model.thumbImage) {
+//            thumbImageview.kf.setImage(with: url)
+//        }
     }
     
 }

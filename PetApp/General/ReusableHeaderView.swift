@@ -32,6 +32,7 @@ extension ReusableHeaderView {
         titleLabel.textColor = .customBlack
         titleLabel.font = .headLine
         titleLabel.textAlignment = .left
+        titleLabel.numberOfLines = 2
         
         spacer.backgroundColor = .customBlack
     }
