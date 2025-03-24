@@ -37,6 +37,7 @@ extension HomeSection: SectionModelType {
 }
 
 final class HomeViewModel: BaseViewModel {
+    
     private var disposeBag = DisposeBag()
     
     struct Input {
@@ -57,5 +58,9 @@ extension HomeViewModel {
         return Output(
             homeResult: homeResult.asDriver()
         )
+    }
+    
+    private func fetchData() {
+        
     }
 }
