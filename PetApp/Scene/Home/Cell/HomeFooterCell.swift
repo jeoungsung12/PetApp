@@ -17,7 +17,6 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.isUserInteractionEnabled = true
     }
     
     override func configureView() {

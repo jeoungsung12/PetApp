@@ -40,19 +40,19 @@ final class DetailViewController: BaseViewController {
             case .header:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailHeaderCell.id, for: indexPath) as? DetailHeaderCell else { return UITableViewCell() }
                 cell.selectionStyle = .none
-                cell.configure()
+                cell.configure(item.data)
                 return cell
                 
             case .middle:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailMiddleCell.id, for: indexPath) as? DetailMiddleCell else { return UITableViewCell() }
                 cell.selectionStyle = .none
-                cell.configure()
+                cell.configure(item.data)
                 return cell
                 
             case .footer:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailFooterCell.id, for: indexPath) as? DetailFooterCell else { return UITableViewCell() }
                 cell.selectionStyle = .none
-                cell.configure()
+                cell.configure(item.data)
                 return cell
             }
         }

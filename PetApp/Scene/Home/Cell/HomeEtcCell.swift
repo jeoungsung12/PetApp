@@ -20,12 +20,10 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.isUserInteractionEnabled = true
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-//        adsImageView.image = nil
         [adsImageView, mapView].forEach {
             $0.isHidden = false
         }

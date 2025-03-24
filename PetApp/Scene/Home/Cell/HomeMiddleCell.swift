@@ -18,7 +18,6 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.isUserInteractionEnabled = true
     }
     
     override func prepareForReuse() {
