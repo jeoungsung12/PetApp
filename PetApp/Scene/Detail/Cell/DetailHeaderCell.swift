@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 import SnapKit
 
 final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
@@ -30,7 +31,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     }
     
     override func configureHierarchy() {
-        [backdropImageView, subTitleLabel, titleLabel].forEach {
+        [backdropImageView, titleLabel, subTitleLabel].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -42,20 +43,23 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
         }
         
         subTitleLabel.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(20)
+            make.horizontalEdges.equalToSuperview().inset(12)
         }
         
         titleLabel.snp.makeConstraints { make in
+            make.bottom.equalTo(subTitleLabel.snp.top).offset(-4)
             make.horizontalEdges.equalToSuperview().inset(12)
-            make.bottom.equalTo(subTitleLabel.snp.top).offset(24)
         }
     }
     
-    //TODO: Entity
-    func configure() {
-        backdropImageView.image = UIImage(named: "mockImage")
-        titleLabel.text = "믹스견"
-        subTitleLabel.text = "3KG 60일 미만"
+    func configure(_ entity: HomeEntity) {
+        titleLabel.text = entity.animal.name
+        subTitleLabel.text = entity.animal.age + " " + entity.animal.weight
+        
+        if let url = URL(string: entity.animal.fullImage) {
+            backdropImageView.kf.setImage(with: url)
+        }
     }
     
 }

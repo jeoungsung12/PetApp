@@ -73,10 +73,27 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
         }
     }
     
-    func configure() {
-        shelterLabel.text = "평택시유기동물보호소"
-        numberLabel.text = "031-8024-3849"
-        addressLabel.text = "경기도 평택시 진위면 야막길 108-86 (진위면), 경기도 평택시 진위면 야막리 85-4번지"
+    func configure(_ entity: HomeEntity) {
+        shelterLabel.text = entity.shelter.name
+        numberLabel.text = entity.shelter.number
+        addressLabel.text = entity.shelter.address
+        
+        
+        if let latitude = Double(entity.shelter.lat),
+           let longitude = Double(entity.shelter.lon) {
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(
+                center: location,
+                latitudinalMeters: 1000,
+                longitudinalMeters: 1000
+            )
+            mapView.setRegion(region, animated: true)
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = location
+            annotation.title = entity.shelter.name
+            mapView.addAnnotation(annotation)
+        }
     }
     
 }

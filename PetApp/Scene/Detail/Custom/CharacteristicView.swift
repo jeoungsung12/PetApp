@@ -11,12 +11,17 @@ import SnapKit
 
 final class CharacteristicView: BaseView {
     
-    func configure(_ char: String,_ date: String) {
-        let characterItem = LineItemView("특징 🐾", char, .left)
-        let dateItem = LineItemView("공고일자 🗓️", date, .left)
+    func configure(_ entity: HomeEntity) {
+        let characterItem = LineItemView("특징 🐾", entity.animal.description, .left)
+        let dateItem = LineItemView(
+            "공고일자 🗓️",
+            "\(entity.shelter.beginDate) ~ \(entity.shelter.endDate)",
+            .left
+        )
+        
         let iconLabel = IconAttributeView()
         let seperateView = SeperateView()
-        iconLabel.configure(image: "", title: "공고 마감까지 7일 남았습니다")
+        iconLabel.configure(image: entity.animal.thumbImage, endDate: entity.shelter.endDate)
         
         [characterItem, dateItem, iconLabel, seperateView].forEach {
             self.addSubview($0)
@@ -62,14 +67,13 @@ fileprivate class IconAttributeView: BaseView {
         self.clipsToBounds = true
         self.layer.cornerRadius = 10
         self.layer.borderWidth = 0.5
+        self.layer.borderColor = UIColor.customLightGray.cgColor
         
         iconImageView.contentMode = .scaleAspectFill
         iconImageView.clipsToBounds = true
-        iconImageView.layer.cornerRadius = 25
+        iconImageView.layer.cornerRadius = 40
         iconImageView.layer.borderWidth = 2
         iconImageView.layer.borderColor = UIColor.point.cgColor
-        
-        self.layer.borderColor = UIColor.customLightGray.cgColor
         iconImageView.tintColor = UIColor.customLightGray
         
         titleLabel.font = .largeBold
@@ -85,32 +89,41 @@ fileprivate class IconAttributeView: BaseView {
     
     override func configureLayout() {
         iconImageView.snp.makeConstraints { make in
-            make.size.equalTo(50)
+            make.size.equalTo(80)
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(titleLabel.snp.leading).offset(-24)
+            make.trailing.equalTo(titleLabel.snp.leading).offset(-36)
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview().offset(40)
+            make.centerX.equalToSuperview().offset(50)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualToSuperview().inset(12)
             make.trailing.lessThanOrEqualToSuperview().inset(12)
         }
     }
     
-    func configure(image: String, title: String) {
+    func configure(image: String, endDate: String) {
+        if let url = URL(string: image) {
+            iconImageView.kf.setImage(with: url)
+        }
+        
+        let endDate = endDate.toDate()
+        let today = Date()
+        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: endDate).day ?? 0
+        
+        let title = "공고 마감까지\n\(daysRemaining)일 남음"
+        
         let attributedString = NSMutableAttributedString(string: title)
         
-        let range = NSRange(location: 0, length: min(2, title.count))
-        attributedString.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 18), range: range)
-        attributedString.addAttribute(.foregroundColor, value: UIColor.red, range: range)
+        if let range = title.range(of: "\(daysRemaining)일 남음") {
+            let nsRange = NSRange(range, in: title)
+            attributedString.addAttributes([
+                .font: UIFont.boldSystemFont(ofSize: 20),
+                .foregroundColor: UIColor.point
+            ], range: nsRange)
+        }
         
         titleLabel.attributedText = attributedString
-        
-        iconImageView.image = UIImage(named: "mockImage")
-        //        if let url = URL(string: image) {
-        //            iconImageView.kf.setImage(with: url)
-        //        }
     }
-    
+
 }

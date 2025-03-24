@@ -16,7 +16,6 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     private let charView = CharacteristicView()
     
     override func configureView() {
-        statusLabel.text = "보호중"
         statusLabel.textColor = .point
         statusLabel.font = .largeBold
         
@@ -62,19 +61,18 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
         }
     }
     
-    func configure() {
+    func configure(_ entity: HomeEntity) {
+        statusLabel.text = entity.animal.state
+        
         lineStackView.configure(
             [
-                .init(title: "구조된 장소", subTitle: "고덕면: 방축3길 81-27"),
-                .init(title: "성별", subTitle: "🚹"),
-                .init(title: "중성화 여부", subTitle: "N")
+                .init(title: "구조된 장소", subTitle: entity.shelter.discplc),
+                .init(title: "성별", subTitle: entity.animal.sex),
+                .init(title: "중성화 여부", subTitle: entity.animal.neut)
             ]
         )
         
-        charView.configure(
-            "70일 추정, 경계심이 많으며 물려는 성향이 있음",
-            "2025.03.07 ~ 2025.03.17"
-        )
+        charView.configure(entity)
     }
     
 }
