@@ -27,16 +27,6 @@ final class DetailViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.isHidden = false
-    }
-    
     override func setBinding() {
         let input = DetailViewModel.Input(
             
@@ -49,16 +39,19 @@ final class DetailViewController: BaseViewController {
             switch DetailSectionType.allCases[indexPath.section] {
             case .header:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailHeaderCell.id, for: indexPath) as? DetailHeaderCell else { return UITableViewCell() }
+                cell.selectionStyle = .none
                 cell.configure()
                 return cell
                 
             case .middle:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailMiddleCell.id, for: indexPath) as? DetailMiddleCell else { return UITableViewCell() }
+                cell.selectionStyle = .none
                 cell.configure()
                 return cell
                 
             case .footer:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailFooterCell.id, for: indexPath) as? DetailFooterCell else { return UITableViewCell() }
+                cell.selectionStyle = .none
                 cell.configure()
                 return cell
             }
@@ -85,7 +78,7 @@ final class DetailViewController: BaseViewController {
     
     override func configureLayout() {
         tableView.snp.makeConstraints { make in
-            make.top.bottom.horizontalEdges.equalToSuperview()
+            make.edges.equalToSuperview()
         }
         
         loadingIndicator.snp.makeConstraints { make in
@@ -95,7 +88,8 @@ final class DetailViewController: BaseViewController {
     }
     
     override func configureView() {
-        setNavigation()
+        setNavigation(color: .clear)
+        self.navigationController?.navigationBar.backgroundColor = .clear
         view.backgroundColor = .customWhite
         loadingIndicator.style = .medium
         loadingIndicator.color = .customLightGray
@@ -106,7 +100,9 @@ final class DetailViewController: BaseViewController {
 extension DetailViewController {
     
     private func configureTableView() {
+        tableView.separatorStyle = .none
         tableView.backgroundColor = .customWhite
+        tableView.contentInsetAdjustmentBehavior = .never
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(DetailHeaderCell.self, forCellReuseIdentifier: DetailHeaderCell.id)
         tableView.register(DetailMiddleCell.self, forCellReuseIdentifier: DetailMiddleCell.id)

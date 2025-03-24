@@ -18,45 +18,47 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     override func configureView() {
         statusLabel.text = "보호중"
         statusLabel.textColor = .point
-        statusLabel.font = .mediumBold
+        statusLabel.font = .largeBold
         
         heartBtn.setImage(.heartImage, for: .normal)
+        heartBtn.tintColor = .customBlack
+        
         shareBtn.setImage(.shareImage, for: .normal)
+        shareBtn.tintColor = .customBlack
     }
     
     override func configureHierarchy() {
-        [statusLabel, shareBtn, heartBtn, lineStackView, charView].forEach {
+        [statusLabel, heartBtn, shareBtn, lineStackView, charView].forEach {
             self.contentView.addSubview($0)
         }
     }
     
     override func configureLayout() {
         statusLabel.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().inset(12)
-        }
-        
-        shareBtn.snp.makeConstraints { make in
-            make.size.equalTo(20)
-            make.top.trailing.equalToSuperview().inset(12)
+            make.top.leading.equalToSuperview().inset(24)
         }
         
         heartBtn.snp.makeConstraints { make in
-            make.size.equalTo(20)
             make.top.equalToSuperview().inset(12)
-            make.trailing.equalTo(shareBtn.snp.leading).inset(8)
+            make.trailing.equalToSuperview().inset(68)
+        }
+        
+        shareBtn.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(24)
+            make.top.equalToSuperview().offset(9)
         }
         
         lineStackView.snp.makeConstraints { make in
-            make.height.equalTo(200)
+            make.height.equalTo(100)
             make.top.equalTo(heartBtn.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
         }
         
         charView.snp.makeConstraints { make in
             make.height.equalTo(300)
             make.bottom.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(12)
-            make.top.equalTo(lineStackView.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(lineStackView.snp.bottom).offset(24)
         }
     }
     
@@ -67,6 +69,11 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
                 .init(title: "성별", subTitle: "🚹"),
                 .init(title: "중성화 여부", subTitle: "N")
             ]
+        )
+        
+        charView.configure(
+            "70일 추정, 경계심이 많으며 물려는 성향이 있음",
+            "2025.03.07 ~ 2025.03.17"
         )
     }
     

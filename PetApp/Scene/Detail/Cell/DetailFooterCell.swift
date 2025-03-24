@@ -30,6 +30,9 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
         numberLabel.textColor = .customLightGray
         addressLabel.textColor = .customBlack
         
+        mapView.clipsToBounds = true
+        mapView.layer.cornerRadius = 10
+        
         [titleLabel, shelterLabel, numberLabel, addressLabel].forEach {
             $0.textAlignment = .left
         }
@@ -43,29 +46,30 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
     
     override func configureLayout() {
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.top.equalToSuperview().offset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
         }
         
         shelterLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
         }
         
         numberLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.top.equalTo(shelterLabel.snp.bottom).offset(8)
         }
         
         addressLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.top.equalTo(numberLabel.snp.bottom).offset(8)
         }
         
         mapView.snp.makeConstraints { make in
             make.height.equalTo(200)
             make.top.equalTo(addressLabel.snp.bottom).offset(24)
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.bottom.equalToSuperview().inset(64)
         }
     }
     

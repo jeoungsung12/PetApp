@@ -120,7 +120,7 @@ final class HomeViewController: BaseViewController {
     }
     
     override func configureView() {
-        setNavigation()
+        setNavigation(logo: true)
         view.backgroundColor = .customWhite
         loadingIndicator.style = .medium
         loadingIndicator.color = .customLightGray

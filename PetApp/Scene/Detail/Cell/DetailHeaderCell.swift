@@ -17,8 +17,8 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     override func configureView() {
         backdropImageView.contentMode = .scaleAspectFill
         
-        titleLabel.font = .headLine
-        subTitleLabel.font = .largeBold
+        titleLabel.font = .systemFont(ofSize: 40, weight: .heavy)
+        subTitleLabel.font = .systemFont(ofSize: 30, weight: .heavy)
         
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = .left
@@ -37,7 +37,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     
     override func configureLayout() {
         backdropImageView.snp.makeConstraints { make in
-            make.height.equalTo(300)
+            make.height.equalTo(UIScreen.main.bounds.width * 1.1)
             make.edges.equalToSuperview()
         }
         
@@ -47,7 +47,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
         
         titleLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(12)
-            make.bottom.equalTo(subTitleLabel.snp.top).offset(8)
+            make.bottom.equalTo(subTitleLabel.snp.top).offset(24)
         }
     }
     

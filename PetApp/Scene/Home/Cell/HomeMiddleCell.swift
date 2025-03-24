@@ -54,7 +54,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         
         statusLabel.text = "보호중"
         statusLabel.clipsToBounds = true
-        statusLabel.font = .mediumSemibold
+        statusLabel.font = .mediumBold
         statusLabel.layer.cornerRadius = 10
         statusLabel.textColor = .customWhite
         statusLabel.backgroundColor = .point

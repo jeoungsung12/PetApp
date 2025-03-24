@@ -19,11 +19,12 @@ final class LineByStackView: BaseView {
     private let verticalLineView = UIView()
     
     override func configureView() {
+        stackView.spacing = 12
         stackView.axis = .horizontal
         stackView.alignment = .center
         stackView.distribution = .fill
         
-        verticalLineView.backgroundColor = .customLightGray
+        verticalLineView.backgroundColor = .customLightGray.withAlphaComponent(0.5)
     }
     
     override func configureHierarchy() {
@@ -34,11 +35,12 @@ final class LineByStackView: BaseView {
     
     override func configureLayout() {
         stackView.snp.makeConstraints { make in
-            make.height.equalTo(60)
+            make.height.equalTo(40)
             make.top.horizontalEdges.equalToSuperview()
         }
         
         verticalLineView.snp.makeConstraints { make in
+            make.height.equalTo(1)
             make.bottom.horizontalEdges.equalToSuperview()
             make.top.equalTo(stackView.snp.bottom).offset(4)
         }
@@ -47,11 +49,18 @@ final class LineByStackView: BaseView {
     func configure(_ model: [LineStack]) {
         for (index, item) in model.enumerated() {
             let horizontalLine = UIView()
-            horizontalLine.backgroundColor = .customLightGray
+            horizontalLine.backgroundColor = .customLightGray.withAlphaComponent(0.5)
             let itemView = LineItemView(item.title, item.subTitle, .center)
             stackView.addArrangedSubview(itemView)
             if (model.count - 1) != index {
                 stackView.addArrangedSubview(horizontalLine)
+                horizontalLine.snp.makeConstraints { make in
+                    make.width.equalTo(1)
+                    make.verticalEdges.equalToSuperview().inset(12)
+                }
+            }
+            itemView.snp.makeConstraints { make in
+                make.verticalEdges.equalToSuperview().inset(12)
             }
         }
     }
@@ -74,9 +83,11 @@ final class LineItemView: BaseView {
     override func configureView() {
         titleLabel.font = .mediumBold
         titleLabel.textColor = .customBlack
+        titleLabel.text = titleString
         
         subTitleLabel.font = .mediumSemibold
         subTitleLabel.textColor = .customLightGray
+        subTitleLabel.text = subTitleString
         
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = alignment
@@ -96,7 +107,7 @@ final class LineItemView: BaseView {
         
         subTitleLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalTo(titleLabel.snp.bottom).offset(4)
+            make.top.equalTo(titleLabel.snp.bottom).offset(12)
             make.bottom.greaterThanOrEqualToSuperview().inset(4)
         }
     }

@@ -10,25 +10,30 @@ import UIKit
 extension UIViewController {
     
     func setNavigation(
+        logo: Bool = false,
         title: String? = nil,
         backTitle: String? = nil,
         backImage: UIImage? = .arrowLeft,
-        color: UIColor = .point
+        color: UIColor = .white
     ) {
         guard let navigationBar = navigationController?.navigationBar else { return }
         
-        let logoImageView = UIImageView()
-        logoImageView.image = UIImage(named: "logo")
-        let titleItem = UIBarButtonItem(customView: logoImageView)
-        self.navigationItem.leftBarButtonItem = titleItem
+        if logo {
+            let logoImageView = UIImageView()
+            logoImageView.image = UIImage(named: "logo")
+            let titleItem = UIBarButtonItem(customView: logoImageView)
+            self.navigationItem.leftBarButtonItem = titleItem
+        }
+        
+        let back = UIBarButtonItem(title: backTitle, style: .plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = back
         
         let appearance = UINavigationBarAppearance()
-        appearance.backgroundColor = .white
-        appearance.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
-        appearance.titleTextAttributes = [.foregroundColor: color]
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = color
         appearance.shadowColor = nil
         
-        navigationBar.tintColor = color
+        navigationBar.tintColor = .point
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
     }
