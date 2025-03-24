@@ -39,7 +39,7 @@ struct HomeShelterEntity {
 
 extension HomeResponseDTO {
     func toEntity() -> [HomeEntity] {
-        return AbdmAnimalProtect[0].row.map {
+        return (abdmAnimalProtect[1].row ?? []).map {
             HomeEntity(
                 animal: HomeAnimalEntity(
                     id: $0.abdmIdntfyNo,

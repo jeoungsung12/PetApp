@@ -52,7 +52,6 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
             $0.textAlignment = .left
         }
         
-        statusLabel.text = "보호중"
         statusLabel.clipsToBounds = true
         statusLabel.font = .mediumBold
         statusLabel.layer.cornerRadius = 10
@@ -98,16 +97,15 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         }
     }
     
-    func configure(_ model: HomeEntity) {
-        shelterLabel.text = model.shelter
-        hashTagLabel.text = model.hashTag
-        descriptionLabel.text = model.description
-        
-        //TODO: 임시
-        thumbImageview.image = UIImage(named: model.thumbImage)
-        //        if let url = URL(string: model.thumbImage) {
-        //            thumbImageview.kf.setImage(with: url)
-        //        }
+    func configure(_ model: HomeEntity?) {
+        guard let model = model else { return }
+        statusLabel.text = model.animal.state
+        shelterLabel.text = model.shelter.name
+        hashTagLabel.text = model.animal.description
+        descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
+        if let url = URL(string: model.animal.fullImage) {
+            thumbImageview.kf.setImage(with: url)
+        }
     }
     
 }

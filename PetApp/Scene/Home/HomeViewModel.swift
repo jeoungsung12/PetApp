@@ -24,7 +24,7 @@ struct HomeSection {
 }
 
 struct HomeItem {
-    let data: HomeEntity
+    let data: HomeEntity?
 }
 
 extension HomeSection: SectionModelType {
@@ -37,11 +37,11 @@ extension HomeSection: SectionModelType {
 }
 
 final class HomeViewModel: BaseViewModel {
-    
+    private let repository: NetworkRepositoryType = NetworkRepository.shared
     private var disposeBag = DisposeBag()
     
     struct Input {
-        
+        let loadTrigger: Observable<Void>
     }
     
     struct Output {
@@ -53,14 +53,49 @@ final class HomeViewModel: BaseViewModel {
 extension HomeViewModel {
     
     func transform(_ input: Input) -> Output {
-        let homeResult: BehaviorRelay<[HomeSection]> = BehaviorRelay(value: [])
+        let homeResult = PublishRelay<[HomeSection]>()
+        
+        input.loadTrigger
+            .flatMapLatest { [weak self] _ -> Single<[HomeSection]>  in
+                return Single<[HomeSection]>.create { single in
+                    Task {
+                        do {
+                            let result = try await self?.fetchData()
+                            single(.success(result ?? []))
+                        } catch {
+                            single(.failure(error))
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .bind(to: homeResult)
+            .disposed(by: disposeBag)
         
         return Output(
-            homeResult: homeResult.asDriver()
+            homeResult: homeResult.asDriver(onErrorJustReturn: [])
         )
     }
     
-    private func fetchData() {
-        
+    private func fetchData() async throws -> [HomeSection] {
+        do {
+            async let firstResult = repository.getAnimal(1)
+            async let secondResult = repository.getAnimal(2)
+            
+            return try await [
+                HomeSection(title: "", items: Array(repeating: .init(data: nil), count: 6)),
+                HomeSection(title: "도움이 필요해요 🚨", items: firstResult.map {
+                    return HomeItem(data: $0)
+                }),
+                HomeSection(title: "", items: [.init(data: nil)]),
+                HomeSection(title: "", items: [.init(data: nil)]),
+                HomeSection(title: "따스한 손길이\n필요한 친구들 🐾", items: secondResult.map {
+                    return HomeItem(data: $0)
+                })
+            ]
+            
+        } catch {
+            throw error
+        }
     }
 }
