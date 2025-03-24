@@ -68,6 +68,26 @@ final class HomeViewController: BaseViewController {
             return headerView
         }
         
+        Observable.zip(collectionView.rx.itemSelected, collectionView.rx.modelSelected(HomeItem.self))
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, selected in
+                //TODO: Coordinator
+                let vm = DetailViewModel(model: selected.1.data)
+                let vc = DetailViewController(viewModel: vm)
+                switch HomeSectionType.allCases[selected.0.section] {
+                case .header,
+                        .middleAds:
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                case .middle,
+                        .footer:
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                case .middleBtn:
+                    //TODO: MapView
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
         let result = output.homeResult
         
         result
