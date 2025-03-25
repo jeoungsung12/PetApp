@@ -19,7 +19,7 @@ final class HomeViewController: BaseViewController {
     
     override func setBinding() {
         let input = HomeViewModel.Input(
-            
+            loadTrigger: Observable.just(())
         )
         let output = viewModel.transform(input)
         loadingIndicator.startAnimating()
@@ -71,8 +71,9 @@ final class HomeViewController: BaseViewController {
         Observable.zip(collectionView.rx.itemSelected, collectionView.rx.modelSelected(HomeItem.self))
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, selected in
+                guard let data = selected.1.data else { return }
                 //TODO: Coordinator
-                let vm = DetailViewModel(model: selected.1.data)
+                let vm = DetailViewModel(model: data)
                 let vc = DetailViewController(viewModel: vm)
                 switch HomeSectionType.allCases[selected.0.section] {
                 case .header,
@@ -158,7 +159,13 @@ extension HomeViewController {
         
         switch type {
         case .header:
-            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.2))
+            let collectionWidth = collectionView.frame.width
+            let totalHeight = collectionWidth + 90
+            
+            groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(totalHeight)
+            )
             group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             section = NSCollectionLayoutSection(group: group)
@@ -167,7 +174,7 @@ extension HomeViewController {
             
         case .middle, .footer:
             groupSize = type == .middle
-            ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.7), heightDimension: .absolute(250))
+            ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
             : NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
             
             group = type == .middle

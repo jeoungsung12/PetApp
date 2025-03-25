@@ -13,10 +13,10 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let thumbImageview = UIImageView()
     private let titleLabel = UILabel()
     private let subTitleLabel = UILabel()
+    private let descriptionLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.isUserInteractionEnabled = true
     }
     
     override func configureView() {
@@ -32,6 +32,11 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         subTitleLabel.font = .largeBold
         subTitleLabel.numberOfLines = 2
         
+        descriptionLabel.textColor = .customBlack
+        descriptionLabel.font = .mediumRegular
+        descriptionLabel.textAlignment = .left
+        descriptionLabel.numberOfLines = 0
+        
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = .left
             $0.numberOfLines = 1
@@ -39,7 +44,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     }
     
     override func configureHierarchy() {
-        [thumbImageview, titleLabel, subTitleLabel].forEach {
+        [thumbImageview, titleLabel, subTitleLabel, descriptionLabel].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -61,17 +66,24 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.leading.equalTo(thumbImageview.snp.trailing).offset(12)
         }
+        
+        descriptionLabel.snp.makeConstraints { make in
+            make.top.equalTo(subTitleLabel.snp.bottom).offset(8)
+            make.trailing.equalToSuperview()
+            make.leading.equalTo(thumbImageview.snp.trailing).offset(12)
+            make.bottom.lessThanOrEqualToSuperview().inset(4)
+        }
     }
     
-    func configure(_ model: HomeEntity) {
-        titleLabel.text = model.shelter
-        subTitleLabel.text = model.description
+    func configure(_ model: HomeEntity?) {
+        guard let model = model else { return }
+        titleLabel.text = model.shelter.name
+        subTitleLabel.text = model.animal.name
+        descriptionLabel.text = model.animal.description
         
-        //TODO: 임시
-        thumbImageview.image = UIImage(named: model.thumbImage)
-//        if let url = URL(string: model.thumbImage) {
-//            thumbImageview.kf.setImage(with: url)
-//        }
+        if let url = URL(string: model.animal.fullImage) {
+            thumbImageview.kf.setImage(with: url)
+        }
     }
     
 }
