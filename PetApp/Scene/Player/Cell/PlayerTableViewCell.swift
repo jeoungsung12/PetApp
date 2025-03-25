@@ -1,0 +1,36 @@
+//
+//  PlayerTableViewCell.swift
+//  PetApp
+//
+//  Created by 정성윤 on 3/25/25.
+//
+
+import UIKit
+import SnapKit
+
+final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
+    private let emptyView = UIView()
+    private let locationLabel = UILabel()
+    private let titleLabel = UILabel()
+    private let descriptionLabel = UILabel()
+    private let statusLabel = UILabel()
+    
+    override func configureView() {
+        emptyView.backgroundColor = .customLightGray
+        emptyView.layer.cornerRadius = 10
+    }
+    
+    override func configureHierarchy() {
+        [emptyView, locationLabel, titleLabel, descriptionLabel, statusLabel].forEach {
+            self.contentView.addSubview($0)
+        }
+    }
+    
+    override func configureLayout() {
+        emptyView.snp.makeConstraints { make in
+            make.height.equalTo(300)
+            make.top.horizontalEdges.equalToSuperview()
+        }
+    }
+    
+}
