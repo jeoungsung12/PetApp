@@ -20,7 +20,8 @@ extension UIViewController {
         
         if logo {
             let logoImageView = UIImageView()
-            logoImageView.image = UIImage(named: "logo")
+            logoImageView.image = UIImage(named: "navigationLogo")
+            logoImageView.contentMode = .scaleAspectFit
             let titleItem = UIBarButtonItem(customView: logoImageView)
             self.navigationItem.leftBarButtonItem = titleItem
         }

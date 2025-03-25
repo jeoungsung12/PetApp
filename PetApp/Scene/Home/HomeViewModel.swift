@@ -84,7 +84,7 @@ extension HomeViewModel {
             
             return try await [
                 HomeSection(title: "", items: Array(repeating: .init(data: nil), count: 6)),
-                HomeSection(title: "도움이 필요해요 🚨", items: firstResult.map {
+                HomeSection(title: "도움이 필요해요!", items: firstResult.map {
                     return HomeItem(data: $0)
                 }),
                 HomeSection(title: "", items: [.init(data: nil)]),

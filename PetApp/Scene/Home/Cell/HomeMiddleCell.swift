@@ -40,7 +40,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         hashTagLabel.textColor = .customLightGray
         hashTagLabel.font = .mediumRegular
         
-        descriptionLabel.font = .headLine
+        descriptionLabel.font = .mediumBold
         descriptionLabel.numberOfLines = 2
         descriptionLabel.textColor = .customWhite
         descriptionLabel.layer.shadowOpacity = 0.5
@@ -53,11 +53,10 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         
         statusLabel.clipsToBounds = true
         statusLabel.font = .mediumBold
-        statusLabel.layer.cornerRadius = 10
+        statusLabel.layer.cornerRadius = 5
         statusLabel.textColor = .customWhite
-        statusLabel.backgroundColor = .point
+        statusLabel.backgroundColor = .black.withAlphaComponent(0.5)
         statusLabel.textAlignment = .center
-        statusLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMaxYCorner]
     }
     
     override func configureHierarchy() {
@@ -73,8 +72,8 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         }
         
         statusLabel.snp.makeConstraints { make in
-            make.top.equalTo(thumbImageview.snp.top)
-            make.trailing.equalTo(thumbImageview.snp.trailing)
+            make.top.equalTo(thumbImageview.snp.top).inset(12)
+            make.trailing.equalTo(thumbImageview.snp.trailing).inset(12)
             make.width.equalTo(50)
             make.height.equalTo(25)
         }
