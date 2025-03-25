@@ -83,7 +83,7 @@ extension HomeViewModel {
             async let secondResult = repository.getAnimal(2)
             
             return try await [
-                HomeSection(title: "", items: Array(repeating: .init(data: nil), count: 6)),
+                HomeSection(title: "", items: [.init(data: nil)]),
                 HomeSection(title: "도움이 필요해요!", items: firstResult.map {
                     return HomeItem(data: $0)
                 }),
