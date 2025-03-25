@@ -52,7 +52,7 @@ extension HomeResponseDTO {
                     fullImage: $0.imageCours,
                     state: $0.stateNm,
                     sex: ($0.sexNm == "M") ? "🚹" : "🚺",
-                    neut: $0.neutYn
+                    neut: ($0.neutYn == "N") ? "❌" : "⭕️"
                 ),
                 shelter: HomeShelterEntity(
                     name: $0.shterNm,

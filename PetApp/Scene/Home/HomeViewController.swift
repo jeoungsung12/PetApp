@@ -159,7 +159,13 @@ extension HomeViewController {
         
         switch type {
         case .header:
-            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(1.2))
+            let collectionWidth = collectionView.frame.width
+            let totalHeight = collectionWidth + 90
+            
+            groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(totalHeight)
+            )
             group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             
             section = NSCollectionLayoutSection(group: group)
@@ -168,7 +174,7 @@ extension HomeViewController {
             
         case .middle, .footer:
             groupSize = type == .middle
-            ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.7), heightDimension: .absolute(250))
+            ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
             : NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
             
             group = type == .middle
