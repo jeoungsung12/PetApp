@@ -18,7 +18,6 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentView.isUserInteractionEnabled = true
     }
     
     override func prepareForReuse() {
@@ -41,7 +40,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         hashTagLabel.textColor = .customLightGray
         hashTagLabel.font = .mediumRegular
         
-        descriptionLabel.font = .headLine
+        descriptionLabel.font = .mediumBold
         descriptionLabel.numberOfLines = 2
         descriptionLabel.textColor = .customWhite
         descriptionLabel.layer.shadowOpacity = 0.5
@@ -52,14 +51,12 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
             $0.textAlignment = .left
         }
         
-        statusLabel.text = "보호중"
         statusLabel.clipsToBounds = true
         statusLabel.font = .mediumBold
-        statusLabel.layer.cornerRadius = 10
+        statusLabel.layer.cornerRadius = 5
         statusLabel.textColor = .customWhite
-        statusLabel.backgroundColor = .point
+        statusLabel.backgroundColor = .black.withAlphaComponent(0.5)
         statusLabel.textAlignment = .center
-        statusLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMaxYCorner]
     }
     
     override func configureHierarchy() {
@@ -75,8 +72,8 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         }
         
         statusLabel.snp.makeConstraints { make in
-            make.top.equalTo(thumbImageview.snp.top)
-            make.trailing.equalTo(thumbImageview.snp.trailing)
+            make.top.equalTo(thumbImageview.snp.top).inset(12)
+            make.trailing.equalTo(thumbImageview.snp.trailing).inset(12)
             make.width.equalTo(50)
             make.height.equalTo(25)
         }
@@ -98,16 +95,15 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         }
     }
     
-    func configure(_ model: HomeEntity) {
-        shelterLabel.text = model.shelter
-        hashTagLabel.text = model.hashTag
-        descriptionLabel.text = model.description
-        
-        //TODO: 임시
-        thumbImageview.image = UIImage(named: model.thumbImage)
-        //        if let url = URL(string: model.thumbImage) {
-        //            thumbImageview.kf.setImage(with: url)
-        //        }
+    func configure(_ model: HomeEntity?) {
+        guard let model = model else { return }
+        statusLabel.text = model.animal.state
+        shelterLabel.text = model.shelter.name
+        hashTagLabel.text = model.animal.description
+        descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
+        if let url = URL(string: model.animal.fullImage) {
+            thumbImageview.kf.setImage(with: url)
+        }
     }
     
 }
