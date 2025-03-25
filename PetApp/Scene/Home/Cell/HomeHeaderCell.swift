@@ -8,134 +8,130 @@
 import UIKit
 import Kingfisher
 import SnapKit
+import RxSwift
+import RxCocoa
 
 final class HomeHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
-    private let posterImageView = UIImageView()
-    private let categoryView = CategoryView()
+    private lazy var posterCollectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: self.createLayout()
+    )
+    private let categoryView = HomeCategoryView()
+    private let posterImages: [UIImage?] = [
+        UIImage(named: "poster1"),
+        UIImage(named: "poster2"),
+        UIImage(named: "poster3"),
+        UIImage(named: "poster4"),
+        UIImage(named: "poster5"),
+        UIImage(named: "poster6")
+    ]
+    private var timer: Timer?
+    private var currentPage = 0
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        stopAutoScrollTimer()
+        startAutoScrollTimer()
+    }
     
     override func configureHierarchy() {
-        [posterImageView, categoryView].forEach {
+        [posterCollectionView, categoryView].forEach {
             contentView.addSubview($0)
         }
     }
     
     override func configureLayout() {
-        posterImageView.snp.makeConstraints { make in
+        posterCollectionView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.height.equalTo(self.contentView.snp.width)
+            make.height.equalTo(contentView.snp.width)
         }
+        
         categoryView.snp.makeConstraints { make in
-            make.top.equalTo(posterImageView.snp.bottom).offset(12)
+            make.top.equalTo(posterCollectionView.snp.bottom).offset(12)
             make.bottom.horizontalEdges.equalToSuperview()
         }
     }
     
     override func configureView() {
-        //TODO: Timer
-        posterImageView.image = UIImage(named: ["poster1","poster2","poster3","poster4","poster5","poster6"].randomElement() ?? "poster1")
-        posterImageView.backgroundColor = .customLightGray
-        posterImageView.contentMode = .scaleToFill
+        posterCollectionView.delegate = self
+        posterCollectionView.dataSource = self
+        posterCollectionView.isPagingEnabled = true
+        posterCollectionView.backgroundColor = .lightGray
+        posterCollectionView.showsHorizontalScrollIndicator = false
+        posterCollectionView
+            .register(
+                PosterCell.self,
+                forCellWithReuseIdentifier: PosterCell.id
+            )
+        startAutoScrollTimer()
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0
+        layout.itemSize = CGSize(
+            width: contentView.frame.width,
+            height: contentView.frame.width
+        )
+        return layout
+    }
+    
+    deinit {
+        print(#function, self)
+        stopAutoScrollTimer()
     }
 }
 
-import SnapKit
+extension HomeHeaderCell {
+    private func startAutoScrollTimer() {
+        stopAutoScrollTimer()
+        timer = Timer
+            .scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+                guard let self = self else { return }
+                self.scrollToNextPage()
+            }
+    }
+    
+    private func stopAutoScrollTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func scrollToNextPage() {
+        let totalItems = posterImages.count
+        currentPage = (currentPage + 1) % totalItems
+        let indexPath = IndexPath(item: currentPage, section: 0)
+        posterCollectionView
+            .scrollToItem(
+                at: indexPath,
+                at: .centeredHorizontally,
+                animated: true
+            )
+    }
+}
 
-fileprivate class CategoryView: BaseView {
-    private let stackView = UIStackView()
-    
-    private let shelterContainer = UIView()
-    private let hospitalContainer = UIView()
-    private let heartContainer = UIView()
-    private let sponsorContainer = UIView()
-    
-    private let shelterImageView = UIImageView()
-    private let hospitalImageView = UIImageView()
-    private let heartImageView = UIImageView()
-    private let sponsorImageView = UIImageView()
-    
-    private let shelterLabel = UILabel()
-    private let hospitalLabel = UILabel()
-    private let heartLabel = UILabel()
-    private let sponsorLabel = UILabel()
-    
-    private let categories: [(image: UIImage?, title: String)] = [
-        (UIImage(named: "Shelter"), "보호소"),
-        (UIImage(named: "Hospital"), "동물병원"),
-        (UIImage(named: "Heart"), "관심"),
-        (UIImage(named: "Sponsor"), "후원")
-    ]
-    
-    private var containers: [UIView] {
-        [shelterContainer, hospitalContainer, heartContainer, sponsorContainer]
+extension HomeHeaderCell: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return posterImages.count
     }
     
-    private var imageViews: [UIImageView] {
-        [shelterImageView, hospitalImageView, heartImageView, sponsorImageView]
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: PosterCell.id,
+            for: indexPath
+        ) as! PosterCell
+        cell
+            .configure(
+                with: posterImages[indexPath.item] ?? UIImage(named: "poster1")
+            )
+        return cell
     }
     
-    private var labels: [UILabel] {
-        [shelterLabel, hospitalLabel, heartLabel, sponsorLabel]
-    }
-    
-    override func configureView() {
-        setupStackView()
-        setupViews()
-    }
-    
-    override func configureHierarchy() {
-        addSubview(stackView)
-        containers.forEach { container in
-            stackView.addArrangedSubview(container)
-            container.addSubview(imageViews[containers.firstIndex(of: container)!])
-            container.addSubview(labels[containers.firstIndex(of: container)!])
-        }
-    }
-    
-    override func configureLayout() {
-        stackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
-            make.leading.equalToSuperview().offset(10)
-            make.trailing.equalToSuperview().offset(-10)
-            make.bottom.equalToSuperview().offset(-10)
-        }
-        
-        for (index, _) in containers.enumerated() {
-            let imageView = imageViews[index]
-            let label = labels[index]
-            
-            imageView.snp.makeConstraints { make in
-                make.centerX.equalToSuperview()
-                make.top.equalToSuperview().offset(5)
-                make.width.height.equalTo(30)
-            }
-            
-            label.snp.makeConstraints { make in
-                make.centerX.equalToSuperview()
-                make.top.equalTo(imageView.snp.bottom).offset(5)
-                make.bottom.lessThanOrEqualToSuperview().offset(-5)
-            }
-        }
-    }
-    
-    private func setupStackView() {
-        stackView.axis = .horizontal
-        stackView.spacing = 10
-        stackView.distribution = .fillEqually
-        stackView.alignment = .center
-    }
-    
-    private func setupViews() {
-        for (index, category) in categories.enumerated() {
-            let imageView = imageViews[index]
-            let label = labels[index]
-            
-            imageView.contentMode = .scaleAspectFit
-            imageView.image = category.image
-            
-            label.text = category.title
-            label.textColor = .black
-            label.font = .smallSemibold
-            label.textAlignment = .center
-        }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(
+            width: contentView.frame.width,
+            height: contentView.frame.width
+        )
     }
 }
