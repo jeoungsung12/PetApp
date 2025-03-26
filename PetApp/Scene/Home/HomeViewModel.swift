@@ -56,7 +56,7 @@ extension HomeViewModel {
         let homeResult = PublishRelay<[HomeSection]>()
         
         input.loadTrigger
-            .flatMapLatest { [weak self] _ -> Single<[HomeSection]>  in
+            .flatMapLatest { [weak self] _ -> Single<[HomeSection]> in
                 return Single<[HomeSection]>.create { single in
                     Task {
                         do {
