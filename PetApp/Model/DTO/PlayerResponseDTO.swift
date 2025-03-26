@@ -8,7 +8,7 @@
 import Foundation
 
 struct PlayerResponseDTO: Decodable {
-    let tbAdpWaitAnimalView: TBAdpWaitAnimalView
+    let tbAdpWaitAnimalView: TBAdpWaitAnimalView?
     
     enum CodingKeys: String, CodingKey {
         case tbAdpWaitAnimalView = "TbAdpWaitAnimalView"

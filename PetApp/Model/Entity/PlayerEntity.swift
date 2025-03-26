@@ -55,7 +55,7 @@ extension PlayerResponseDTO {
     }
     
     func toEntity() -> [PlayerEntity] {
-        return tbAdpWaitAnimalView.row.map {
+        return tbAdpWaitAnimalView?.row.map {
             return PlayerEntity(
                 name: $0.breeds,
                 date: $0.entrncDate,
@@ -67,6 +67,6 @@ extension PlayerResponseDTO {
                 videoURL: $0.intrcnMVPURL,
                 shelter: "서울동물복지지원센터 " + $0.nm
             )
-        }
+        } ?? []
     }
 }
