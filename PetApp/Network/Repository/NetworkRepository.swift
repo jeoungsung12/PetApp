@@ -9,6 +9,7 @@ import Foundation
 
 protocol NetworkRepositoryType: AnyObject {
     func getAnimal(_ page: Int) async throws -> [HomeEntity]
+    func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
 }
 
 final class NetworkRepository: NetworkRepositoryType {
@@ -21,6 +22,15 @@ final class NetworkRepository: NetworkRepositoryType {
             return result.toEntity()
         } catch {
             //TODO: CustomError
+            throw error
+        }
+    }
+    
+    func getVideo(start: Int, end: Int) async throws -> [PlayerEntity] {
+        do {
+            let result: PlayerResponseDTO = try await network.fetchData(OpenSquareRouter.getVideo(startPage: start, endPage: end))
+            return result.toEntity()
+        } catch {
             throw error
         }
     }

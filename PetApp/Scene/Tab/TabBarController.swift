@@ -22,7 +22,7 @@ extension TabBarController {
         let firstVC = UINavigationController(rootViewController: HomeViewController())
         let secondVC = UINavigationController(rootViewController: HomeViewController())
         let thirdVC = UINavigationController(rootViewController: HomeViewController())
-        let forthVC = UINavigationController(rootViewController: HomeViewController())
+        let forthVC = UINavigationController(rootViewController: PlayerViewController())
         let fifthVC = UINavigationController(rootViewController: HomeViewController())
         
         self.setViewControllers([firstVC, secondVC, thirdVC, forthVC, fifthVC], animated: true)
