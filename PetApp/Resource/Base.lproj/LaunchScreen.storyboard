@@ -23,13 +23,11 @@
                                     <constraint firstAttribute="height" constant="50" id="7fP-ze-ha9"/>
                                 </constraints>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="aeN-PI-fEe">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Character" translatesAutoresizingMaskIntoConstraints="NO" id="aeN-PI-fEe">
                                 <rect key="frame" x="0.0" y="552" width="393" height="300"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="300" id="5FS-83-YAk"/>
                                 </constraints>
-                                <string key="image">
-Character</string>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -50,10 +48,7 @@ Character</string>
         </scene>
     </scenes>
     <resources>
-        <image width="375" height="303">
-            <string key="name">
-Character</string>
-        </image>
+        <image name="Character" width="375" height="303"/>
         <image name="logo" width="230" height="46.666667938232422"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

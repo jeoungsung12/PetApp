@@ -15,7 +15,7 @@
 		E49726962D8D299600716594 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = E49726952D8D299600716594 /* Toast */; };
 		E49726992D8D29A000716594 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E49726982D8D29A000716594 /* Alamofire */; };
 		E49726AA2D8D2D6B00716594 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E49726A92D8D2D6B00716594 /* .gitignore */; };
-		E4972E542D93D5B300716594 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E4972E532D93D5B300716594 /* YouTubeiOSPlayerHelper */; };
+		E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,7 +52,7 @@
 				E49726962D8D299600716594 /* Toast in Frameworks */,
 				E49726992D8D29A000716594 /* Alamofire in Frameworks */,
 				E497268E2D8D297700716594 /* RxCocoa in Frameworks */,
-				E4972E542D93D5B300716594 /* YouTubeiOSPlayerHelper in Frameworks */,
+				E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */,
 				E497268B2D8D296900716594 /* Kingfisher in Frameworks */,
 				E49726902D8D297700716594 /* RxSwift in Frameworks */,
 				E49726932D8D298C00716594 /* RxDataSources in Frameworks */,
@@ -107,7 +107,7 @@
 				E49726922D8D298C00716594 /* RxDataSources */,
 				E49726952D8D299600716594 /* Toast */,
 				E49726982D8D29A000716594 /* Alamofire */,
-				E4972E532D93D5B300716594 /* YouTubeiOSPlayerHelper */,
+				E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -144,7 +144,7 @@
 				E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				E4972E522D93D5B300716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
+				E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
@@ -188,7 +188,7 @@
 				DEVELOPMENT_TEAM = Q653PU93R6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
+				INFOPLIST_KEY_CFBundleDisplayName = "댕냥꿈";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -222,7 +222,7 @@
 				DEVELOPMENT_TEAM = Q653PU93R6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
+				INFOPLIST_KEY_CFBundleDisplayName = "댕냥꿈";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -437,7 +437,7 @@
 				minimumVersion = 5.10.2;
 			};
 		};
-		E4972E522D93D5B300716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
+		E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper.git";
 			requirement = {
@@ -483,9 +483,9 @@
 			package = E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		E4972E532D93D5B300716594 /* YouTubeiOSPlayerHelper */ = {
+		E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E4972E522D93D5B300716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
+			package = E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
 			productName = YouTubeiOSPlayerHelper;
 		};
 /* End XCSwiftPackageProductDependency section */
