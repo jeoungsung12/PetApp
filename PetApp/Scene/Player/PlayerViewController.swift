@@ -35,6 +35,7 @@ final class PlayerViewController: BaseViewController {
     }
     
     override func configureView() {
+        self.setNavigation(logo: true)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .customWhite
         tableView.rowHeight = UITableView.automaticDimension

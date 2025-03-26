@@ -29,8 +29,16 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
     override func configureLayout() {
         emptyView.snp.makeConstraints { make in
             make.height.equalTo(300)
-            make.top.horizontalEdges.equalToSuperview()
+            make.edges.equalToSuperview().inset(12)
         }
+    }
+    
+    func configure(_ entity: PlayerEntity) {
+        titleLabel.text = entity.name
+        statusLabel.text = entity.status
+        locationLabel.text = entity.shelter
+        descriptionLabel.text = "\(entity.species) \(entity.weight) \(entity.age)"
+        //TODO: Video Player
     }
     
 }
