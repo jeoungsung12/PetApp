@@ -10,15 +10,22 @@ import RxSwift
 import RxCocoa
 
 final class PlayerViewModel: BaseViewModel {
+    
+    struct PlayerRequest {
+        let start: Int
+        let end: Int
+    }
+    
     private let repository: NetworkRepositoryType = NetworkRepository()
     private var disposeBag = DisposeBag()
+    private(set) var playerRequest: PlayerRequest?
     
     struct Input {
-        let loadTrigger: Observable<Void>
+        let loadTrigger: PublishRelay<PlayerRequest>
     }
     
     struct Output {
-        let videoResult: Driver<[PlayerEntity]>
+        let videoResult: BehaviorRelay<[PlayerEntity]>
     }
     
 }
@@ -26,15 +33,22 @@ final class PlayerViewModel: BaseViewModel {
 extension PlayerViewModel {
     
     func transform(_ input: Input) -> Output {
-        let videoResult = PublishRelay<[PlayerEntity]>()
+        let videoResult = BehaviorRelay<[PlayerEntity]>(value: [])
         
         input.loadTrigger
-            .flatMapLatest { [weak self] _ -> Single<[PlayerEntity]> in
+            .flatMapLatest { [weak self] request -> Single<[PlayerEntity]> in
                 return Single<[PlayerEntity]>.create { single in
                     Task {
                         do {
-                            let result = try await self?.repository.getVideo(start: 1, end: 5)
-                            single(.success(result ?? []))
+                            print(request)
+                            self?.playerRequest = request
+                            let result = try await self?.repository.getVideo(
+                                start: request.start,
+                                end: request.end
+                            )
+                            
+                            guard let result = result else { return single(.failure(NSError()))}
+                            single(.success(self?.AppendOriginValue(videoResult, result) ?? []))
                         } catch {
                             single(.failure(error))
                         }
@@ -46,7 +60,16 @@ extension PlayerViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            videoResult: videoResult.asDriver(onErrorJustReturn: [])
+            videoResult: videoResult
         )
+    }
+    
+    private func AppendOriginValue(
+        _ videoResult: BehaviorRelay<[PlayerEntity]>,
+        _ resultValue: [PlayerEntity]
+    ) -> [PlayerEntity] {
+        var originValue = videoResult.value
+        originValue.append(contentsOf: resultValue)
+        return originValue
     }
 }
