@@ -36,6 +36,7 @@ final class ChatViewController: BaseViewController {
                 
             case .footer:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChatFooterCell.id, for: indexPath) as? ChatFooterCell else { return UICollectionViewCell() }
+                //TODO: Realm 데이터 사용
                 cell.configure(item.data)
                 return cell
             }
@@ -60,6 +61,14 @@ final class ChatViewController: BaseViewController {
             .drive(collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        collectionView.rx.modelSelected(HomeItem.self)
+            .bind(with: self) { owner, item in
+                guard let data = item.data else { return }
+                let vm = ChatDetailViewModel(entity: data)
+                let vc = ChatDetailViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {

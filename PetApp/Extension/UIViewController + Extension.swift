@@ -9,6 +9,11 @@ import UIKit
 
 extension UIViewController {
     
+    @objc
+    func tabGestureAction() {
+        self.view.endEditing(true)
+    }
+    
     func setNavigation(
         logo: Bool = false,
         title: String? = nil,
