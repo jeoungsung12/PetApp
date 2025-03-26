@@ -65,7 +65,7 @@ extension PlayerResponseDTO {
                 weight: String($0.bdwgh),
                 status: stateToStatus($0.adpSttus, $0.tmprPrtcSttus),
                 videoURL: $0.intrcnMVPURL,
-                shelter: "서울동묵복지지원센터 " + $0.nm
+                shelter: "서울동물복지지원센터 " + $0.nm
             )
         }
     }

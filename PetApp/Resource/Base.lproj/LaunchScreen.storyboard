@@ -54,7 +54,7 @@ Character</string>
             <string key="name">
 Character</string>
         </image>
-        <image name="logo" width="221" height="46.666667938232422"/>
+        <image name="logo" width="230" height="46.666667938232422"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

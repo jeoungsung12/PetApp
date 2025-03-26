@@ -28,15 +28,29 @@ final class PlayerViewController: BaseViewController {
         result
             .drive(tableView.rx.items(cellIdentifier: PlayerTableViewCell.id, cellType: PlayerTableViewCell.self)) { row, element, cell in
                 cell.selectionStyle = .none
-                
+                cell.configure(element)
             }
             .disposed(by: disposeBag)
         
+//        tableView.rx.willDisplayCell
+//            .bind(with: self, onNext: { owner, event in
+//                guard let cell = event.cell as? PlayerTableViewCell else { return }
+//                cell.playVideo()
+//            })
+//            .disposed(by: disposeBag)
+//          
+//        
+//        tableView.rx.didEndDisplayingCell
+//            .bind(with: self, onNext: { owner, event in
+//                guard let cell = event.cell as? PlayerTableViewCell else { return }
+//                cell.stopVideo()
+//            })
+//            .disposed(by: disposeBag)
     }
     
     override func configureView() {
         self.setNavigation(logo: true)
-        tableView.separatorStyle = .none
+        tableView.separatorStyle = .singleLine
         tableView.backgroundColor = .customWhite
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(PlayerTableViewCell.self, forCellReuseIdentifier: PlayerTableViewCell.id)
