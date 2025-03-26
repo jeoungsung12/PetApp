@@ -70,7 +70,8 @@ extension ReusableHeaderView {
         }
     }
     
-    func configure(_ title: String) {
+    func configure(_ title: String,_ isMore: Bool = false) {
         titleLabel.text = title
+        moreBtn.isHidden = (isMore)
     }
 }
