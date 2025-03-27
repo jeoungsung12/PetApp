@@ -41,7 +41,9 @@ final class ChatDetailViewModel: BaseViewModel {
 extension ChatDetailViewModel {
     
     func transform(_ input: Input) -> Output {
-        let chatResult: BehaviorRelay<[ChatEntity]> = BehaviorRelay(value: [])
+        let chatResult: BehaviorRelay<[ChatEntity]> = BehaviorRelay(value: [
+            .init(type: .bot, name: entity.animal.name, message: "안녕하세요! 저에 대해 알고 싶으신가요? 편하게 질문해 주세요! 🐾", thumbImage: entity.animal.thumbImage)
+        ])
         
         input.loadTrigger
             .withUnretained(self)
