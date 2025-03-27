@@ -30,12 +30,12 @@ final class SponsorCollectionViewCell: BaseCollectionViewCell, ReusableIdentifie
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = self.frame.width / 2
-        imageView.backgroundColor = .customLightGray
         
         nameLabel.font = .mediumBold
         nameLabel.numberOfLines = 2
         nameLabel.textColor = .customWhite
-        nameLabel.layer.shadowOpacity = 0.5
+        nameLabel.layer.shadowOpacity = 1.0
+        nameLabel.textAlignment = .center
         nameLabel.layer.shadowOffset = CGSize(width: 0, height: 0)
         nameLabel.layer.shadowColor = UIColor.customBlack.cgColor
         
@@ -65,7 +65,7 @@ final class SponsorCollectionViewCell: BaseCollectionViewCell, ReusableIdentifie
         }
     }
     
-    func configure(_ entity: SponsorViewModel.SponsorEntity) {
+    func configure(_ entity: SponsorEntity) {
         imageView.image = UIImage(named: entity.image)
         nameLabel.text = entity.title
         self.siteURL = entity.siteURL

@@ -80,12 +80,12 @@ final class SponsorViewController: BaseViewController {
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(20)
-            make.leading.trailing.equalToSuperview().inset(12)
+            make.leading.trailing.equalToSuperview().inset(24)
         }
         
         subTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(12)
+            make.leading.trailing.equalToSuperview().inset(24)
         }
         
         descriptionLabel.snp.makeConstraints { make in
@@ -96,19 +96,21 @@ final class SponsorViewController: BaseViewController {
         regularSponsorButton.snp.makeConstraints { make in
             make.top.equalTo(descriptionLabel.snp.bottom).offset(20)
             make.centerX.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(30)
         }
         
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(regularSponsorButton.snp.bottom).offset(20)
             make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(400)
             make.bottom.equalToSuperview().inset(20)
+            make.height.equalTo(400)
         }
     }
 }
 
 extension SponsorViewController {
+    
     private func configureCollectionView() {
         collectionView.isScrollEnabled = false
         collectionView.backgroundColor = .customWhite
@@ -118,17 +120,13 @@ extension SponsorViewController {
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
-        
         let padding: CGFloat = 16
-        let spacing: CGFloat = 8
-        let availableWidth = UIScreen.main.bounds.width - (padding * 2) - (spacing * 2)
-        let itemWidth = availableWidth / 3
-        
+        let availableWidth = UIScreen.main.bounds.width - (padding * 3)
+        let itemWidth = availableWidth / 4
         layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
-        layout.minimumInteritemSpacing = spacing
-        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = padding
+        layout.minimumLineSpacing = padding
         layout.sectionInset = UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding)
-        
         return layout
     }
 }
