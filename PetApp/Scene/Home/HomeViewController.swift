@@ -62,6 +62,7 @@ final class HomeViewController: BaseViewController {
                 return UICollectionReusableView()
             }
             
+            headerView.delegate = self
             headerView.configure(dataSource.sectionModels[indexPath.section].title)
             
             return headerView
@@ -128,7 +129,12 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController {
+extension HomeViewController: MoreBtnDelegate {
+    
+    func moreBtnTapped() {
+        //TODO: Coordinator
+        self.navigationController?.pushViewController(ListViewController(), animated: true)
+    }
     
     private func configureCollectionView() {
         collectionView.backgroundColor = .customWhite
