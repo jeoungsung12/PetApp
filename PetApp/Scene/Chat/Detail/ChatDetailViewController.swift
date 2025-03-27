@@ -40,6 +40,22 @@ final class ChatDetailViewController: BaseViewController {
         self.tabBarController?.tabBar.isHidden = false
     }
     
+    override func setBinding() {
+        let input = ChatDetailViewModel.Input(
+            loadTrigger: Observable.just(())
+        )
+        let output = viewModel.transform(input)
+        
+        let result = output.chatResult
+        
+        result
+            .drive(tableView.rx.items(cellIdentifier: ChatDetailCell.id, cellType: ChatDetailCell.self)) { row, element, cell in
+                cell.configure(element)
+            }
+            .disposed(by: disposeBag)
+        
+    }
+    
     override func configureView() {
         self.setNavigation()
         self.view.backgroundColor = .white
@@ -120,6 +136,6 @@ final class ChatDetailViewController: BaseViewController {
     }
     
     private func setupBindings() {
-        
+        //TODO: 메세지 버튼 액션
     }
 }

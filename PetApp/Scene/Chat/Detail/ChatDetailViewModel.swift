@@ -16,16 +16,35 @@ enum ChatType {
     case mine
 }
 
+struct ChatEntity {
+    let type: ChatType
+    let name: String = "푸들"
+    let message: String = "안녕하세요! 뭐하세요? 머ㅣㄴ어리;ㅓㅣ먼이ㅓㄹ미ㅏ넝;ㅏㅣ러ㅣ;ㅁㄴ어ㅣ라ㅓ마ㅣㄴ어리ㅏ머니아ㅓ리ㅏ먼ㅇ;ㅣㅏ럼;ㅣㅏㅓㄴㅇ리ㅏ"
+    let thumbImage: String = ""
+}
+
+final class ChatMock {
+    static let data = [
+        ChatEntity(type: .bot),
+        ChatEntity(type: .mine),
+        ChatEntity(type: .bot),
+        ChatEntity(type: .mine),
+        ChatEntity(type: .bot),
+        ChatEntity(type: .mine),
+        ChatEntity(type: .bot)
+    ]
+}
+
 final class ChatDetailViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     private let entity: HomeEntity
     
     struct Input {
-        
+        let loadTrigger: Observable<Void>
     }
     
     struct Output {
-        
+        let chatResult: Driver<[ChatEntity]>
     }
     
     init(entity: HomeEntity) {
@@ -40,7 +59,10 @@ final class ChatDetailViewModel: BaseViewModel {
 extension ChatDetailViewModel {
     
     func transform(_ input: Input) -> Output {
+        let chatResult: BehaviorRelay<[ChatEntity]> = BehaviorRelay(value: ChatMock.data)
         
-        return Output()
+        return Output(
+            chatResult: chatResult.asDriver()
+        )
     }
 }
