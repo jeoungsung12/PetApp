@@ -67,7 +67,7 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
         lineStackView.configure(
             [
                 .init(title: "구조된 장소", subTitle: entity.shelter.discplc),
-                .init(title: "성별", subTitle: entity.animal.sex),
+                .init(title: "성별", subTitle: entity.animal.gender),
                 .init(title: "중성화 여부", subTitle: entity.animal.neut)
             ]
         )
