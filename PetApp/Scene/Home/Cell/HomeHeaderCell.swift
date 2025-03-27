@@ -16,7 +16,7 @@ final class HomeHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
         frame: .zero,
         collectionViewLayout: self.createLayout()
     )
-    private let categoryView = HomeCategoryView()
+    let categoryView = HomeCategoryView()
     private let customPageControl = UILabel()
     private let posterImages: [UIImage?] = [
         UIImage(named: "poster1"),

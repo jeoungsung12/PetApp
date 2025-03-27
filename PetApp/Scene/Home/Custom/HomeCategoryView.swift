@@ -7,14 +7,27 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
+
+enum CategoryType {
+    case shelter
+    case hospital
+    case heart
+    case sponsor
+}
+
+protocol CategoryDelegate: AnyObject {
+    func didTapCategory(_ type: CategoryType)
+}
 
 final class HomeCategoryView: BaseView {
     private let stackView = UIStackView()
     
-    private let shelterContainer = UIView()
-    private let hospitalContainer = UIView()
-    private let heartContainer = UIView()
-    private let sponsorContainer = UIView()
+    private let shelterContainer = UIButton()
+    private let hospitalContainer = UIButton()
+    private let heartContainer = UIButton()
+    private let sponsorContainer = UIButton()
     
     private let shelterImageView = UIImageView()
     private let hospitalImageView = UIImageView()
@@ -26,12 +39,40 @@ final class HomeCategoryView: BaseView {
     private let heartLabel = UILabel()
     private let sponsorLabel = UILabel()
     
+    private var disposeBag = DisposeBag()
+    weak var delegate: CategoryDelegate?
     private let categories: [(image: UIImage?, title: String)] = [
         (UIImage(named: "Shelter"), "보호소"),
         (UIImage(named: "Hospital"), "동물병원"),
         (UIImage(named: "Heart"), "관심"),
         (UIImage(named: "Sponsor"), "후원")
     ]
+    
+    override func setBinding() {
+        shelterContainer.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.delegate?.didTapCategory(.shelter)
+            }
+            .disposed(by: disposeBag)
+        
+        hospitalContainer.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.delegate?.didTapCategory(.hospital)
+            }
+            .disposed(by: disposeBag)
+        
+        heartContainer.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.delegate?.didTapCategory(.heart)
+            }
+            .disposed(by: disposeBag)
+        
+        sponsorContainer.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.delegate?.didTapCategory(.sponsor)
+            }
+            .disposed(by: disposeBag)
+    }
     
     private var containers: [UIView] {
         [shelterContainer, hospitalContainer, heartContainer, sponsorContainer]
