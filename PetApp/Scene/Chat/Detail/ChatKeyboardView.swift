@@ -10,6 +10,7 @@ import SnapKit
 
 final class ChatKeyboardView: BaseView {
     private let containerView = UIView()
+    //TODO: UITextView
     private let textField = UITextField()
     private let sendButton = UIButton()
     
