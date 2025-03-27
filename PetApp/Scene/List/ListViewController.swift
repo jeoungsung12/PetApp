@@ -31,10 +31,18 @@ final class ListViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        tableView.rx.modelSelected(HomeEntity.self)
+            .bind(with: self) { owner, entity in
+                let vm = DetailViewModel(model: entity)
+                let vc = DetailViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.prefetchRows
             .bind(with: self) { owner, IndexPaths in
                 if let lastIndex = IndexPaths.last.map({ $0.row }),
-                    (output.homeResult.value.count - 2) < lastIndex
+                   (output.homeResult.value.count - 2) < lastIndex
                 {
                     //TODO: 캐싱
                     input.loadTrigger.accept(owner.viewModel.page + 1)

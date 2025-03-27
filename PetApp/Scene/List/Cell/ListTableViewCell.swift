@@ -69,20 +69,20 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(12)
             make.top.equalTo(thumbImageview.snp.top)
             make.leading.equalTo(thumbImageview.snp.trailing).offset(12)
         }
         
         subTitleLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(12)
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
             make.leading.equalTo(thumbImageview.snp.trailing).offset(12)
         }
         
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(subTitleLabel.snp.bottom).offset(8)
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(12)
             make.leading.equalTo(thumbImageview.snp.trailing).offset(12)
             make.bottom.lessThanOrEqualToSuperview().inset(4)
         }
