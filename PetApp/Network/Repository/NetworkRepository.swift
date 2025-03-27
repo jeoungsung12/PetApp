@@ -10,6 +10,7 @@ import Foundation
 protocol NetworkRepositoryType: AnyObject {
     func getAnimal(_ page: Int) async throws -> [HomeEntity]
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
+    func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity
 }
 
 final class NetworkRepository: NetworkRepositoryType {
@@ -30,6 +31,15 @@ final class NetworkRepository: NetworkRepositoryType {
         do {
             let result: PlayerResponseDTO = try await network.fetchData(OpenSquareRouter.getVideo(startPage: start, endPage: end))
             return result.toEntity()
+        } catch {
+            throw error
+        }
+    }
+    
+    func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity {
+        do {
+            let result: ChatResponseDTO = try await network.fetchData(ChatRouter.getChatAnswer(entity: entity, question: question))
+            return ChatEntity(type: .bot, name: entity.animal.name, message: result.choices.first?.message.content ?? "", thumbImage: entity.animal.thumbImage)
         } catch {
             throw error
         }

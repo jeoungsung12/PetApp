@@ -13,7 +13,7 @@ class TabBarController: UITabBarController {
         super.viewDidLoad()
         configure()
     }
-
+    
 }
 
 extension TabBarController {
@@ -21,7 +21,7 @@ extension TabBarController {
     private func configure() {
         let firstVC = UINavigationController(rootViewController: HomeViewController())
         let secondVC = UINavigationController(rootViewController: HomeViewController())
-        let thirdVC = UINavigationController(rootViewController: HomeViewController())
+        let thirdVC = UINavigationController(rootViewController: ChatViewController())
         let forthVC = UINavigationController(rootViewController: PlayerViewController())
         let fifthVC = UINavigationController(rootViewController: HomeViewController())
         
@@ -38,12 +38,11 @@ extension TabBarController {
         items[2].title = "채팅"
         items[3].title = "영상"
         items[4].title = "프로필"
-           
+        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .customWhite
         self.tabBar.standardAppearance = appearance
-//        self.tabBar.scrollEdgeAppearance = appearance
         
         self.selectedIndex = 0
         self.tabBar.tintColor = .point

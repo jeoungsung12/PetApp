@@ -25,7 +25,6 @@ final class HomeViewController: BaseViewController {
         loadingIndicator.startAnimating()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { dataSource, collectionView, indexPath, item in
-            
             switch HomeSectionType.allCases[indexPath.section] {
             case .header:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeHeaderCell.id, for: indexPath) as? HomeHeaderCell else { return UICollectionViewCell() }

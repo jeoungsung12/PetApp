@@ -9,6 +9,8 @@
 ## Router
 DataDreamRouter.swift
 OpenSquareRouter.swift
+ChatRouter.swift
+
 ## APIKey
 APIKey.swift
 
