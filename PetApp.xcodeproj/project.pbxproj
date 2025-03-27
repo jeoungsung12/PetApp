@@ -188,7 +188,7 @@
 				DEVELOPMENT_TEAM = Q653PU93R6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "댕냥꿈";
+				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -222,7 +222,7 @@
 				DEVELOPMENT_TEAM = Q653PU93R6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "댕냥꿈";
+				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

@@ -7,22 +7,38 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
+
+protocol MoreBtnDelegate: AnyObject {
+    func moreBtnTapped()
+}
 
 final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
     private let titleLabel = UILabel()
     private let spacer = UIView()
     private let moreBtn = UIButton()
-    
+    private var disposeBag = DisposeBag()
+    weak var delegate: MoreBtnDelegate?
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureView()
         configureHierarchy()
         configureLayout()
+        setBinding()
     }
     
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setBinding() {
+        moreBtn.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.delegate?.moreBtnTapped()
+            }
+            .disposed(by: disposeBag)
     }
     
 }
