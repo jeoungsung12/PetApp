@@ -12,14 +12,8 @@ import RxCocoa
 final class SponsorViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     private var data: [SponsorEntity] = [
-        SponsorEntity(image: "", title: "동물자유연대", siteURL: "")
+        
     ]
-    
-    struct SponsorEntity {
-        let image: String
-        let title: String
-        let siteURL: String
-    }
     
     struct Input {
         
@@ -33,7 +27,7 @@ final class SponsorViewModel: BaseViewModel {
 extension SponsorViewModel {
     
     func transform(_ input: Input) -> Output {
-        let sponsorResult = BehaviorRelay<[SponsorEntity]>(value: [])
+        let sponsorResult = BehaviorRelay<[SponsorEntity]>(value: SponsorData)
         return Output(
             sponsorResult: sponsorResult.asDriver()
         )

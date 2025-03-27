@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "mockImage.png",
+      "filename" : "sponsor4.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "mockImage@2x.png",
+      "filename" : "sponsor4@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "mockImage@3x.png",
+      "filename" : "sponsor4@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
