@@ -22,7 +22,7 @@ struct HomeAnimalEntity {
     let thumbImage: String
     let fullImage: String
     let state: String
-    let sex: String
+    let gender: String
     let neut: String
 }
 
@@ -51,7 +51,7 @@ extension HomeResponseDTO {
                     thumbImage: $0.thumbImageCours,
                     fullImage: $0.imageCours,
                     state: $0.stateNm,
-                    sex: ($0.sexNm == "M") ? "🚹" : "🚺",
+                    gender: ($0.sexNm == "M") ? "🚹" : "🚺",
                     neut: ($0.neutYn == "N") ? "❌" : "⭕️"
                 ),
                 shelter: HomeShelterEntity(

@@ -42,7 +42,7 @@ final class ChatDetailViewController: BaseViewController {
     
     override func setBinding() {
         let input = ChatDetailViewModel.Input(
-            loadTrigger: Observable.just(())
+            loadTrigger: PublishRelay()
         )
         let output = viewModel.transform(input)
         
