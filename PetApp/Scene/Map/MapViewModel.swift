@@ -16,6 +16,7 @@ enum MapType {
 }
 
 struct MapViewModel: BaseViewModel {
+    private let repository: NetworkRepositoryType = NetworkRepository()
     private var disposeBag = DisposeBag()
     private(set) var mapType: MapType
     struct Input {
@@ -23,7 +24,7 @@ struct MapViewModel: BaseViewModel {
     }
     
     struct Output {
-        let mapResult: Driver<[CLLocationCoordinate2D]>
+        let mapResult: Driver<[MapEntity]>
     }
     
     init(mapType: MapType) {
@@ -34,10 +35,32 @@ struct MapViewModel: BaseViewModel {
 extension MapViewModel {
     
     func transform(_ input: Input) -> Output {
-        let mapResult = BehaviorRelay<[CLLocationCoordinate2D]>(value: [])
+        let mapResult = BehaviorRelay<[MapEntity]>(value: [])
+        
+        input.loadTrigger
+            .flatMapLatest {
+                Single.create { single in
+                    Task {
+                        do {
+                            let result = try await repository.getShelter()
+                            single(.success(result))
+                        } catch {
+                            single(.failure(error))
+                        }
+                    }
+                    return Disposables.create()
+                }
+            }
+            .bind(to: mapResult)
+            .disposed(by: disposeBag)
+        
         return Output(
             mapResult: mapResult.asDriver()
         )
+    }
+    
+    private func fetchData() {
+        
     }
     
 }
