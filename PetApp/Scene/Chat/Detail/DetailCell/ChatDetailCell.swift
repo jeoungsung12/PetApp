@@ -55,6 +55,7 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
     
     override func configureLayout() {
         guard let chatType = chatType else { return }
+        
         thumbImageView.snp.makeConstraints { make in
             make.size.equalTo(50)
             make.top.equalToSuperview().inset(12)
@@ -67,7 +68,7 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
             make.leading.equalTo(thumbImageView.snp.trailing).offset(8)
         }
         
-        bubbleView.snp.makeConstraints { make in
+        bubbleView.snp.remakeConstraints { make in
             make.bottom.equalToSuperview().inset(12)
             switch chatType {
             case .bot:
@@ -76,12 +77,13 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
                 make.leading.equalTo(thumbImageView.snp.trailing).offset(8)
             case .mine:
                 make.top.equalToSuperview().offset(8)
-                make.leading.greaterThanOrEqualToSuperview().inset(12)
                 make.trailing.equalToSuperview().inset(12)
+                make.leading.greaterThanOrEqualToSuperview().inset(12)
+                make.width.lessThanOrEqualToSuperview().multipliedBy(0.8).priority(.high)
             }
         }
         
-        messageLabel.snp.makeConstraints { make in
+        messageLabel.snp.remakeConstraints { make in
             make.edges.equalToSuperview().inset(12)
         }
     }
