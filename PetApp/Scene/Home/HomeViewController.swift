@@ -28,6 +28,7 @@ final class HomeViewController: BaseViewController {
             switch HomeSectionType.allCases[indexPath.section] {
             case .header:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeHeaderCell.id, for: indexPath) as? HomeHeaderCell else { return UICollectionViewCell() }
+                cell.categoryView.delegate = self
                 return cell
                 
             case .middle:
@@ -129,11 +130,25 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController: MoreBtnDelegate {
+extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
     
     func moreBtnTapped() {
         //TODO: Coordinator
         self.navigationController?.pushViewController(ListViewController(), animated: true)
+    }
+    
+    func didTapCategory(_ type: CategoryType) {
+        //TODO: Coordinator
+        switch type {
+        case .shelter:
+            self.navigationController?.pushViewController(ListViewController(), animated: true)
+        case .hospital:
+            self.navigationController?.pushViewController(ListViewController(), animated: true)
+        case .heart:
+            self.navigationController?.pushViewController(ListViewController(), animated: true)
+        case .sponsor:
+            self.navigationController?.pushViewController(SponsorViewController(), animated: true)
+        }
     }
     
     private func configureCollectionView() {
