@@ -10,6 +10,7 @@
 DataDreamRouter.swift
 OpenSquareRouter.swift
 ChatRouter.swift
+SponsorAPI.swift
 
 ## APIKey
 APIKey.swift
