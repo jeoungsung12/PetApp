@@ -65,7 +65,7 @@ final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     func configure(_ entity: HomeEntity?) {
         guard let entity = entity else { return }
         titleLabel.text = entity.animal.name
-        descriptionLabel.text = entity.animal.description
+        descriptionLabel.text = "안녕하세요! 저에 대해 알고 싶으신가요? 편하게 질문해 주세요! 🐾"
         shelterLabel.text = entity.shelter.name
         
         if let url = URL(string: entity.animal.thumbImage) {
