@@ -51,9 +51,15 @@ final class ChatDetailViewController: BaseViewController {
         result
             .drive(tableView.rx.items(cellIdentifier: ChatDetailCell.id, cellType: ChatDetailCell.self)) { row, element, cell in
                 cell.configure(element)
+                cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         
+        result
+            .drive(with: self) { owner, entity in
+                owner.tableView.scrollToRow(at: IndexPath(row: entity.count-1, section: 0), at: .bottom, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {
