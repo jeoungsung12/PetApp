@@ -19,19 +19,19 @@ enum ChatType {
 struct ChatEntity {
     let type: ChatType
     let name: String = "푸들"
-    let message: String = "안녕하세요! 뭐하세요? 머ㅣㄴ어리;ㅓㅣ먼이ㅓㄹ미ㅏ넝;ㅏㅣ러ㅣ;ㅁㄴ어ㅣ라ㅓ마ㅣㄴ어리ㅏ머니아ㅓ리ㅏ먼ㅇ;ㅣㅏ럼;ㅣㅏㅓㄴㅇ리ㅏ"
+    let message: String
     let thumbImage: String = ""
 }
 
 final class ChatMock {
     static let data = [
-        ChatEntity(type: .bot),
-        ChatEntity(type: .mine),
-        ChatEntity(type: .bot),
-        ChatEntity(type: .mine),
-        ChatEntity(type: .bot),
-        ChatEntity(type: .mine),
-        ChatEntity(type: .bot)
+        ChatEntity(type: .bot, message: "kajsld\nasdf\nasdf\nasdfas"),
+        ChatEntity(type: .mine, message: "kajsld\nasdf"),
+        ChatEntity(type: .bot, message: "asdf"),
+        ChatEntity(type: .mine, message: "asdf"),
+        ChatEntity(type: .bot, message: "l;jalsdj"),
+        ChatEntity(type: .mine, message: "message: asd\na\nsdlkfjlkasdj\nnadsf"),
+        ChatEntity(type: .bot, message: "dddd")
     ]
 }
 

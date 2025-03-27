@@ -12,6 +12,7 @@ import SnapKit
 final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
     private let thumbImageView = UIImageView()
     private let titleLabel = UILabel()
+    private let bubbleView = UIView()
     private let messageLabel = UILabel()
     private var chatType: ChatType?
     
@@ -33,9 +34,9 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         titleLabel.font = .mediumSemibold
         titleLabel.textAlignment = (chatType == .bot) ? .left : .right
         
-        messageLabel.clipsToBounds = true
-        messageLabel.layer.cornerRadius = 10
-        messageLabel.backgroundColor = (chatType == .bot) ? .customLightGray : .point.withAlphaComponent(0.3)
+        bubbleView.clipsToBounds = true
+        bubbleView.layer.cornerRadius = 10
+        bubbleView.backgroundColor = (chatType == .bot) ? .systemGray5 : .point.withAlphaComponent(0.3)
         
         messageLabel.numberOfLines = 0
         messageLabel.textColor = .customBlack
@@ -44,7 +45,8 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
     }
     
     override func configureHierarchy() {
-        [thumbImageView, titleLabel, messageLabel].forEach {
+        bubbleView.addSubview(messageLabel)
+        [thumbImageView, titleLabel, bubbleView].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -74,22 +76,35 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
             }
         }
         
-        messageLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+        bubbleView.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(12)
             switch chatType {
             case .bot:
+                make.top.equalTo(titleLabel.snp.bottom).offset(8)
                 make.trailing.lessThanOrEqualToSuperview().inset(12)
                 make.leading.equalTo(thumbImageView.snp.trailing).offset(8)
             case .mine:
+                make.top.equalToSuperview().offset(8)
                 make.leading.greaterThanOrEqualToSuperview().inset(12)
-                make.trailing.equalTo(thumbImageView.snp.leading).inset(8)
+                make.trailing.equalToSuperview().inset(12)
             }
+        }
+        
+        messageLabel.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(12)
         }
     }
     
     func configure(_ entity: ChatEntity) {
         self.chatType = entity.type
+        switch entity.type {
+        case .bot:
+            thumbImageView.isHidden = false
+            titleLabel.isHidden = false
+        case .mine:
+            thumbImageView.isHidden = true
+            titleLabel.isHidden = true
+        }
         
         titleLabel.text = entity.name
         messageLabel.text = entity.message
