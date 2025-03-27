@@ -57,7 +57,15 @@ final class ChatDetailViewController: BaseViewController {
         
         result
             .drive(with: self) { owner, entity in
-                owner.tableView.scrollToRow(at: IndexPath(row: entity.count-1, section: 0), at: .bottom, animated: true)
+                owner.tableView.scrollToRow(at: IndexPath(row: entity.count-1, section: 0), at: .middle, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        keyboardView.sendButton.rx.tap
+            .bind(with: self) { owner, _ in
+                guard let text = owner.keyboardView.textField.text else { return }
+                input.loadTrigger.accept(text)
+                owner.keyboardView.textField.text = nil
             }
             .disposed(by: disposeBag)
     }
@@ -102,7 +110,6 @@ final class ChatDetailViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupKeyboardHandling()
-        setupBindings()
     }
     
     private func setupKeyboardHandling() {
@@ -139,9 +146,5 @@ final class ChatDetailViewController: BaseViewController {
                 }
             }
             .disposed(by: disposeBag)
-    }
-    
-    private func setupBindings() {
-        //TODO: 메세지 버튼 액션
     }
 }

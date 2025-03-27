@@ -11,8 +11,8 @@ import SnapKit
 final class ChatKeyboardView: BaseView {
     private let containerView = UIView()
     //TODO: UITextView
-    private let textField = UITextField()
-    private let sendButton = UIButton()
+    let textField = UITextField()
+    let sendButton = UIButton()
     
     override func configureView() {
         containerView.backgroundColor = .systemGray6

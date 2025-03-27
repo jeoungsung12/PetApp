@@ -22,6 +22,8 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         [titleLabel, messageLabel].forEach {
             $0.text = nil
         }
+        titleLabel.isHidden = false
+        thumbImageView.isHidden = false
     }
     
     override func configureView() {
@@ -56,24 +58,13 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         thumbImageView.snp.makeConstraints { make in
             make.size.equalTo(50)
             make.top.equalToSuperview().inset(12)
-            switch chatType {
-            case .bot:
-                make.leading.equalToSuperview().inset(12)
-            case .mine:
-                make.trailing.equalToSuperview().inset(12)
-            }
+            make.leading.equalToSuperview().inset(12)
         }
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(12)
-            switch chatType {
-            case .bot:
-                make.trailing.equalToSuperview().inset(12)
-                make.leading.equalTo(thumbImageView.snp.trailing).offset(8)
-            case .mine:
-                make.leading.equalToSuperview().inset(12)
-                make.trailing.equalTo(thumbImageView.snp.leading).inset(8)
-            }
+            make.trailing.equalToSuperview().inset(12)
+            make.leading.equalTo(thumbImageView.snp.trailing).offset(8)
         }
         
         bubbleView.snp.makeConstraints { make in
@@ -109,10 +100,9 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         titleLabel.text = entity.name
         messageLabel.text = entity.message
         
-        thumbImageView.image = UIImage(named: "mockImage")
-        //        if let url = URL(string: entity.thumbImage) {
-        //            thumbImageView.kf.setImage(with: url)
-        //        }
+        if let url = URL(string: entity.thumbImage) {
+            thumbImageView.kf.setImage(with: url)
+        }
         
         configureView()
         configureLayout()
