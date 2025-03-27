@@ -1,29 +1,25 @@
 //
-//  HomeFooterCell.swift
+//  ListTableViewCell.swift
 //  PetApp
 //
-//  Created by 정성윤 on 3/22/25.
+//  Created by 정성윤 on 3/27/25.
 //
 
 import UIKit
 import Kingfisher
 import SnapKit
 
-final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
+final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
     private let thumbImageview = UIImageView()
     private let titleLabel = UILabel()
     private let subTitleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let statusLabel = UILabel()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
     override func configureView() {
         thumbImageview.clipsToBounds = true
         thumbImageview.contentMode = .scaleAspectFill
-        thumbImageview.layer.cornerRadius = 60
+        thumbImageview.layer.cornerRadius = 10
         thumbImageview.backgroundColor = .customLightGray
         
         titleLabel.textColor = .customLightGray
@@ -60,13 +56,14 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     override func configureLayout() {
         thumbImageview.snp.makeConstraints { make in
             make.size.equalTo(120)
-            make.top.leading.equalToSuperview()
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().inset(12)
         }
         
         statusLabel.snp.makeConstraints { make in
             make.width.equalTo(50)
             make.height.equalTo(25)
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(12)
             make.top.equalTo(thumbImageview.snp.top)
             make.leading.greaterThanOrEqualTo(thumbImageview.snp.trailing).offset(12)
         }
