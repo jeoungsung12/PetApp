@@ -59,10 +59,11 @@ extension ChatViewModel {
     
     private func fetchData() async throws -> [HomeSection] {
         do {
-            async let firstResult = repository.getAnimal(1)
-            async let secondResult = repository.getAnimal(2)
+            let result = try await repository.getAnimal(1)
+            let firstResult = result.prefix(5)
+            let secondResult = result.dropFirst(5).prefix(5)
             
-            return try await [
+            return [
                 HomeSection(title: "지금 도움이 필요한\n친구들과 대화해 보세요 💬", items: firstResult.map {
                     return HomeItem(data: $0)
                 }),
