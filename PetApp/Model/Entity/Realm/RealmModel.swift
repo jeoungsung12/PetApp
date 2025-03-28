@@ -8,12 +8,13 @@
 import Foundation
 import RealmSwift
 
-class RealmHomeEntity: Object {
+final class RealmHomeEntity: Object {
+    @Persisted(primaryKey: true) var id: String = ""
     @Persisted var animal: RealmHomeAnimalEntity?
     @Persisted var shelter: RealmHomeShelterEntity?
 }
 
-class RealmHomeAnimalEntity: Object {
+final class RealmHomeAnimalEntity: Object {
     @Persisted(primaryKey: true) var id: String = ""
     @Persisted var name: String = ""
     @Persisted var descriptionText: String = ""
@@ -27,7 +28,7 @@ class RealmHomeAnimalEntity: Object {
     @Persisted var neut: String = ""
 }
 
-class RealmHomeShelterEntity: Object {
+final class RealmHomeShelterEntity: Object {
     @Persisted var name: String = ""
     @Persisted var number: String = ""
     @Persisted var address: String = ""
