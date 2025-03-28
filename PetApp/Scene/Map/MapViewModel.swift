@@ -42,7 +42,7 @@ extension MapViewModel {
                 Single.create { single in
                     Task {
                         do {
-                            let result = try await repository.getShelter()
+                            let result = try await repository.getMap(mapType)
                             single(.success(result))
                         } catch {
                             single(.failure(error))
@@ -57,10 +57,6 @@ extension MapViewModel {
         return Output(
             mapResult: mapResult.asDriver()
         )
-    }
-    
-    private func fetchData() {
-        
     }
     
 }
