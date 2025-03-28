@@ -21,7 +21,7 @@ final class NetworkManager: NetworkManagerType {
         let network = AF.request(api).validate(statusCode: 200...499)
         let response = network.serializingDecodable(T.self)
         
-//        print(await response.response.debugDescription)
+        //        print(await response.response.debugDescription)
         switch await response.result {
         case let .success(data):
             return data

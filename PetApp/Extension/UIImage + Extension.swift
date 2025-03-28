@@ -47,3 +47,21 @@ extension UIImage {
     static let heartFillImage = UIImage(systemName: ImageSubscription.heartFill.rawValue)
     static let shareImage = UIImage(systemName: ImageSubscription.share.rawValue)
 }
+
+extension UIImage {
+    
+    func downSampling(scale: CGFloat) -> UIImage {
+        let data = self.pngData()! as CFData
+        let imageSource = CGImageSourceCreateWithData(data, nil)!
+        let maxPixel = max(self.size.width, self.size.height) * scale
+        let options = [
+            kCGImageSourceThumbnailMaxPixelSize: maxPixel,
+            kCGImageSourceCreateThumbnailFromImageAlways: true
+            
+        ] as CFDictionary
+        
+        let scaledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options)!
+//        print(scaledImage)
+        return UIImage(cgImage: scaledImage)
+    }
+}
