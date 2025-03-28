@@ -9,7 +9,7 @@ import Foundation
 
 protocol NetworkRepositoryType: AnyObject {
     func getAnimal(_ page: Int) async throws -> [HomeEntity]
-    func getShelter() async throws -> [MapEntity]
+    func getMap(_ type: MapType) async throws -> [MapEntity]
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
     func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity
 }
@@ -28,10 +28,16 @@ final class NetworkRepository: NetworkRepositoryType {
         }
     }
     
-    func getShelter() async throws -> [MapEntity] {
+    func getMap(_ type: MapType) async throws -> [MapEntity] {
         do {
-            let result: ShelterResponseDTO = try await network.fetchData(DataDreamRouter.getShelter)
-            return result.toEntity()
+            switch type {
+            case .shelter:
+                let result: ShelterResponseDTO = try await network.fetchData(DataDreamRouter.getShelter)
+                return result.toEntity()
+            case .hospital:
+                let result: HospitalResponseDTO = try await network.fetchData(DataDreamRouter.getHospital)
+                return result.toEntity()
+            }
         } catch {
             //TODO: CustomError
             throw error

@@ -49,11 +49,9 @@ final class MapViewController: BaseViewController {
                 let annotations = entity.map { CustomAnnotation(entity: $0) }
                 owner.mapView.addAnnotations(annotations)
                 
-                if !entity.isEmpty {
-                    let coordinates = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
-                    let region = owner.calculateRegion(for: coordinates)
-                    owner.mapView.setRegion(region, animated: true)
-                }
+                let coordinates = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
+                let region = owner.calculateRegion(for: coordinates)
+                owner.mapView.setRegion(region, animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -61,7 +59,7 @@ final class MapViewController: BaseViewController {
     override func configureView() {
         self.setNavigation(color: .clear)
         mapView.delegate = self
-        //사용자 위치 허락
+        //TODO: 사용자 위치 허락
 //        mapView.showsUserLocation = true
     }
     

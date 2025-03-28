@@ -32,3 +32,19 @@ extension ShelterResponseDTO {
         }
     }
 }
+
+extension HospitalResponseDTO {
+    func toEntity() -> [MapEntity] {
+        return (self.Animalhosptl[1].row ?? []).map {
+            MapEntity(
+                name: $0.bizplcNm,
+                number: $0.locplcFacltTelno ?? "",
+                address: $0.refineLotnoAddr,
+                roadAddress: $0.refineRoadnmAddr ?? "",
+                numAddress: $0.refineZipCD ?? "",
+                lon: Double($0.refineWgs84Logt ?? "") ?? 0.0,
+                lat: Double($0.refineWgs84Lat ?? "") ?? 0.0
+            )
+        }
+    }
+}
