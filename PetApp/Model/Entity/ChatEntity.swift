@@ -13,9 +13,3 @@ struct ChatEntity {
     let message: String
     let thumbImage: String
 }
-//
-//extension ChatResponseDTO {
-//    func toEntity() -> ChatResponseEntity {
-//        return ChatResponseEntity(content: self.choices.first?.message.content ?? "")
-//    }
-//}

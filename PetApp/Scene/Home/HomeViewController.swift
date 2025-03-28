@@ -72,20 +72,25 @@ final class HomeViewController: BaseViewController {
         Observable.zip(collectionView.rx.itemSelected, collectionView.rx.modelSelected(HomeItem.self))
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, selected in
-                guard let data = selected.1.data else { return }
-                //TODO: Coordinator
-                let vm = DetailViewModel(model: data)
-                let vc = DetailViewController(viewModel: vm)
-                switch HomeSectionType.allCases[selected.0.section] {
-                case .header,
-                        .middleAds:
-                    owner.navigationController?.pushViewController(vc, animated: true)
-                case .middle,
-                        .footer:
-                    owner.navigationController?.pushViewController(vc, animated: true)
-                case .middleBtn:
-                    //TODO: MapView
-                    owner.navigationController?.pushViewController(vc, animated: true)
+                if let data = selected.1.data {
+                    switch HomeSectionType.allCases[selected.0.section] {
+                    case .middle,
+                            .footer:
+                        let vm = DetailViewModel(model: data)
+                        let vc = DetailViewController(viewModel: vm)
+                        owner.navigationController?.pushViewController(vc, animated: true)
+                    default:
+                        break
+                    }
+                } else {
+                    switch HomeSectionType.allCases[selected.0.section] {
+                    case .middleBtn:
+                        let mapVM = MapViewModel(mapType: .shelter)
+                        let mapVC = MapViewController(viewModel: mapVM)
+                        owner.navigationController?.pushViewController(mapVC, animated: true)
+                    default:
+                        break
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -141,9 +146,13 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
         //TODO: Coordinator
         switch type {
         case .shelter:
-            self.navigationController?.pushViewController(ListViewController(), animated: true)
+            let mapVM = MapViewModel(mapType: .shelter)
+            let mapVC = MapViewController(viewModel: mapVM)
+            self.navigationController?.pushViewController(mapVC, animated: true)
         case .hospital:
-            self.navigationController?.pushViewController(ListViewController(), animated: true)
+            let mapVM = MapViewModel(mapType: .hospital)
+            let mapVC = MapViewController(viewModel: mapVM)
+            self.navigationController?.pushViewController(mapVC, animated: true)
         case .heart:
             self.navigationController?.pushViewController(ListViewController(), animated: true)
         case .sponsor:
