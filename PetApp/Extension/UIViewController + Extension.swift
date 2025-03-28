@@ -9,10 +9,39 @@ import UIKit
 
 extension UIViewController {
     
+    enum AlertType: String, CaseIterable {
+        case Ok
+        case Cancel
+    }
+    
     @objc
     func tabGestureAction() {
         self.view.endEditing(true)
     }
+    
+    func setRootView(_ rootVC: UIViewController) {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else { return }
+        window.rootViewController = rootVC
+    }
+    
+    func customAlert(_ title: String = "",_ message: String = "",_ action: [AlertType] = [.Ok],_ method: @escaping () -> Void) {
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        for type in action {
+            switch type {
+            case .Ok:
+                let action = UIAlertAction(title: type.rawValue, style: .default) { _ in
+                    method()
+                }
+                alertVC.addAction(action)
+            case .Cancel:
+                let action = UIAlertAction(title: type.rawValue, style: .destructive )
+                alertVC.addAction(action)
+            }
+        }
+        
+        self.present(alertVC, animated: true)
+    }
+    
     
     func setNavigation(
         logo: Bool = false,
