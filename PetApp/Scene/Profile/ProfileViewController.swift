@@ -18,6 +18,7 @@ final class ProfileViewController: BaseViewController {
     private let spacingView = UIView()
     private let descriptionLabel = UILabel()
     private let successButton = UIButton()
+    private var profileImage: String?
     
     private let viewModel = ProfileViewModel()
     private var inputTrigger = ProfileViewModel.Input(
@@ -48,6 +49,7 @@ final class ProfileViewController: BaseViewController {
                     owner.profileButton.profileImage.image = UIImage(named: userInfo.image)
                 } else {
                     guard let image = ProfileData.allCases.randomElement()?.rawValue else { return }
+                    owner.profileImage = image
                     owner.profileButton.profileImage.image = UIImage(named: image)
                 }
             }).disposed(by: disposeBag)
@@ -56,9 +58,7 @@ final class ProfileViewController: BaseViewController {
             .drive(with: self, onNext: { owner, valid in
                 if let valid = valid, valid {
                     let rootVC = TabBarController()
-                    
-                } else {
-                    
+                    owner.setRootView(rootVC)
                 }
             }).disposed(by: disposeBag)
         
@@ -89,7 +89,7 @@ final class ProfileViewController: BaseViewController {
         profileButton.rx.tap
             .bind(with: self) { owner, _ in
                 let vc = ProfileImageViewController()
-//                vc.profileImage = owner.profileButton.profileImage.image
+                vc.profileImage = owner.profileImage
                 vc.profileDelegate = owner
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

@@ -7,28 +7,6 @@
 import Foundation
 import RealmSwift
 
-struct RealmEntity {
-    var bool: Bool
-    var message: String
-    
-    enum RealmType {
-        case add
-        case delete
-        case error
-        
-        var description: String {
-            switch self {
-            case .add:
-                "관심 등록 되었습니다!"
-            case .delete:
-                "관심 해제 되었습니다!"
-            case .error:
-                "실패! 잠시후 다시 시도해 보세요"
-            }
-        }
-    }
-}
-
 struct UserInfo {
     let name: String
     let image: String
@@ -52,6 +30,8 @@ protocol UserRepositoryType {
     func deleteUserInfo()
 }
 
+import RealmSwift
+
 final class RealmUserRepository: UserRepositoryType {
     static let shared: UserRepositoryType = RealmUserRepository()
     private let realm = try! Realm()
@@ -60,6 +40,7 @@ final class RealmUserRepository: UserRepositoryType {
     
     private func toRealmEntity(_ homeEntity: HomeEntity) -> RealmHomeEntity {
         let realmHomeEntity = RealmHomeEntity()
+        realmHomeEntity.id = homeEntity.animal.id // Primary Key 설정
         
         let animal = RealmHomeAnimalEntity()
         animal.id = homeEntity.animal.id
@@ -129,7 +110,7 @@ final class RealmUserRepository: UserRepositoryType {
     func removeLikedHomeEntity(id: String) {
         guard let entity = realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) else { return }
         try! realm.write {
-            if let homeEntity = realm.objects(RealmHomeEntity.self).filter("animal.id == %@", id).first {
+            if let homeEntity = realm.objects(RealmHomeEntity.self).filter("id == %@", id).first {
                 realm.delete(homeEntity)
             }
         }
@@ -143,9 +124,21 @@ final class RealmUserRepository: UserRepositoryType {
     func isLiked(id: String) -> Bool {
         return realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) != nil
     }
-}
-
-extension RealmUserRepository {
+    
+    // UserInfo 관련 메서드 (기존 코드 유지)
+    private func toRealmUserInfo(_ userInfo: UserInfo) -> RealmUserInfo {
+        let realmUserInfo = RealmUserInfo()
+        realmUserInfo.name = userInfo.name
+        realmUserInfo.image = userInfo.image
+        return realmUserInfo
+    }
+    
+    private func toUserInfo(_ realmUserInfo: RealmUserInfo) -> UserInfo {
+        return UserInfo(
+            name: realmUserInfo.name,
+            image: realmUserInfo.image
+        )
+    }
     
     func saveUserInfo(_ userInfo: UserInfo) {
         let realmUserInfo = toRealmUserInfo(userInfo)
@@ -170,19 +163,5 @@ extension RealmUserRepository {
         try! realm.write {
             realm.delete(realm.objects(RealmUserInfo.self))
         }
-    }
-    
-    private func toRealmUserInfo(_ userInfo: UserInfo) -> RealmUserInfo {
-        let realmUserInfo = RealmUserInfo()
-        realmUserInfo.name = userInfo.name
-        realmUserInfo.image = userInfo.image
-        return realmUserInfo
-    }
-    
-    private func toUserInfo(_ realmUserInfo: RealmUserInfo) -> UserInfo {
-        return UserInfo(
-            name: realmUserInfo.name,
-            image: realmUserInfo.image
-        )
     }
 }
