@@ -10,8 +10,8 @@ import UIKit
 extension UIViewController {
     
     enum AlertType: String, CaseIterable {
-        case Ok
-        case Cancel
+        case Ok = "확인"
+        case Cancel = "취소"
     }
     
     @objc
