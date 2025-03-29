@@ -40,7 +40,6 @@ extension PlayerViewModel {
                 return Single<[PlayerEntity]>.create { single in
                     Task {
                         do {
-                            print(request)
                             self?.playerRequest = request
                             let result = try await self?.repository.getVideo(
                                 start: request.start,

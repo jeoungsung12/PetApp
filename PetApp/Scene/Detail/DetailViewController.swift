@@ -46,7 +46,9 @@ final class DetailViewController: BaseViewController {
             case .middle:
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailMiddleCell.id, for: indexPath) as? DetailMiddleCell else { return UITableViewCell() }
                 cell.selectionStyle = .none
-                cell.configure(item.data)
+                
+                let vm = DetailMiddleViewModel(entity: item.data)
+                cell.configure(item.data, viewModel: vm)
                 return cell
                 
             case .footer:

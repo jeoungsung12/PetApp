@@ -16,6 +16,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     
     
     override func configureView() {
+        backdropImageView.clipsToBounds = true
         backdropImageView.contentMode = .scaleAspectFill
         
         titleLabel.font = .systemFont(ofSize: 40, weight: .heavy)
