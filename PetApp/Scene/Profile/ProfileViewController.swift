@@ -190,8 +190,9 @@ extension ProfileViewController: UITextFieldDelegate, ProfileImageDelegate {
     
     private func enableTrigger(_ enable: Bool) {
         let trigger = (enable) ? inputTrigger.buttonEnabledTrigger : inputTrigger.successButtonTrigger
-        if let nickname = nameTextField.text, let description = descriptionLabel.text {
-            trigger.onNext(ProfileButton(profileImage: "", name: nickname, description: description))
+        if let nickname = nameTextField.text, let description = descriptionLabel.text,
+           let profileImage = self.profileImage {
+            trigger.onNext(ProfileButton(profileImage: profileImage, name: nickname, description: description))
         }
     }
     

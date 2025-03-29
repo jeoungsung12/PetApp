@@ -15,14 +15,15 @@ final class MyPageViewController: BaseViewController {
     private let buttonStackView = UIStackView()
     private let categoryStackView = UIStackView()
     private let countLabel = UILabel()
-    private let aniBoxButton = UIButton()
-    private let changeProfileButton = UIButton()
+    private let likeBoxsButton = MypageItemButton(type: MyPageCategoryType.likeBox)
+    private let listBoxsButton = MypageItemButton(type: MyPageCategoryType.writeList)
+    private let changeProfileButton = MypageItemButton(type: MyPageCategoryType.profile)
     
     private let viewModel = MyPageViewModel()
     let inputTrigger = MyPageViewModel.Input(
         profileTrigger: PublishRelay<Void>(),
         listBtnTrigger: PublishRelay<MyPageViewModel.MyPageButtonType>(),
-        categoryBtnTrigger: PublishRelay<MyPageViewModel.MyPageCategoryType>()
+        categoryBtnTrigger: PublishRelay<MyPageCategoryType>()
     )
     private var disposeBag = DisposeBag()
     
@@ -41,8 +42,9 @@ final class MyPageViewController: BaseViewController {
         output.profileResult
             .drive(with: self, onNext: { owner, userInfo in
                 guard let userInfo = userInfo else { return }
+                dump(userInfo)
                 owner.myProfileView.configure(userInfo)
-                owner.countLabel.text = String(format: "%2d", owner.viewModel.getLikeAnimate())
+                owner.countLabel.text = "\(owner.viewModel.getLikeAnimate())개 게시물 보관중"
             }).disposed(by: disposeBag)
         
         output.listBtnResult
@@ -76,19 +78,20 @@ final class MyPageViewController: BaseViewController {
                 }
             }).disposed(by: disposeBag)
         
-        [aniBoxButton, changeProfileButton].forEach({ btn in
+        [likeBoxsButton, listBoxsButton, changeProfileButton].forEach({ btn in
             btn.rx.tap
                 .bind(with: self) { owner, _ in
-                    let type = MyPageViewModel.MyPageCategoryType.allCases[btn.tag]
+                    let type = MyPageCategoryType.allCases[btn.tag]
                     owner.inputTrigger.categoryBtnTrigger.accept(type)
                 }.disposed(by: disposeBag)
         })
     }
     
     override func configureHierarchy() {
-        [aniBoxButton, changeProfileButton].forEach({
+        [likeBoxsButton, listBoxsButton ,changeProfileButton].forEach({
             self.categoryStackView.addArrangedSubview($0)
         })
+        
         [myProfileView, categoryStackView, buttonStackView, countLabel].forEach({
             self.view.addSubview($0)
         })
@@ -117,8 +120,8 @@ final class MyPageViewController: BaseViewController {
         countLabel.snp.makeConstraints { make in
             make.width.equalTo(100)
             make.height.equalTo(20)
-            make.centerX.equalTo(aniBoxButton.snp.centerX)
-            make.top.equalTo(aniBoxButton.snp.top).offset(-20)
+            make.centerX.equalTo(likeBoxsButton.snp.centerX)
+            make.top.equalTo(likeBoxsButton.snp.top).offset(-20)
         }
         
     }
@@ -126,15 +129,10 @@ final class MyPageViewController: BaseViewController {
     override func configureView() {
         self.setNavigation(logo: true)
         self.view.backgroundColor = .customWhite
-        aniBoxButton.tag = 0
-        self.buttonConfiguration(aniBoxButton,  MyPageViewModel.MyPageCategoryType.likeBox.rawValue, MyPageViewModel.MyPageCategoryType.likeBox.image)
+        likeBoxsButton.tag = 0
+        listBoxsButton.tag = 1
+        changeProfileButton.tag = 2
         
-        changeProfileButton.tag = 1
-        self.buttonConfiguration(changeProfileButton, MyPageViewModel.MyPageCategoryType.profile.rawValue, MyPageViewModel.MyPageCategoryType.profile.image)
-        
-        [aniBoxButton, changeProfileButton].forEach({
-            $0.tintColor = .black
-        })
         categoryStackView.axis = .horizontal
         categoryStackView.alignment = .center
         categoryStackView.distribution = .fillEqually
@@ -170,15 +168,6 @@ extension MyPageViewController {
             button.configure(type.rawValue)
             buttonStackView.addArrangedSubview(button)
         }
-    }
-    
-    private func buttonConfiguration(_ btn: UIButton,_ title: String,_ image: String)  {
-        btn.setTitle(title, for: .normal)
-        btn.setTitleColor(.customLightGray, for: .normal)
-        btn.setImage(UIImage(systemName: image), for: .normal)
-        btn.imageView?.contentMode = .scaleAspectFit
-        btn.tintColor = .customLightGray
-        //TODO: 이미지 위치 아래에
     }
     
 }

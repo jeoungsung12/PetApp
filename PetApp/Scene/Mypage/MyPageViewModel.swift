@@ -9,27 +9,28 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+enum MyPageCategoryType: String, CaseIterable {
+    case likeBox = "관심\n보관함"
+    case writeList = "함께한\n시간"
+    case profile = "프로필\n수정"
+    
+    var image: String {
+        switch self {
+        case .likeBox:
+            "cube.box"
+        case .writeList:
+            "list.dash"
+        case .profile:
+            "person.text.rectangle"
+        }
+    }
+}
+
+
 final class MyPageViewModel: BaseViewModel {
     private let realm: UserRepositoryType = RealmUserRepository.shared
     private(set) var profileData = ProfileData.allCases
     private var disposeBag = DisposeBag()
-    
-    enum MyPageCategoryType: String, CaseIterable {
-        case likeBox = " 관심\n보관함"
-        case writeList = " 함께한\n시간"
-        case profile = "  프로필\n수정"
-        
-        var image: String {
-            switch self {
-            case .likeBox:
-                "cube.box"
-            case .writeList:
-                "list.dash"
-            case .profile:
-                "person.text.rectangle"
-            }
-        }
-    }
     
     enum MyPageButtonType: String, CaseIterable {
         case oftenQS = "자주묻는 질문"
