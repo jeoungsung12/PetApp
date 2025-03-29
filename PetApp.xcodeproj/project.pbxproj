@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; };
+		E48EB3572D97E9C400ACAEA3 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E49726882D8D296100716594 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E49726872D8D296100716594 /* SnapKit */; };
 		E497268B2D8D296900716594 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E497268A2D8D296900716594 /* Kingfisher */; };
 		E497268E2D8D297700716594 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E497268D2D8D297700716594 /* RxCocoa */; };
@@ -16,18 +18,16 @@
 		E49726992D8D29A000716594 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E49726982D8D29A000716594 /* Alamofire */; };
 		E49726AA2D8D2D6B00716594 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E49726A92D8D2D6B00716594 /* .gitignore */; };
 		E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */; };
-		E49737962D965FDE00716594 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E49737952D965FDE00716594 /* RealmSwift */; };
-		E49739882D966EDE00716594 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E49737952D965FDE00716594 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		E49739892D966EDE00716594 /* Embed Frameworks */ = {
+		E48EB3582D97E9C400ACAEA3 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E49739882D966EDE00716594 /* RealmSwift in Embed Frameworks */,
+				E48EB3572D97E9C400ACAEA3 /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,7 +68,7 @@
 				E49726962D8D299600716594 /* Toast in Frameworks */,
 				E49726992D8D29A000716594 /* Alamofire in Frameworks */,
 				E497268E2D8D297700716594 /* RxCocoa in Frameworks */,
-				E49737962D965FDE00716594 /* RealmSwift in Frameworks */,
+				E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */,
 				E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */,
 				E497268B2D8D296900716594 /* Kingfisher in Frameworks */,
 				E49726902D8D297700716594 /* RxSwift in Frameworks */,
@@ -107,7 +107,7 @@
 				E497264C2D8D273300716594 /* Sources */,
 				E497264D2D8D273300716594 /* Frameworks */,
 				E497264E2D8D273300716594 /* Resources */,
-				E49739892D966EDE00716594 /* Embed Frameworks */,
+				E48EB3582D97E9C400ACAEA3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -126,7 +126,7 @@
 				E49726952D8D299600716594 /* Toast */,
 				E49726982D8D29A000716594 /* Alamofire */,
 				E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */,
-				E49737952D965FDE00716594 /* RealmSwift */,
+				E48EB3552D97E9BB00ACAEA3 /* RealmSwift */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -164,7 +164,7 @@
 				E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
-				E49737942D965FDE00716594 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
@@ -409,6 +409,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -465,17 +473,14 @@
 				minimumVersion = 1.0.4;
 			};
 		};
-		E49737942D965FDE00716594 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E48EB3552D97E9BB00ACAEA3 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
 		E49726872D8D296100716594 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */;
@@ -515,11 +520,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
 			productName = YouTubeiOSPlayerHelper;
-		};
-		E49737952D965FDE00716594 /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E49737942D965FDE00716594 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
