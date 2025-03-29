@@ -45,6 +45,7 @@ final class ProfileViewController: BaseViewController {
         output.configureViewResult
             .drive(with: self, onNext: { owner, userInfo in
                 if let userInfo = userInfo {
+                    owner.profileImage = userInfo.image
                     owner.nameTextField.text = userInfo.name
                     owner.profileButton.profileImage.image = UIImage(named: userInfo.image)
                 } else {

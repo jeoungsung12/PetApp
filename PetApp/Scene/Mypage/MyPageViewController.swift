@@ -42,7 +42,6 @@ final class MyPageViewController: BaseViewController {
         output.profileResult
             .drive(with: self, onNext: { owner, userInfo in
                 guard let userInfo = userInfo else { return }
-                dump(userInfo)
                 owner.myProfileView.configure(userInfo)
                 owner.countLabel.text = "\(owner.viewModel.getLikeAnimate())개 게시물 보관중"
             }).disposed(by: disposeBag)
@@ -51,7 +50,7 @@ final class MyPageViewController: BaseViewController {
             .drive(with: self) { owner, type in
                 switch type {
                 case .oftenQS:
-                    print("자주묻는 질문")
+                    owner.navigationController?.pushViewController(FAQViewController(), animated: true)
                 case .feedback:
                     print("피드백")
                 case .withdraw:
@@ -74,7 +73,9 @@ final class MyPageViewController: BaseViewController {
                 case .writeList:
                     print("함께한 시간")
                 case .profile:
-                    print("프로필 변경")
+                    let vc = UINavigationController(rootViewController: SheetProfileViewController())
+                    vc.modalPresentationStyle = .fullScreen
+                    owner.present(vc, animated: true)
                 }
             }).disposed(by: disposeBag)
         

@@ -79,9 +79,7 @@ extension ProfileViewModel {
         let successResult = PublishSubject<Bool?>()
         input.successButtonTrigger
             .bind(with: self) { owner, success in
-                if let value = owner.handleSuccessButtonTap(profileImage: success.profileImage, name: success.name, description: success.description) {
-                    successResult.onNext(owner.validateText(value, true))
-                }
+                successResult.onNext(owner.validateText(success, true))
             }.disposed(by: disposeBag)
         
         let nameResult = PublishSubject<String?>()
@@ -94,10 +92,7 @@ extension ProfileViewModel {
         let buttonResult = PublishSubject<Bool?>()
         input.buttonEnabledTrigger
             .bind(with: self) { owner, enable in
-                if let value = owner.handleSuccessButtonTap(profileImage: enable.profileImage, name: enable.name, description: enable.description)
-                {
-                    buttonResult.onNext(owner.validateText(value, false))
-                }
+                buttonResult.onNext(owner.validateText(enable, false))
             }.disposed(by: disposeBag)
         
         return Output(
@@ -121,14 +116,5 @@ extension ProfileViewModel {
         } else {
             return false
         }
-    }
-    
-    private func handleSuccessButtonTap(profileImage: String, name: String, description: String) -> ProfileButton? {
-        let profileData = ProfileButton(
-            profileImage: profileImage,
-            name: name,
-            description: description
-        )
-        return profileData
     }
 }
