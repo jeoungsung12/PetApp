@@ -71,7 +71,7 @@ final class MyPageViewController: BaseViewController {
             .drive(with: self, onNext: { owner, type in
                 switch type {
                 case .likeBox:
-                    print("관심 등록된")
+                    owner.navigationController?.pushViewController(LikeViewController(), animated: true)
                 case .writeList:
                     print("함께한 시간")
                 case .profile:
