@@ -38,3 +38,13 @@ final class RealmHomeShelterEntity: Object {
     @Persisted var lon: String = ""
     @Persisted var lat: String = ""
 }
+
+struct UserInfo {
+    let name: String
+    let image: String
+}
+
+class RealmUserInfo: Object {
+    @Persisted(primaryKey: true) var name: String = ""
+    @Persisted var image: String = ""
+}
