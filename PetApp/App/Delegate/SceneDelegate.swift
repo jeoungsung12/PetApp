@@ -10,13 +10,17 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    private let realmRepo: UserRepositoryType = RealmUserRepository.shared
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         sleep(1)
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
-        window?.rootViewController = TabBarController()
+        if (realmRepo.getUserInfo()) != nil {
+            window?.rootViewController = TabBarController()
+        } else {
+            window?.rootViewController = UINavigationController(rootViewController: ProfileViewController())
+        }
         window?.makeKeyAndVisible()
     }
 

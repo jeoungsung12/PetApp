@@ -23,7 +23,7 @@ extension TabBarController {
         let secondVC = UINavigationController(rootViewController: HomeViewController())
         let thirdVC = UINavigationController(rootViewController: ChatViewController())
         let forthVC = UINavigationController(rootViewController: PlayerViewController())
-        let fifthVC = UINavigationController(rootViewController: HomeViewController())
+        let fifthVC = UINavigationController(rootViewController: MyPageViewController())
         
         self.setViewControllers([firstVC, secondVC, thirdVC, forthVC, fifthVC], animated: true)
         guard let items = self.tabBar.items else { return }
