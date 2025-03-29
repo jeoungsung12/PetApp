@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         sleep(1)
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
-        if let userInfo = realmRepo.getUserInfo() {
+        if (realmRepo.getUserInfo()) != nil {
             window?.rootViewController = TabBarController()
         } else {
             window?.rootViewController = UINavigationController(rootViewController: ProfileViewController())

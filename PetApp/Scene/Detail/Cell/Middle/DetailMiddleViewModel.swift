@@ -16,35 +16,42 @@ final class DetailMiddleViewModel: BaseViewModel {
     private let repo: UserRepositoryType = RealmUserRepository.shared
     private var disposeBag = DisposeBag()
     
+    private let entity: HomeEntity
     struct Input {
-        let heartTapped: Observable<HomeEntity>
+        let heartTapped: ControlEvent<Void>
     }
     
     struct Output {
-        let isLiked: Driver<Bool>
+        let isLikedResult: Driver<Bool>
     }
     
-    private let isLikedSubject = BehaviorSubject<Bool>(value: false)
-    
+    init(entity: HomeEntity) {
+        self.entity = entity
+    }
+}
+
+extension DetailMiddleViewModel {
     func transform(_ input: Input) -> Output {
+        let id = self.entity.animal.id
+        let isLikedResult = BehaviorRelay<Bool>(value: self.isLiked(id: id))
+        
         input.heartTapped
-            .subscribe(onNext: { [weak self] entity in
-                guard let self = self else { return }
-                let isCurrentlyLiked = self.repo.isLiked(id: entity.animal.id)
+            .bind(with: self, onNext: { owner, _ in
+                let isCurrentlyLiked = owner.repo.isLiked(id: id)
                 
                 if isCurrentlyLiked {
-                    self.repo.removeLikedHomeEntity(id: entity.animal.id)
+                    owner.repo.removeLikedHomeEntity(id: id)
                 } else {
-                    self.repo.saveLikedHomeEntity(entity)
+                    owner.repo.saveLikedHomeEntity(owner.entity)
                 }
                 
                 let newIsLiked = !isCurrentlyLiked
-                self.isLikedSubject.onNext(newIsLiked)
+                isLikedResult.accept(newIsLiked)
             })
             .disposed(by: disposeBag)
         
         let output = Output(
-            isLiked: isLikedSubject.asDriver(onErrorJustReturn: false)
+            isLikedResult: isLikedResult.asDriver()
         )
         
         return output

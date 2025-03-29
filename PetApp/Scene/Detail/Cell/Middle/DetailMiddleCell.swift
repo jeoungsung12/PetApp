@@ -10,10 +10,6 @@ import SnapKit
 import Toast
 import RxSwift
 import RxCocoa
-
-import RxSwift
-import RxCocoa
-
 final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     private let statusLabel = UILabel()
     private let heartBtn = UIButton()
@@ -22,7 +18,6 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     private let charView = CharacteristicView()
     
     private var viewModel: DetailMiddleViewModel?
-    private var entity: HomeEntity?
     private var disposeBag = DisposeBag()
     
     override func prepareForReuse() {
@@ -79,7 +74,6 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     }
     
     func configure(_ entity: HomeEntity, viewModel: DetailMiddleViewModel) {
-        self.entity = entity
         self.viewModel = viewModel
         
         statusLabel.text = entity.animal.state
@@ -98,22 +92,25 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
         heartBtn.isSelected = isLiked
         heartBtn.tintColor = isLiked ? .point : .customBlack
         
-        guard let entity = self.entity else { return }
+        setBinding()
+    }
+    
+    override func setBinding() {
+        guard let viewModel = viewModel else { return }
+        
         let input = DetailMiddleViewModel.Input(
             heartTapped: heartBtn.rx.tap
-                .map { entity }
-                .asObservable()
         )
         let output = viewModel.transform(input)
         
-        output.isLiked
-            .drive(onNext: { [weak self] isLiked in
-                self?.updateHeartButton(isLiked: isLiked)
-            })
+        output.isLikedResult
+            .drive(with: self) { owner, isLiked in
+                owner.updateHeartButton(isLiked: isLiked)
+            }
             .disposed(by: disposeBag)
     }
     
-    func updateHeartButton(isLiked: Bool) {
+    private func updateHeartButton(isLiked: Bool) {
         heartBtn.isSelected = isLiked
         heartBtn.tintColor = isLiked ? .point : .customBlack
         let message = isLiked ? "관심등록에 성공했습니다!" : "관심목록에서 삭제되었습니다!"

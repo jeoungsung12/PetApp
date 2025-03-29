@@ -7,30 +7,17 @@
 import Foundation
 import RealmSwift
 
-struct UserInfo {
-    let name: String
-    let image: String
-}
-
-class RealmUserInfo: Object {
-    @Persisted(primaryKey: true) var name: String = ""
-    @Persisted var image: String = ""
-}
-
 protocol UserRepositoryType {
     func saveLikedHomeEntity(_ homeEntity: HomeEntity)
     func removeLikedHomeEntity(id: String)
     func getAllLikedHomeEntities() -> [HomeEntity]
     func isLiked(id: String) -> Bool
     
-    
     func saveUserInfo(_ userInfo: UserInfo)
     func getUserInfo() -> UserInfo?
     func updateUserInfo(_ userInfo: UserInfo)
     func deleteUserInfo()
 }
-
-import RealmSwift
 
 final class RealmUserRepository: UserRepositoryType {
     static let shared: UserRepositoryType = RealmUserRepository()
@@ -40,7 +27,7 @@ final class RealmUserRepository: UserRepositoryType {
     
     private func toRealmEntity(_ homeEntity: HomeEntity) -> RealmHomeEntity {
         let realmHomeEntity = RealmHomeEntity()
-        realmHomeEntity.id = homeEntity.animal.id // Primary Key 설정
+        realmHomeEntity.id = homeEntity.animal.id
         
         let animal = RealmHomeAnimalEntity()
         animal.id = homeEntity.animal.id
@@ -70,7 +57,6 @@ final class RealmUserRepository: UserRepositoryType {
         
         return realmHomeEntity
     }
-    
     private func toHomeEntity(_ realmEntity: RealmHomeEntity) -> HomeEntity {
         let animal = HomeAnimalEntity(
             id: realmEntity.animal?.id ?? "",
@@ -108,7 +94,7 @@ final class RealmUserRepository: UserRepositoryType {
     }
     
     func removeLikedHomeEntity(id: String) {
-        guard let entity = realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) else { return }
+        guard realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) != nil else { return }
         try! realm.write {
             if let homeEntity = realm.objects(RealmHomeEntity.self).filter("id == %@", id).first {
                 realm.delete(homeEntity)
@@ -125,7 +111,10 @@ final class RealmUserRepository: UserRepositoryType {
         return realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) != nil
     }
     
-    // UserInfo 관련 메서드 (기존 코드 유지)
+}
+
+extension RealmUserRepository {
+    
     private func toRealmUserInfo(_ userInfo: UserInfo) -> RealmUserInfo {
         let realmUserInfo = RealmUserInfo()
         realmUserInfo.name = userInfo.name
