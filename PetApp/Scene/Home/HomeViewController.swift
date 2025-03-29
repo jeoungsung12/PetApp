@@ -154,7 +154,7 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             let mapVC = MapViewController(viewModel: mapVM)
             self.navigationController?.pushViewController(mapVC, animated: true)
         case .heart:
-            self.navigationController?.pushViewController(ListViewController(), animated: true)
+            self.navigationController?.pushViewController(LikeViewController(), animated: true)
         case .sponsor:
             self.navigationController?.pushViewController(SponsorViewController(), animated: true)
         }
