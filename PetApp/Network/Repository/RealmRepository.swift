@@ -30,7 +30,6 @@ final class RealmUserRepository: UserRepositoryType {
         realmHomeEntity.id = homeEntity.animal.id
         
         let animal = RealmHomeAnimalEntity()
-        animal.id = homeEntity.animal.id
         animal.name = homeEntity.animal.name
         animal.descriptionText = homeEntity.animal.description
         animal.color = homeEntity.animal.color
@@ -59,7 +58,7 @@ final class RealmUserRepository: UserRepositoryType {
     }
     private func toHomeEntity(_ realmEntity: RealmHomeEntity) -> HomeEntity {
         let animal = HomeAnimalEntity(
-            id: realmEntity.animal?.id ?? "",
+            id: realmEntity.id,
             name: realmEntity.animal?.name ?? "",
             description: realmEntity.animal?.descriptionText ?? "",
             color: realmEntity.animal?.color ?? "",
@@ -94,9 +93,8 @@ final class RealmUserRepository: UserRepositoryType {
     }
     
     func removeLikedHomeEntity(id: String) {
-        guard realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) != nil else { return }
         try! realm.write {
-            if let homeEntity = realm.objects(RealmHomeEntity.self).filter("id == %@", id).first {
+            if let homeEntity = realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) {
                 realm.delete(homeEntity)
             }
         }
@@ -108,7 +106,7 @@ final class RealmUserRepository: UserRepositoryType {
     }
     
     func isLiked(id: String) -> Bool {
-        return realm.object(ofType: RealmHomeAnimalEntity.self, forPrimaryKey: id) != nil
+        return realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) != nil
     }
     
 }

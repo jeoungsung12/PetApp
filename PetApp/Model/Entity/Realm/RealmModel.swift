@@ -15,7 +15,6 @@ final class RealmHomeEntity: Object {
 }
 
 final class RealmHomeAnimalEntity: Object {
-    @Persisted(primaryKey: true) var id: String = ""
     @Persisted var name: String = ""
     @Persisted var descriptionText: String = ""
     @Persisted var color: String = ""

@@ -38,7 +38,6 @@ extension DetailMiddleViewModel {
         input.heartTapped
             .bind(with: self, onNext: { owner, _ in
                 let isCurrentlyLiked = owner.repo.isLiked(id: id)
-                print(isCurrentlyLiked)
                 if isCurrentlyLiked {
                     owner.repo.removeLikedHomeEntity(id: id)
                 } else {
