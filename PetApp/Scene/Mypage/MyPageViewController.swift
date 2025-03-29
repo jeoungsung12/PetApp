@@ -52,7 +52,9 @@ final class MyPageViewController: BaseViewController {
                 case .oftenQS:
                     owner.navigationController?.pushViewController(FAQViewController(), animated: true)
                 case .feedback:
-                    print("피드백")
+                    if let url = URL(string: DataDreamRouter.feedBackURL) {
+                        UIApplication.shared.open(url)
+                    }
                 case .withdraw:
                     owner.customAlert(
                         "탈퇴하기",
