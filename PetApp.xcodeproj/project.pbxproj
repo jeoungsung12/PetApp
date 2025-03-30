@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; };
 		E48EB3572D97E9C400ACAEA3 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E48EB3982D993DEF00ACAEA3 /* YPImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3972D993DEF00ACAEA3 /* YPImagePicker */; };
 		E49726882D8D296100716594 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E49726872D8D296100716594 /* SnapKit */; };
 		E497268B2D8D296900716594 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E497268A2D8D296900716594 /* Kingfisher */; };
 		E497268E2D8D297700716594 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E497268D2D8D297700716594 /* RxCocoa */; };
@@ -66,6 +67,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E49726962D8D299600716594 /* Toast in Frameworks */,
+				E48EB3982D993DEF00ACAEA3 /* YPImagePicker in Frameworks */,
 				E49726992D8D29A000716594 /* Alamofire in Frameworks */,
 				E497268E2D8D297700716594 /* RxCocoa in Frameworks */,
 				E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */,
@@ -127,6 +129,7 @@
 				E49726982D8D29A000716594 /* Alamofire */,
 				E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */,
 				E48EB3552D97E9BB00ACAEA3 /* RealmSwift */,
+				E48EB3972D993DEF00ACAEA3 /* YPImagePicker */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -165,6 +168,7 @@
 				E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 				E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				E48EB3962D993DEF00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
@@ -417,6 +421,14 @@
 				kind = branch;
 			};
 		};
+		E48EB3962D993DEF00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Yummypets/YPImagePicker.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.2;
+			};
+		};
 		E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -480,6 +492,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
+		};
+		E48EB3972D993DEF00ACAEA3 /* YPImagePicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB3962D993DEF00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */;
+			productName = YPImagePicker;
 		};
 		E49726872D8D296100716594 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

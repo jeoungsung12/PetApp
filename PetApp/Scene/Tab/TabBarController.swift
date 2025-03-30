@@ -20,7 +20,7 @@ extension TabBarController {
     
     private func configure() {
         let firstVC = UINavigationController(rootViewController: HomeViewController())
-        let secondVC = UINavigationController(rootViewController: HomeViewController())
+        let secondVC = UINavigationController(rootViewController: RecordViewController())
         let thirdVC = UINavigationController(rootViewController: ChatViewController())
         let forthVC = UINavigationController(rootViewController: PlayerViewController())
         let fifthVC = UINavigationController(rootViewController: MyPageViewController())

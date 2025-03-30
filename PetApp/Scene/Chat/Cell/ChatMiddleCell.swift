@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class ChatMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
-    private let iconView = IconLabelView()
+    private let iconView = IconLabelButton()
     
     override func configureView() {
         iconView.configure(image: .archiveboxImage, title: "더 많은 친구들과 대화하기")

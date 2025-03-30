@@ -73,7 +73,7 @@ final class MyPageViewController: BaseViewController {
                 case .likeBox:
                     owner.navigationController?.pushViewController(LikeViewController(), animated: true)
                 case .writeList:
-                    print("함께한 시간")
+                    owner.navigationController?.pushViewController(RecordViewController(), animated: true)
                 case .profile:
                     let vc = UINavigationController(rootViewController: SheetProfileViewController())
                     vc.modalPresentationStyle = .fullScreen
