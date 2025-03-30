@@ -50,12 +50,9 @@ final class RealmUserInfo: Object {
 
 final class RecordRealmEntity: Object {
     @Persisted(primaryKey: true)
-    var id: ObjectId
-    
+    var date: String
     @Persisted
     var location: String
-    @Persisted
-    var date: String
     @Persisted
     var imagePaths: List<String>
     @Persisted
@@ -71,7 +68,6 @@ final class RecordRealmEntity: Object {
         subTitle: String
     ) {
         self.init()
-        self.id = ObjectId()
         self.location = location
         self.imagePaths.append(objectsIn: imagePaths)
         self.date = date

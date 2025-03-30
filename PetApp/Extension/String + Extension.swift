@@ -18,7 +18,7 @@ extension String {
     
     static func currentDate() -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 MM월 dd일"
+        formatter.dateFormat = "yyyy년 MM월 dd일 HH:mm:ss"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: Date())
     }
@@ -34,7 +34,6 @@ extension String {
             try data.write(to: imagePath)
             return imagePath.path
         } catch {
-            print(error)
             return nil
         }
     }

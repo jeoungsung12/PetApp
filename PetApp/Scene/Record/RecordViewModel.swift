@@ -15,6 +15,7 @@ final class RecordViewModel: BaseViewModel {
     
     struct Input {
         let loadTrigger: PublishRelay<Void>
+        let searchText: PublishRelay<String>
     }
     
     struct Output {
@@ -28,10 +29,26 @@ extension RecordViewModel {
     func transform(_ input: Input) -> Output {
         let recordResult = BehaviorRelay(value: realmRepo.getAllRecords())
         
+        input.searchText
+            .withUnretained(self)
+            .map { owner, searchText in
+                if searchText.isEmpty {
+                    return owner.realmRepo.getAllRecords().reversed()
+                } else {
+                    return owner.realmRepo.getAllRecords().reversed().filter { record in
+                        return record.location.contains(searchText) ||
+                        record.title.contains(searchText) ||
+                        record.subTitle.contains(searchText)
+                    }
+                }
+            }
+            .bind(to: recordResult)
+            .disposed(by: disposeBag)
+        
         input.loadTrigger
             .withUnretained(self)
             .map { owner, _ in
-                return owner.realmRepo.getAllRecords()
+                return owner.realmRepo.getAllRecords().reversed()
             }
             .bind(to: recordResult)
             .disposed(by: disposeBag)
