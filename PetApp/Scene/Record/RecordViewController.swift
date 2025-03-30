@@ -114,6 +114,12 @@ extension RecordViewController: RemoveDelegate {
     }
     
     func remove() {
-        input.loadTrigger.accept(())
+        self.customAlert(
+            "게시글 삭제",
+            "확인을 누르시면 영구적으로 게시글이 삭제됩니다. 삭제하시겠습니까?",
+            [.Ok, .Cancel]
+        ) { [weak self] in
+            self?.input.loadTrigger.accept(())
+        }
     }
 }

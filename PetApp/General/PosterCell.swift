@@ -11,6 +11,11 @@ import SnapKit
 final class PosterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let imageView = UIImageView()
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+    }
+    
     override func configureView() {
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill

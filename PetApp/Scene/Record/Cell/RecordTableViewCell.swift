@@ -30,6 +30,15 @@ final class RecordTableViewCell: BaseTableViewCell, ReusableIdentifier {
     
     weak var delegate: RemoveDelegate?
     private var entity: RecordRealmEntity?
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        iconImageView.image = nil
+        [locationLabel, dateLabel, titleLabel, descriptionLabel].forEach {
+            $0.text = nil
+        }
+    }
+    
     override func setBinding() {
         let output = viewModel.transform(input)
         
