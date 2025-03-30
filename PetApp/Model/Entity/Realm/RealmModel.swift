@@ -43,7 +43,39 @@ struct UserInfo {
     let image: String
 }
 
-class RealmUserInfo: Object {
+final class RealmUserInfo: Object {
     @Persisted(primaryKey: true) var name: String = ""
     @Persisted var image: String = ""
+}
+
+final class RecordRealmEntity: Object {
+    @Persisted(primaryKey: true)
+    var id: ObjectId
+    
+    @Persisted
+    var location: String
+    @Persisted
+    var date: String
+    @Persisted
+    var imagePaths: List<String>
+    @Persisted
+    var title: String
+    @Persisted
+    var subTitle: String
+    
+    convenience init(
+        location: String,
+        date: String,
+        imagePaths: [String],
+        title: String,
+        subTitle: String
+    ) {
+        self.init()
+        self.id = ObjectId()
+        self.location = location
+        self.imagePaths.append(objectsIn: imagePaths)
+        self.date = date
+        self.title = title
+        self.subTitle = subTitle
+    }
 }

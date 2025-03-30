@@ -17,6 +17,11 @@ protocol UserRepositoryType {
     func getUserInfo() -> UserInfo?
     func updateUserInfo(_ userInfo: UserInfo)
     func deleteUserInfo()
+    
+    func saveRecord(_ record: RecordRealmEntity)
+    func removeRecord(id: String)
+    func getAllRecords() -> [RecordRealmEntity]
+    func removeAllRecords()
 }
 
 final class RealmUserRepository: UserRepositoryType {
@@ -24,6 +29,51 @@ final class RealmUserRepository: UserRepositoryType {
     private let realm = try! Realm()
     
     private init() {}
+    
+    func saveRecord(_ record: RecordRealmEntity) {
+        do {
+            try realm.write {
+                realm.add(record, update: .modified)
+            }
+        } catch {
+            print("기록 저장 실패")
+        }
+    }
+    
+    func removeRecord(id: String) {
+        guard let objectId = try? ObjectId(string: id),
+              let record = realm.object(ofType: RecordRealmEntity.self, forPrimaryKey: objectId) else {
+            print("기록 삭제 실패")
+            return
+        }
+        do {
+            try realm.write {
+                realm.delete(record)
+            }
+        } catch {
+            print("기록 삭제 실패")
+        }
+    }
+    
+    func removeAllRecords() {
+        do {
+            try realm.write {
+                let allRecords = realm.objects(RecordRealmEntity.self)
+                realm.delete(allRecords)
+            }
+        } catch {
+            print("모든 기록 삭제 실패")
+        }
+    }
+    
+    func getAllRecords() -> [RecordRealmEntity] {
+        let records = realm.objects(RecordRealmEntity.self)
+        return Array(records)
+    }
+    
+}
+
+extension RealmUserRepository {
     
     private func toRealmEntity(_ homeEntity: HomeEntity) -> RealmHomeEntity {
         let realmHomeEntity = RealmHomeEntity()
@@ -56,6 +106,7 @@ final class RealmUserRepository: UserRepositoryType {
         
         return realmHomeEntity
     }
+    
     private func toHomeEntity(_ realmEntity: RealmHomeEntity) -> HomeEntity {
         let animal = HomeAnimalEntity(
             id: realmEntity.id,
@@ -108,7 +159,6 @@ final class RealmUserRepository: UserRepositoryType {
     func isLiked(id: String) -> Bool {
         return realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) != nil
     }
-    
 }
 
 extension RealmUserRepository {
