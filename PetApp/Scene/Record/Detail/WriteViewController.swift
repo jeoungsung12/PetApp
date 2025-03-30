@@ -7,14 +7,17 @@
 
 import UIKit
 import SnapKit
+import YPImagePicker
 import RxSwift
 import RxCocoa
-import Photos
 
 final class WriteViewController: BaseViewController {
     private let saveButton = UIBarButtonItem(title: "완료", style: .plain, target: nil, action: nil)
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     //TODO: DropDown
     private let photoButton = UIButton()
+    private let photoIconBtn = UIButton()
     private let titleTextField = UITextField()
     private let spacerView = SeperateView()
     private let descriptionTextView = UITextView()
@@ -23,11 +26,55 @@ final class WriteViewController: BaseViewController {
     private let viewModel = WriteViewModel()
     private var disposeBag = DisposeBag()
     
+    private lazy var picker = YPImagePicker(configuration: self.configurePicker())
+    private var selectedImages = PublishRelay<[UIImage]>()
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
+    
     override func setBinding() {
         let input = WriteViewModel.Input()
         let output = viewModel.transform(input)
         
+        photoButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.present(owner.picker, animated: true)
+            }
+            .disposed(by: disposeBag)
         
+        photoIconBtn.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.present(owner.picker, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        picker.didFinishPicking { [weak self] items, cancelled in
+            guard let self = self else { return }
+            
+            let images = items.compactMap { item -> UIImage? in
+                switch item {
+                case .photo(let photo):
+                    return photo.image
+                default:
+                    return nil
+                }
+            }
+            self.selectedImages.accept(images)
+            self.dismiss(animated: true)
+        }
+        
+        let result = selectedImages.asDriver(onErrorJustReturn: [])
+        
+        result
+            .drive(collectionView.rx.items(cellIdentifier: PosterCell.id, cellType: PosterCell.self)) { items, element, cell in
+                cell.configure(with: element)
+            }
+            .disposed(by: disposeBag)
+        
+        result
+            .drive(with: self) { owner, images in
+                owner.photoIconBtn.isHidden = (images.isEmpty)
+                owner.photoButton.isHidden = !(images.isEmpty)
+            }
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {
@@ -37,6 +84,14 @@ final class WriteViewController: BaseViewController {
         
         photoButton.contentMode = .scaleAspectFit
         photoButton.setImage(UIImage(named: "bubble"), for: .normal)
+        
+        photoIconBtn.isHidden = true
+        photoIconBtn.tintColor = .black
+        photoIconBtn.contentMode = .scaleAspectFit
+        photoIconBtn.setImage(.photoImage, for: .normal)
+        photoIconBtn.setTitle("수정하기", for: .normal)
+        photoButton.setTitleColor(.customBlack, for: .normal)
+        
         titleTextField.placeholder = "제목을 입력해 주세요"
         titleTextField.textColor = .customBlack
         titleTextField.font = .largeBold
@@ -46,35 +101,64 @@ final class WriteViewController: BaseViewController {
         
         descriptionLabel.numberOfLines = 0
         descriptionLabel.textColor = .customLightGray
-        descriptionLabel.font = .mediumSemibold
+        descriptionLabel.font = .mediumRegular
+        descriptionLabel.textAlignment = .center
         descriptionLabel.text =
                                 """
                                 동물들과 함께한 오늘, 어떤 순간이 가장 가슴에 남았나요? 
                                 혹시 처음 다가온 강아지의 눈빛, 조용히 곁을 내어준 고양이의 따뜻함이 기억나시나요? 봉사활동을 하며 느낀 감정과 생각을 이곳에 기록해보세요. 작은 순간들이 모이면, 나만의 특별한 봉사 다이어리가 완성됩니다. 당신의 진심 어린 기록이 또 다른 사람에게 영감을 줄지도 몰라요. 지금 이 순간을 잊지 않도록 소중히 남겨보세요.
                                 """
+        
+        configureCollectionView()
     }
     
     override func configureHierarchy() {
+        self.view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
         [
+            collectionView,
             photoButton,
+            photoIconBtn,
             titleTextField,
             spacerView,
             descriptionTextView,
             descriptionLabel
         ].forEach {
-            self.view.addSubview($0)
+            contentView.addSubview($0)
         }
     }
     
     override func configureLayout() {
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+        }
+        
         photoButton.snp.makeConstraints { make in
-            make.height.equalToSuperview().dividedBy(4)
-            make.top.equalTo(self.view.safeAreaLayoutGuide)
+            make.height.equalTo(200)
+            make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
         
+        collectionView.snp.makeConstraints { make in
+            make.height.equalTo(200)
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+        }
+        
+        photoIconBtn.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.top.equalTo(collectionView.snp.bottom).offset(12)
+            make.trailing.equalToSuperview().inset(24)
+        }
+        
         titleTextField.snp.makeConstraints { make in
-            make.top.equalTo(photoButton.snp.bottom).offset(12)
+            make.top.equalTo(photoIconBtn.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
         }
         
@@ -96,4 +180,32 @@ final class WriteViewController: BaseViewController {
         }
     }
     
+}
+
+extension WriteViewController {
+    
+    private func configureCollectionView() {
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(PosterCell.self, forCellWithReuseIdentifier: PosterCell.id)
+    }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 12
+        layout.minimumLineSpacing = 12
+        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
+        return layout
+    }
+    
+    private func configurePicker() -> YPImagePickerConfiguration {
+        var config = YPImagePickerConfiguration()
+        config.screens = [.library]
+        config.library.maxNumberOfItems = 5
+        config.startOnScreen = .library
+        config.library.mediaType = .photo
+        return config
+    }
 }

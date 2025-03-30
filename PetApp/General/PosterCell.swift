@@ -8,26 +8,23 @@
 import UIKit
 import SnapKit
 
-final class PosterCell: UICollectionViewCell, ReusableIdentifier {
+final class PosterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let imageView = UIImageView()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
+    override func configureView() {
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .lightGray
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupView()
-    }
-    
-    private func setupView() {
+    override func configureHierarchy() {
         contentView.addSubview(imageView)
+    }
+    
+    override func configureLayout() {
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = .lightGray
     }
     
     func configure(with image: UIImage?) {
