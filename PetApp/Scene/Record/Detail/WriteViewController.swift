@@ -8,11 +8,12 @@
 import UIKit
 import SnapKit
 import YPImagePicker
+import Toast
 import RxSwift
 import RxCocoa
 
 final class WriteViewController: BaseViewController {
-    private let saveButton = UIBarButtonItem(title: "완료", style: .plain, target: nil, action: nil)
+    private let saveButton = UIBarButtonItem(title: "저장", style: .plain, target: nil, action: nil)
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     //TODO: DropDown
@@ -27,11 +28,13 @@ final class WriteViewController: BaseViewController {
     private var disposeBag = DisposeBag()
     
     private lazy var picker = YPImagePicker(configuration: self.configurePicker())
-    private var selectedImages = PublishRelay<[UIImage]>()
+    private var selectedImages = BehaviorRelay<[UIImage]>(value: [])
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
     
     override func setBinding() {
-        let input = WriteViewModel.Input()
+        let input = WriteViewModel.Input(
+            saveTrigger: PublishRelay()
+        )
         let output = viewModel.transform(input)
         
         photoButton.rx.tap
@@ -60,6 +63,63 @@ final class WriteViewController: BaseViewController {
             self.selectedImages.accept(images)
             self.dismiss(animated: true)
         }
+        
+        descriptionTextView.rx.didBeginEditing
+            .bind(with: self, onNext: { owner, _ in
+                if owner.descriptionTextView.textColor == .customLightGray {
+                    owner.descriptionTextView.text = ""
+                    owner.descriptionTextView.textColor = .customBlack
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        descriptionTextView.rx.didEndEditing
+            .bind(with: self, onNext: { owner, _ in
+                if owner.descriptionTextView.text.isEmpty {
+                    owner.descriptionTextView.text = """
+                            친구들과 함께 했던 얘기를 자유롭게 얘기해보세요!
+                            #봉사활동 #기록 #함께라서 행복 #얼른 가족만나길
+                        """
+                    owner.descriptionTextView.textColor = .customLightGray
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        saveButton.rx.tap
+            .bind(with: self) { owner, _ in
+                guard let title = owner.titleTextField.text, !title.isEmpty,
+                      let description = owner.descriptionTextView.text, !description.isEmpty,
+                      !owner.selectedImages.value.isEmpty else {
+                    owner.view.makeToast("모든 항목을 기록해 주세요!", duration: 1, position: .center)
+                    return
+                }
+                
+                let record = RecordRealmEntity(
+                    location: "Seoul",
+                    date: .currentDate(),
+                    imagePaths: owner.selectedImages.value.compactMap { image in
+                        return .saveImage(image: image)
+                    },
+                    title: title,
+                    subTitle: description
+                )
+                
+                input.saveTrigger.accept(record)
+            }
+            .disposed(by: disposeBag)
+        
+        output.saveResult
+            .drive(with: self) { owner, valid in
+                if valid {
+                    owner.view.makeToast("저장 성공!", duration: 1, position: .center)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        owner.navigationController?.popViewController(animated: true)
+                    }
+                } else {
+                    owner.view.makeToast("저장에 실패했습니다!", duration: 1, position: .center)
+                }
+            }
+            .disposed(by: disposeBag)
         
         let result = selectedImages.asDriver(onErrorJustReturn: [])
         
@@ -96,8 +156,15 @@ final class WriteViewController: BaseViewController {
         titleTextField.textColor = .customBlack
         titleTextField.font = .largeBold
         
-        descriptionTextView.textColor = .customBlack
+        descriptionTextView.textColor = .customLightGray
         descriptionTextView.font = .mediumRegular
+        descriptionTextView.isScrollEnabled = false
+        descriptionTextView.textContainer.maximumNumberOfLines = 0
+        descriptionTextView.textContainer.lineBreakMode = .byWordWrapping
+        descriptionTextView.text = """
+                                친구들과 함께 했던 얘기를 자유롭게 얘기해보세요!
+                                #봉사활동 #기록 #함께라서 행복 #얼른 가족만나길
+                                """
         
         descriptionLabel.numberOfLines = 0
         descriptionLabel.textColor = .customLightGray
@@ -174,7 +241,7 @@ final class WriteViewController: BaseViewController {
         }
         
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(descriptionTextView.snp.bottom).offset(12)
+            make.top.equalTo(descriptionTextView.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.bottom.equalToSuperview()
         }
@@ -208,4 +275,5 @@ extension WriteViewController {
         config.library.mediaType = .photo
         return config
     }
+    
 }
