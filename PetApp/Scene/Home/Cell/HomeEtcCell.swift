@@ -16,7 +16,7 @@ enum HomeEtcType {
 
 final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
     private let adsImageView = UIImageView()
-    private let mapView = IconLabelView()
+    private let mapView = IconLabelButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
