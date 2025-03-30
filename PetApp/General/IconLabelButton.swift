@@ -8,9 +8,9 @@
 import UIKit
 import SnapKit
 
-final class IconLabelView: BaseView {
+final class IconLabelButton: BaseButton {
     private let iconImageView = UIImageView()
-    private let titleLabel = UILabel()
+    private let subTitleLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,15 +20,15 @@ final class IconLabelView: BaseView {
         self.clipsToBounds = true
         self.layer.cornerRadius = 10
         self.layer.borderWidth = 0.5
-        
+        self.backgroundColor = .customWhite
         iconImageView.contentMode = .scaleAspectFit
         
-        titleLabel.font = .largeBold
-        titleLabel.textAlignment = .center
+        subTitleLabel.font = .largeBold
+        subTitleLabel.textAlignment = .center
     }
     
     override func configureHierarchy() {
-        [titleLabel, iconImageView].forEach {
+        [subTitleLabel, iconImageView].forEach {
             self.addSubview($0)
         }
     }
@@ -37,10 +37,10 @@ final class IconLabelView: BaseView {
         iconImageView.snp.makeConstraints { make in
             make.size.equalTo(20)
             make.centerY.equalToSuperview()
-            make.trailing.equalTo(titleLabel.snp.leading).offset(-8)
+            make.trailing.equalTo(subTitleLabel.snp.leading).offset(-8)
         }
         
-        titleLabel.snp.makeConstraints { make in
+        subTitleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview().offset(20)
             make.centerY.equalToSuperview()
             make.leading.greaterThanOrEqualToSuperview().inset(12)
@@ -50,10 +50,10 @@ final class IconLabelView: BaseView {
     
     func configure(image: UIImage?, title: String, color: UIColor = .customLightGray) {
         self.layer.borderColor = color.cgColor
-        titleLabel.textColor = color
+        subTitleLabel.textColor = color
         iconImageView.tintColor = color
         
-        titleLabel.text = title
+        subTitleLabel.text = title
         iconImageView.image = image
     }
 }

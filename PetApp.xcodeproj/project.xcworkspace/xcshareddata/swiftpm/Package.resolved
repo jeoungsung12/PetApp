@@ -1,5 +1,5 @@
 {
-  "originHash" : "15bc529ca7a9dc68af634ff208e756cf66287530dabb5467e457760cc333ad0a",
+  "originHash" : "e55cbf95fadc70047df16ef9ed64577babd7cd47d4e84fe0d008cbff78bff5dd",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "4c6b067f96953ee19526e49e4189403a2be21fb3",
         "version" : "8.3.1"
+      }
+    },
+    {
+      "identity" : "prynttrimmerview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/HHK1/PryntTrimmerView",
+      "state" : {
+        "revision" : "ac1b60a22c7e6a6514de7a66d2f3d5b537c956d5",
+        "version" : "4.0.2"
       }
     },
     {
@@ -65,6 +74,15 @@
       }
     },
     {
+      "identity" : "stevia",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/freshOS/Stevia",
+      "state" : {
+        "revision" : "cfb1a1d2159277bb553c3dc46f3f742c0275566d",
+        "version" : "5.1.2"
+      }
+    },
+    {
       "identity" : "toast-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scalessec/Toast-Swift.git",
@@ -80,6 +98,15 @@
       "state" : {
         "revision" : "f57129cd4380ec0a74dd3a59da3270a1d653d59b",
         "version" : "1.0.4"
+      }
+    },
+    {
+      "identity" : "ypimagepicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Yummypets/YPImagePicker.git",
+      "state" : {
+        "revision" : "2db04eb020e3ef03828d3207d85250e110fa5919",
+        "version" : "5.2.2"
       }
     }
   ],
