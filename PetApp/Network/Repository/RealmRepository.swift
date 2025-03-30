@@ -42,8 +42,7 @@ final class RealmUserRepository: UserRepositoryType {
     }
     
     func removeRecord(id: String) -> Bool {
-        guard let objectId = try? ObjectId(string: id),
-              let record = realm.object(ofType: RecordRealmEntity.self, forPrimaryKey: objectId) else {
+        guard let record = realm.object(ofType: RecordRealmEntity.self, forPrimaryKey: id) else {
             print("기록 삭제 실패")
             return false
         }

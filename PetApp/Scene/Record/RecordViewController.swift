@@ -14,16 +14,21 @@ final class RecordViewController: BaseViewController {
     private let imageView = UIImageView()
     private let searchBar = UISearchBar()
     private let tableView = UITableView()
-    //TODO: 드롭다운
     private let writeButton = IconLabelButton()
     
     private let viewModel = RecordViewModel()
+    private lazy var input = RecordViewModel.Input(
+        loadTrigger: PublishRelay(),
+        searchText: PublishRelay()
+    )
     private var disposeBag = DisposeBag()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        input.loadTrigger.accept(())
+    }
+    
     override func setBinding() {
-        let input = RecordViewModel.Input(
-            loadTrigger: PublishRelay()
-        )
         let output = viewModel.transform(input)
         
         writeButton.rx.tap
@@ -35,7 +40,9 @@ final class RecordViewController: BaseViewController {
         let result = output.recordResult
         
         result
-            .drive(tableView.rx.items(cellIdentifier: RecordTableViewCell.id, cellType: RecordTableViewCell.self)) { row, element, cell in
+            .drive(tableView.rx.items(cellIdentifier: RecordTableViewCell.id, cellType: RecordTableViewCell.self)) { [weak self] row, element, cell in
+                cell.delegate = self
+                cell.selectionStyle = .none
                 cell.configure(element)
             }
             .disposed(by: disposeBag)
@@ -46,6 +53,10 @@ final class RecordViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        searchBar.rx.text
+            .orEmpty
+            .bind(to: input.searchText)
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {
@@ -75,7 +86,8 @@ final class RecordViewController: BaseViewController {
         
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
         
         writeButton.snp.makeConstraints { make in
@@ -90,13 +102,18 @@ final class RecordViewController: BaseViewController {
     }
 }
 
-extension RecordViewController {
+extension RecordViewController: RemoveDelegate {
     
     private func configureTableView() {
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
+        tableView.keyboardDismissMode = .onDrag
         tableView.rowHeight = UITableView.automaticDimension
         tableView.showsVerticalScrollIndicator = false
         tableView.register(RecordTableViewCell.self, forCellReuseIdentifier: RecordTableViewCell.id)
+    }
+    
+    func remove() {
+        input.loadTrigger.accept(())
     }
 }

@@ -9,14 +9,16 @@ import UIKit
 import SnapKit
 import YPImagePicker
 import Toast
+import Photos
 import RxSwift
 import RxCocoa
 
 final class WriteViewController: BaseViewController {
+    private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tabGestureAction))
     private let saveButton = UIBarButtonItem(title: "저장", style: .plain, target: nil, action: nil)
     private let scrollView = UIScrollView()
     private let contentView = UIView()
-    //TODO: DropDown
+    private let locationTextField = UITextField()
     private let photoButton = UIButton()
     private let photoIconBtn = UIButton()
     private let titleTextField = UITextField()
@@ -31,6 +33,12 @@ final class WriteViewController: BaseViewController {
     private var selectedImages = BehaviorRelay<[UIImage]>(value: [])
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
     override func setBinding() {
         let input = WriteViewModel.Input(
             saveTrigger: PublishRelay()
@@ -39,13 +47,17 @@ final class WriteViewController: BaseViewController {
         
         photoButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.present(owner.picker, animated: true)
+                owner.requestPhotoLibraryPermission {
+                    owner.present(owner.picker, animated: true)
+                }
             }
             .disposed(by: disposeBag)
         
         photoIconBtn.rx.tap
             .bind(with: self) { owner, _ in
-                owner.present(owner.picker, animated: true)
+                owner.requestPhotoLibraryPermission {
+                    owner.present(owner.picker, animated: true)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -87,7 +99,8 @@ final class WriteViewController: BaseViewController {
         
         saveButton.rx.tap
             .bind(with: self) { owner, _ in
-                guard let title = owner.titleTextField.text, !title.isEmpty,
+                guard let location = owner.locationTextField.text , !location.isEmpty,
+                      let title = owner.titleTextField.text, !title.isEmpty,
                       let description = owner.descriptionTextView.text, !description.isEmpty,
                       !owner.selectedImages.value.isEmpty else {
                     owner.view.makeToast("모든 항목을 기록해 주세요!", duration: 1, position: .center)
@@ -95,7 +108,7 @@ final class WriteViewController: BaseViewController {
                 }
                 
                 let record = RecordRealmEntity(
-                    location: "Seoul",
+                    location: location,
                     date: .currentDate(),
                     imagePaths: owner.selectedImages.value.compactMap { image in
                         return .saveImage(image: image)
@@ -142,6 +155,8 @@ final class WriteViewController: BaseViewController {
         self.view.backgroundColor = .customWhite
         self.navigationItem.rightBarButtonItem = saveButton
         
+        scrollView.keyboardDismissMode = .onDrag
+        
         photoButton.contentMode = .scaleAspectFit
         photoButton.setImage(UIImage(named: "bubble"), for: .normal)
         
@@ -149,8 +164,21 @@ final class WriteViewController: BaseViewController {
         photoIconBtn.tintColor = .black
         photoIconBtn.contentMode = .scaleAspectFit
         photoIconBtn.setImage(.photoImage, for: .normal)
-        photoIconBtn.setTitle("수정하기", for: .normal)
-        photoButton.setTitleColor(.customBlack, for: .normal)
+        
+        locationTextField.clipsToBounds = true
+        locationTextField.layer.cornerRadius = 10
+        locationTextField.backgroundColor = .systemGray6
+        locationTextField.placeholder = "위치를 입력해 주세요"
+        locationTextField.textColor = .customBlack
+        locationTextField.font = .largeSemibold
+        
+        let paddingViewLeft = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: locationTextField.frame.height))
+        let paddingViewRight = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: locationTextField.frame.height))
+        
+        locationTextField.leftView = paddingViewLeft
+        locationTextField.rightView = paddingViewRight
+        locationTextField.leftViewMode = .always
+        locationTextField.rightViewMode = .always
         
         titleTextField.placeholder = "제목을 입력해 주세요"
         titleTextField.textColor = .customBlack
@@ -184,6 +212,7 @@ final class WriteViewController: BaseViewController {
         scrollView.addSubview(contentView)
         
         [
+            locationTextField,
             collectionView,
             photoButton,
             photoIconBtn,
@@ -206,15 +235,21 @@ final class WriteViewController: BaseViewController {
             make.width.equalToSuperview()
         }
         
+        locationTextField.snp.makeConstraints { make in
+            make.height.equalTo(40)
+            make.top.equalToSuperview().offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+        }
+        
         photoButton.snp.makeConstraints { make in
             make.height.equalTo(200)
-            make.top.equalToSuperview()
+            make.top.equalTo(locationTextField.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview()
         }
         
         collectionView.snp.makeConstraints { make in
             make.height.equalTo(200)
-            make.top.equalToSuperview()
+            make.top.equalTo(locationTextField.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview()
         }
         
@@ -247,6 +282,11 @@ final class WriteViewController: BaseViewController {
         }
     }
     
+    deinit {
+        print(#function, self)
+        NotificationCenter.default.removeObserver(self)
+    }
+    
 }
 
 extension WriteViewController {
@@ -274,6 +314,58 @@ extension WriteViewController {
         config.startOnScreen = .library
         config.library.mediaType = .photo
         return config
+    }
+    
+    @objc
+    private
+    func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+              let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset.bottom = keyboardFrame.height + 20
+            self.scrollView.verticalScrollIndicatorInsets.bottom = keyboardFrame.height
+        }
+    }
+    
+    @objc
+    private func keyboardWillHide(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+        
+        UIView.animate(withDuration: duration) {
+            self.scrollView.contentInset.bottom = 0
+            self.scrollView.verticalScrollIndicatorInsets.bottom = 0
+        }
+    }
+
+    
+    private func requestPhotoLibraryPermission(completion: @escaping () -> Void) {
+        let status = PHPhotoLibrary.authorizationStatus()
+        switch status {
+        case .authorized:
+            completion()
+        case .denied, .restricted:
+            let alert = UIAlertController(title: "권한이 필요합니다", message: "앱에서 사진에 접근할 수 있도록 권한을 허용해주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "설정으로 가기", style: .default, handler: { _ in
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+            present(alert, animated: true)
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization { status in
+                if status == .authorized {
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
+            }
+        default:
+            break
+        }
     }
     
 }

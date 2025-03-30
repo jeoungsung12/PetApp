@@ -20,7 +20,7 @@ final class IconLabelButton: BaseButton {
         self.clipsToBounds = true
         self.layer.cornerRadius = 10
         self.layer.borderWidth = 0.5
-        
+        self.backgroundColor = .customWhite
         iconImageView.contentMode = .scaleAspectFit
         
         subTitleLabel.font = .largeBold

@@ -108,6 +108,7 @@ fileprivate class IconAttributeView: BaseView {
         }
         
         let endDate = endDate.toDate()
+        print(endDate)
         let today = Date()
         let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: endDate).day ?? 0
         
