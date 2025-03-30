@@ -18,8 +18,8 @@ protocol UserRepositoryType {
     func updateUserInfo(_ userInfo: UserInfo)
     func deleteUserInfo()
     
-    func saveRecord(_ record: RecordRealmEntity)
-    func removeRecord(id: String)
+    func saveRecord(_ record: RecordRealmEntity) -> Bool
+    func removeRecord(id: String) -> Bool
     func getAllRecords() -> [RecordRealmEntity]
     func removeAllRecords()
 }
@@ -30,28 +30,30 @@ final class RealmUserRepository: UserRepositoryType {
     
     private init() {}
     
-    func saveRecord(_ record: RecordRealmEntity) {
+    func saveRecord(_ record: RecordRealmEntity) -> Bool {
         do {
             try realm.write {
                 realm.add(record, update: .modified)
             }
+            return true
         } catch {
-            print("기록 저장 실패")
+            return false
         }
     }
     
-    func removeRecord(id: String) {
+    func removeRecord(id: String) -> Bool {
         guard let objectId = try? ObjectId(string: id),
               let record = realm.object(ofType: RecordRealmEntity.self, forPrimaryKey: objectId) else {
             print("기록 삭제 실패")
-            return
+            return false
         }
         do {
             try realm.write {
                 realm.delete(record)
             }
+            return true
         } catch {
-            print("기록 삭제 실패")
+            return false
         }
     }
     

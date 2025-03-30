@@ -5,7 +5,7 @@
 //  Created by 정성윤 on 3/28/25.
 //
 
-import Foundation
+import UIKit
 import RealmSwift
 
 final class RealmHomeEntity: Object {
