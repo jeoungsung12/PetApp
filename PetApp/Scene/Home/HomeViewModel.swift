@@ -54,23 +54,24 @@ final class HomeViewModel: BaseViewModel {
 extension HomeViewModel {
     
     func transform(_ input: Input) -> Output {
-        let homeResult = PublishRelay<[HomeSection]>()
+        let homeResult = BehaviorRelay<[HomeSection]>(value: [])
         let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
-            .flatMapLatest { [weak self] _ -> Single<[HomeSection]> in
+            .withUnretained(self)
+            .flatMapLatest { owner, _ -> Single<[HomeSection]> in
                 return Single<[HomeSection]>.create { single in
                     Task {
                         do {
-                            let result = try await self?.fetchData()
-                            single(.success(result ?? []))
+                            let result = try await owner.fetchData()
+                            single(.success(result))
                         } catch {
                             if let dataDreamError = error as? DataDreamError {
                                 errorResult.accept(dataDreamError)
                             } else {
                                 errorResult.accept(DataDreamError.serverError)
                             }
-                            single(.success([]))
+                            single(.success(homeResult.value))
                         }
                     }
                     return Disposables.create()

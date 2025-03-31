@@ -28,7 +28,7 @@ struct Row: Decodable {
     let imageCours: String
     let stateNm, sexNm, neutYn, sfetrInfo: String
     let shterNm, shterTelno, protectPLC, jurisdInstNm: String
-    let chrgpsnNm, chrgpsnContctNo, partclrMatr: Int?
+    let chrgpsnNm, chrgpsnContctNo: Int?
     let refineLotnoAddr, refineRoadnmAddr, refineZipCD, refineWgs84Logt: String
     let refineWgs84Lat: String
     
@@ -57,7 +57,6 @@ struct Row: Decodable {
         case jurisdInstNm = "JURISD_INST_NM"
         case chrgpsnNm = "CHRGPSN_NM"
         case chrgpsnContctNo = "CHRGPSN_CONTCT_NO"
-        case partclrMatr = "PARTCLR_MATR"
         case refineLotnoAddr = "REFINE_LOTNO_ADDR"
         case refineRoadnmAddr = "REFINE_ROADNM_ADDR"
         case refineZipCD = "REFINE_ZIP_CD"

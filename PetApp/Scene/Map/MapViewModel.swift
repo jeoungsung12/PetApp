@@ -52,7 +52,7 @@ extension MapViewModel {
                             } else {
                                 errorResult.accept(DataDreamError.serverError)
                             }
-                            single(.success([]))
+                            single(.success(mapResult.value))
                         }
                     }
                     return Disposables.create()
