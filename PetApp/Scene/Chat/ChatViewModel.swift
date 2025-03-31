@@ -17,7 +17,7 @@ enum ChatSectionType: CaseIterable {
 }
 
 final class ChatViewModel: BaseViewModel {
-    private let realmRepo: UserRepositoryType = RealmUserRepository.shared
+    private let realmRepo: RealmRepositoryType = RealmRepository.shared
     private let repository: NetworkRepositoryType = NetworkRepository.shared
     private var disposeBag = DisposeBag()
     private var likedEntities: [HomeEntity] = []

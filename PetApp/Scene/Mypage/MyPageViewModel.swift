@@ -28,7 +28,7 @@ enum MyPageCategoryType: String, CaseIterable {
 
 
 final class MyPageViewModel: BaseViewModel {
-    private let realm: UserRepositoryType = RealmUserRepository.shared
+    private let realm: RealmRepositoryType = RealmRepository.shared
     private(set) var profileData = ProfileData.allCases
     private var disposeBag = DisposeBag()
     

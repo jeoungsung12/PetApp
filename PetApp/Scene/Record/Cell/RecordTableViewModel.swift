@@ -14,7 +14,7 @@ protocol RemoveDelegate: AnyObject {
 }
 
 final class RecordTableViewModel: BaseViewModel {
-    private let repo: UserRepositoryType = RealmUserRepository.shared
+    private let repo: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
     
     struct Input {

@@ -14,7 +14,7 @@ protocol ShareDelegate: AnyObject {
 }
 
 final class DetailMiddleViewModel: BaseViewModel {
-    private let repo: UserRepositoryType = RealmUserRepository.shared
+    private let repo: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
     
     private let entity: HomeEntity
