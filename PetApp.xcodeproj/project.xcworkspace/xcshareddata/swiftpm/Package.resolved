@@ -1,5 +1,5 @@
 {
-  "originHash" : "e55cbf95fadc70047df16ef9ed64577babd7cd47d4e84fe0d008cbff78bff5dd",
+  "originHash" : "2d8564545b943f2f9f6364dac06a6ffe0f216289061a22acccbd2fc60af1f2c6",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher.git",
       "state" : {
-        "revision" : "4c6b067f96953ee19526e49e4189403a2be21fb3",
-        "version" : "8.3.1"
+        "revision" : "2ef543ee21d63734e1c004ad6c870255e8716c50",
+        "version" : "7.12.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/realm/realm-swift.git",
       "state" : {
-        "branch" : "master",
-        "revision" : "8cb364a6a63695df296f05b53f7c3f3b1dda6af3"
+        "revision" : "8cb364a6a63695df296f05b53f7c3f3b1dda6af3",
+        "version" : "10.54.3"
       }
     },
     {
