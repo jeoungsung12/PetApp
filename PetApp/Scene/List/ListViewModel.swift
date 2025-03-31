@@ -40,6 +40,7 @@ extension ListViewModel {
                             let result = try await self?.fetchData(value, page)
                             single(.success(result ?? []))
                         } catch {
+                            print(error)
                             if let dataDreamError = error as? DataDreamError {
                                 errorResult.accept(dataDreamError)
                             } else {
