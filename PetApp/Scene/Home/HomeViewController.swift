@@ -106,6 +106,15 @@ final class HomeViewController: BaseViewController {
                 owner.loadingIndicator.stopAnimating()
             }
             .disposed(by: disposeBag)
+        
+        output.errorResult
+            .drive(with: self) { owner, error in
+                let errorVM = ErrorViewModel(notiType: .player)
+                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
+                errorVC.modalPresentationStyle = .fullScreen
+                owner.present(errorVC, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     override func configureHierarchy() {
