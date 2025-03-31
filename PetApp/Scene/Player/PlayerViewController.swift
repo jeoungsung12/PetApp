@@ -25,6 +25,7 @@ final class PlayerViewController: BaseViewController {
         )
         let output = viewModel.transform(input)
         input.loadTrigger.accept(.init(start: 1, end: 10))
+        LoadingIndicator.showLoading()
         
         let result = output.videoResult.asDriver(onErrorJustReturn: [])
         
@@ -35,12 +36,28 @@ final class PlayerViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        result
+            .drive(with: self) { owner, _ in
+                LoadingIndicator.hideLoading()
+            }
+            .disposed(by: disposeBag)
+        
+        output.errorResult
+            .drive(with: self) { owner, error in
+                let errorVM = ErrorViewModel(notiType: .player)
+                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
+                errorVC.modalPresentationStyle = .overCurrentContext
+                owner.present(errorVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.prefetchRows
             .bind(with: self) { owner, IndexPaths in
                 if let lastIndex = IndexPaths.last.map({ $0.row }),
                    let request = owner.viewModel.playerRequest,
                    (output.videoResult.value.count - 2) < lastIndex
                 {
+                    LoadingIndicator.showLoading()
                     //TODO: 캐싱
                     input.loadTrigger.accept(.init(start: 1 + request.end, end: request.end + 10))
                 }
@@ -52,21 +69,6 @@ final class PlayerViewController: BaseViewController {
                 //TODO: 네트워크 요청 취소
             }
             .disposed(by: disposeBag)
-        
-        //        tableView.rx.willDisplayCell
-        //            .bind(with: self, onNext: { owner, event in
-        //                guard let cell = event.cell as? PlayerTableViewCell else { return }
-        //                cell.playVideo()
-        //            })
-        //            .disposed(by: disposeBag)
-        //
-        //
-        //        tableView.rx.didEndDisplayingCell
-        //            .bind(with: self, onNext: { owner, event in
-        //                guard let cell = event.cell as? PlayerTableViewCell else { return }
-        //                cell.stopVideo()
-        //            })
-        //            .disposed(by: disposeBag)
     }
     
     override func configureView() {

@@ -7,7 +7,7 @@
 import Foundation
 import RealmSwift
 
-protocol UserRepositoryType {
+protocol RealmRepositoryType {
     func saveLikedHomeEntity(_ homeEntity: HomeEntity)
     func removeLikedHomeEntity(id: String)
     func getAllLikedHomeEntities() -> [HomeEntity]
@@ -15,7 +15,6 @@ protocol UserRepositoryType {
     
     func saveUserInfo(_ userInfo: UserInfo)
     func getUserInfo() -> UserInfo?
-    func updateUserInfo(_ userInfo: UserInfo)
     func deleteUserInfo()
     
     func saveRecord(_ record: RecordRealmEntity) -> Bool
@@ -24,8 +23,8 @@ protocol UserRepositoryType {
     func removeAllRecords()
 }
 
-final class RealmUserRepository: UserRepositoryType {
-    static let shared: UserRepositoryType = RealmUserRepository()
+final class RealmRepository: RealmRepositoryType {
+    static let shared: RealmRepositoryType = RealmRepository()
     private let realm = try! Realm()
     
     private init() {}
@@ -74,7 +73,7 @@ final class RealmUserRepository: UserRepositoryType {
     
 }
 
-extension RealmUserRepository {
+extension RealmRepository {
     
     private func toRealmEntity(_ homeEntity: HomeEntity) -> RealmHomeEntity {
         let realmHomeEntity = RealmHomeEntity()
@@ -162,7 +161,7 @@ extension RealmUserRepository {
     }
 }
 
-extension RealmUserRepository {
+extension RealmRepository {
     
     private func toRealmUserInfo(_ userInfo: UserInfo) -> RealmUserInfo {
         let realmUserInfo = RealmUserInfo()
@@ -180,21 +179,15 @@ extension RealmUserRepository {
     
     func saveUserInfo(_ userInfo: UserInfo) {
         let realmUserInfo = toRealmUserInfo(userInfo)
+        deleteUserInfo()
         try! realm.write {
-            realm.add(realmUserInfo, update: .modified)
+            realm.add(realmUserInfo)
         }
     }
     
     func getUserInfo() -> UserInfo? {
         guard let realmUserInfo = realm.objects(RealmUserInfo.self).first else { return nil }
         return toUserInfo(realmUserInfo)
-    }
-    
-    func updateUserInfo(_ userInfo: UserInfo) {
-        try! realm.write {
-            let realmUserInfo = toRealmUserInfo(userInfo)
-            realm.add(realmUserInfo, update: .modified)
-        }
     }
     
     func deleteUserInfo() {

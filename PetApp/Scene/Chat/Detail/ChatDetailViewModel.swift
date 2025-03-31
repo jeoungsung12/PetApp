@@ -27,6 +27,7 @@ final class ChatDetailViewModel: BaseViewModel {
     
     struct Output {
         let chatResult: Driver<[ChatEntity]>
+        let errorResult: Driver<ChatError>
     }
     
     init(entity: HomeEntity) {
@@ -44,6 +45,7 @@ extension ChatDetailViewModel {
         let chatResult: BehaviorRelay<[ChatEntity]> = BehaviorRelay(value: [
             .init(type: .bot, name: entity.animal.name, message: "안녕하세요! 저에 대해 알고 싶으신가요? 편하게 질문해 주세요! 🐾", thumbImage: entity.animal.thumbImage)
         ])
+        let errorResult = PublishRelay<ChatError>()
         
         input.loadTrigger
             .withUnretained(self)
@@ -61,7 +63,12 @@ extension ChatDetailViewModel {
                             let result = try await owner.repository.getChatAnswer(entity: owner.entity, question: question)
                             single(.success(owner.appendList(chatResult.value, result)))
                         } catch {
-                            single(.failure(error))
+                            if let chatError = error as? ChatError {
+                                errorResult.accept(chatError)
+                            } else {
+                                errorResult.accept(ChatError.unsupportedRegion)
+                            }
+                            single(.success(chatResult.value))
                         }
                     }
                     return Disposables.create()
@@ -71,7 +78,8 @@ extension ChatDetailViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            chatResult: chatResult.asDriver()
+            chatResult: chatResult.asDriver(),
+            errorResult: errorResult.asDriver(onErrorJustReturn: .unsupportedRegion)
         )
     }
     

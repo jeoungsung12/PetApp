@@ -44,8 +44,20 @@ struct UserInfo {
 }
 
 final class RealmUserInfo: Object {
-    @Persisted(primaryKey: true) var name: String = ""
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var name: String = ""
     @Persisted var image: String = ""
+
+    convenience init(
+        id: ObjectId = ObjectId.generate(),
+        name: String,
+        image: String
+    ) {
+        self.init()
+        self.id = id
+        self.name = name
+        self.image = image
+    }
 }
 
 final class RecordRealmEntity: Object {

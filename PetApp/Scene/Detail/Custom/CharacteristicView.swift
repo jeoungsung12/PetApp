@@ -107,10 +107,10 @@ fileprivate class IconAttributeView: BaseView {
             iconImageView.kf.setImage(with: url)
         }
         
-        let endDate = endDate.toDate()
+        let date: Date = endDate.toDate()
         print(endDate)
         let today = Date()
-        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: endDate).day ?? 0
+        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: date).day ?? 0
         
         let title = "공고 마감까지\n\(daysRemaining)일 남음"
         

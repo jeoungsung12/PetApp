@@ -9,16 +9,19 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-import RxSwift
-import RxCocoa
+protocol ShareDelegate: AnyObject {
+    func activityShare(_ entity: HomeEntity)
+}
 
 final class DetailMiddleViewModel: BaseViewModel {
-    private let repo: UserRepositoryType = RealmUserRepository.shared
+    private let repo: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
     
     private let entity: HomeEntity
+    weak var delegate: ShareDelegate?
     struct Input {
         let heartTapped: ControlEvent<Void>
+        let shareTapped: ControlEvent<Void>
     }
     
     struct Output {
@@ -46,6 +49,12 @@ extension DetailMiddleViewModel {
                 
                 let newIsLiked = !isCurrentlyLiked
                 isLikedResult.accept(newIsLiked)
+            })
+            .disposed(by: disposeBag)
+        
+        input.shareTapped
+            .bind(with: self, onNext: { owner, _ in
+                owner.delegate?.activityShare(owner.entity)
             })
             .disposed(by: disposeBag)
         

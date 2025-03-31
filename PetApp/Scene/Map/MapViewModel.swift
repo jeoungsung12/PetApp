@@ -25,6 +25,7 @@ struct MapViewModel: BaseViewModel {
     
     struct Output {
         let mapResult: Driver<[MapEntity]>
+        let errorResult: Driver<DataDreamError>
     }
     
     init(mapType: MapType) {
@@ -36,6 +37,7 @@ extension MapViewModel {
     
     func transform(_ input: Input) -> Output {
         let mapResult = BehaviorRelay<[MapEntity]>(value: [])
+        let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
             .flatMapLatest {
@@ -45,7 +47,12 @@ extension MapViewModel {
                             let result = try await repository.getMap(mapType)
                             single(.success(result))
                         } catch {
-                            single(.failure(error))
+                            if let dataDreamError = error as? DataDreamError {
+                                errorResult.accept(dataDreamError)
+                            } else {
+                                errorResult.accept(DataDreamError.serverError)
+                            }
+                            single(.success(mapResult.value))
                         }
                     }
                     return Disposables.create()
@@ -55,7 +62,8 @@ extension MapViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            mapResult: mapResult.asDriver()
+            mapResult: mapResult.asDriver(),
+            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
         )
     }
     
