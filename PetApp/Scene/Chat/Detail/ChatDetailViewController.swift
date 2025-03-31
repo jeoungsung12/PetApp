@@ -76,6 +76,16 @@ final class ChatDetailViewController: BaseViewController {
                 owner.keyboardView.textField.text = nil
             }
             .disposed(by: disposeBag)
+        
+        keyboardView.textField.rx.controlEvent(.editingDidEndOnExit)
+            .withLatestFrom(keyboardView.textField.rx.text)
+            .bind(with: self) { owner, text in
+                guard let text = owner.keyboardView.textField.text else { return }
+                LoadingIndicator.showLoading()
+                input.loadTrigger.accept(text)
+                owner.keyboardView.textField.text = nil
+            }
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {
