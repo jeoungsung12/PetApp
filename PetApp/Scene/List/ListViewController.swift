@@ -21,6 +21,7 @@ final class ListViewController: BaseViewController {
         )
         let output = viewModel.transform(input)
         input.loadTrigger.accept(viewModel.page)
+        LoadingIndicator.showLoading()
         
         let result = output.homeResult.asDriver()
         
@@ -28,6 +29,12 @@ final class ListViewController: BaseViewController {
             .drive(tableView.rx.items(cellIdentifier: ListTableViewCell.id, cellType: ListTableViewCell.self)) { row, element, cell in
                 cell.configure(element)
                 cell.selectionStyle = .none
+            }
+            .disposed(by: disposeBag)
+        
+        result
+            .drive(with: self) { owner, _ in
+                LoadingIndicator.hideLoading()
             }
             .disposed(by: disposeBag)
         
@@ -53,6 +60,7 @@ final class ListViewController: BaseViewController {
                 if let lastIndex = IndexPaths.last.map({ $0.row }),
                    (output.homeResult.value.count - 2) < lastIndex
                 {
+                    LoadingIndicator.showLoading()
                     //TODO: 캐싱
                     input.loadTrigger.accept(owner.viewModel.page + 1)
                 }

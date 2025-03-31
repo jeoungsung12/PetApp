@@ -41,6 +41,7 @@ final class MapViewController: BaseViewController {
             loadTrigger: Observable.just(())
         )
         let output = viewModel.transform(input)
+        LoadingIndicator.showLoading()
         
         let result = output.mapResult
         result
@@ -52,6 +53,7 @@ final class MapViewController: BaseViewController {
                 let coordinates = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
                 let region = owner.calculateRegion(for: coordinates)
                 owner.mapView.setRegion(region, animated: true)
+                LoadingIndicator.hideLoading()
             }
             .disposed(by: disposeBag)
         

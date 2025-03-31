@@ -12,7 +12,6 @@ import RxDataSources
 import SnapKit
 
 final class HomeViewController: BaseViewController {
-    private let loadingIndicator = UIActivityIndicatorView()
     private let viewModel = HomeViewModel()
     private let disposeBag = DisposeBag()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
@@ -22,7 +21,7 @@ final class HomeViewController: BaseViewController {
             loadTrigger: Observable.just(())
         )
         let output = viewModel.transform(input)
-        loadingIndicator.startAnimating()
+        LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { dataSource, collectionView, indexPath, item in
             switch HomeSectionType.allCases[indexPath.section] {
@@ -103,7 +102,7 @@ final class HomeViewController: BaseViewController {
         
         result
             .drive(with: self) { owner, _ in
-                owner.loadingIndicator.stopAnimating()
+                LoadingIndicator.hideLoading()
             }
             .disposed(by: disposeBag)
         
@@ -118,9 +117,7 @@ final class HomeViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        [collectionView, loadingIndicator].forEach {
-            view.addSubview($0)
-        }
+        self.view.addSubview(collectionView)
     }
     
     override func configureLayout() {
@@ -128,18 +125,11 @@ final class HomeViewController: BaseViewController {
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.bottom.horizontalEdges.equalToSuperview()
         }
-        
-        loadingIndicator.snp.makeConstraints { make in
-            make.size.equalTo(40)
-            make.center.equalToSuperview()
-        }
     }
     
     override func configureView() {
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
-        loadingIndicator.style = .medium
-        loadingIndicator.color = .customLightGray
         configureCollectionView()
     }
 }
