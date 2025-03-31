@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class RecordViewModel: BaseViewModel {
-    private let realmRepo: UserRepositoryType = RealmUserRepository.shared
+    private let realmRepo: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
     
     struct Input {

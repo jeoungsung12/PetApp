@@ -40,7 +40,7 @@ struct NickName {
 }
 
 final class ProfileViewModel: BaseViewModel {
-    private let db: UserRepositoryType = RealmUserRepository.shared
+    private let db: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
     
     struct Input {
