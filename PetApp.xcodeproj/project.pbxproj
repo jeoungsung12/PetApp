@@ -7,18 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; };
-		E48EB3572D97E9C400ACAEA3 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E48EB3552D97E9BB00ACAEA3 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		E48EB4A32D997F9D00ACAEA3 /* YPImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB4A22D997F9D00ACAEA3 /* YPImagePicker */; };
-		E49726882D8D296100716594 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E49726872D8D296100716594 /* SnapKit */; };
-		E497268B2D8D296900716594 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E497268A2D8D296900716594 /* Kingfisher */; };
-		E497268E2D8D297700716594 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E497268D2D8D297700716594 /* RxCocoa */; };
-		E49726902D8D297700716594 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E497268F2D8D297700716594 /* RxSwift */; };
-		E49726932D8D298C00716594 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = E49726922D8D298C00716594 /* RxDataSources */; };
-		E49726962D8D299600716594 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = E49726952D8D299600716594 /* Toast */; };
-		E49726992D8D29A000716594 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E49726982D8D29A000716594 /* Alamofire */; };
+		E48EB5F12D9AA3FE00ACAEA3 /* YPImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F02D9AA3FE00ACAEA3 /* YPImagePicker */; };
+		E48EB5F42D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F32D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper */; };
+		E48EB5F72D9AA41700ACAEA3 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F62D9AA41700ACAEA3 /* Toast */; };
+		E48EB5FA2D9AA42C00ACAEA3 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F92D9AA42C00ACAEA3 /* SnapKit */; };
+		E48EB5FD2D9AA43F00ACAEA3 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5FC2D9AA43F00ACAEA3 /* RxCocoa */; };
+		E48EB5FF2D9AA43F00ACAEA3 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5FE2D9AA43F00ACAEA3 /* RxSwift */; };
+		E48EB6022D9AA49900ACAEA3 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB6012D9AA49900ACAEA3 /* RealmSwift */; };
+		E48EB6052D9AA4D500ACAEA3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB6042D9AA4D500ACAEA3 /* Kingfisher */; };
+		E48EB6082D9AA50600ACAEA3 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB6072D9AA50600ACAEA3 /* Alamofire */; };
+		E48EB60B2D9AA56C00ACAEA3 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB60A2D9AA56C00ACAEA3 /* RxDataSources */; };
+		E48EB60C2D9AA5E900ACAEA3 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E48EB6012D9AA49900ACAEA3 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E49726AA2D8D2D6B00716594 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = E49726A92D8D2D6B00716594 /* .gitignore */; };
-		E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,7 +28,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E48EB3572D97E9C400ACAEA3 /* RealmSwift in Embed Frameworks */,
+				E48EB60C2D9AA5E900ACAEA3 /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -66,16 +66,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E49726962D8D299600716594 /* Toast in Frameworks */,
-				E48EB4A32D997F9D00ACAEA3 /* YPImagePicker in Frameworks */,
-				E49726992D8D29A000716594 /* Alamofire in Frameworks */,
-				E497268E2D8D297700716594 /* RxCocoa in Frameworks */,
-				E48EB3562D97E9BB00ACAEA3 /* RealmSwift in Frameworks */,
-				E4972ED22D93E2E500716594 /* YouTubeiOSPlayerHelper in Frameworks */,
-				E497268B2D8D296900716594 /* Kingfisher in Frameworks */,
-				E49726902D8D297700716594 /* RxSwift in Frameworks */,
-				E49726932D8D298C00716594 /* RxDataSources in Frameworks */,
-				E49726882D8D296100716594 /* SnapKit in Frameworks */,
+				E48EB6082D9AA50600ACAEA3 /* Alamofire in Frameworks */,
+				E48EB5FF2D9AA43F00ACAEA3 /* RxSwift in Frameworks */,
+				E48EB5F72D9AA41700ACAEA3 /* Toast in Frameworks */,
+				E48EB60B2D9AA56C00ACAEA3 /* RxDataSources in Frameworks */,
+				E48EB6022D9AA49900ACAEA3 /* RealmSwift in Frameworks */,
+				E48EB5FA2D9AA42C00ACAEA3 /* SnapKit in Frameworks */,
+				E48EB6052D9AA4D500ACAEA3 /* Kingfisher in Frameworks */,
+				E48EB5FD2D9AA43F00ACAEA3 /* RxCocoa in Frameworks */,
+				E48EB5F12D9AA3FE00ACAEA3 /* YPImagePicker in Frameworks */,
+				E48EB5F42D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,16 +120,16 @@
 			);
 			name = PetApp;
 			packageProductDependencies = (
-				E49726872D8D296100716594 /* SnapKit */,
-				E497268A2D8D296900716594 /* Kingfisher */,
-				E497268D2D8D297700716594 /* RxCocoa */,
-				E497268F2D8D297700716594 /* RxSwift */,
-				E49726922D8D298C00716594 /* RxDataSources */,
-				E49726952D8D299600716594 /* Toast */,
-				E49726982D8D29A000716594 /* Alamofire */,
-				E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */,
-				E48EB3552D97E9BB00ACAEA3 /* RealmSwift */,
-				E48EB4A22D997F9D00ACAEA3 /* YPImagePicker */,
+				E48EB5F02D9AA3FE00ACAEA3 /* YPImagePicker */,
+				E48EB5F32D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper */,
+				E48EB5F62D9AA41700ACAEA3 /* Toast */,
+				E48EB5F92D9AA42C00ACAEA3 /* SnapKit */,
+				E48EB5FC2D9AA43F00ACAEA3 /* RxCocoa */,
+				E48EB5FE2D9AA43F00ACAEA3 /* RxSwift */,
+				E48EB6012D9AA49900ACAEA3 /* RealmSwift */,
+				E48EB6042D9AA4D500ACAEA3 /* Kingfisher */,
+				E48EB6072D9AA50600ACAEA3 /* Alamofire */,
+				E48EB60A2D9AA56C00ACAEA3 /* RxDataSources */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -160,15 +160,15 @@
 			mainGroup = E49726472D8D273300716594;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */,
-				E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */,
-				E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
-				E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
-				E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */,
-				E48EB4A12D997F9D00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */,
+				E48EB5EF2D9AA3FE00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */,
+				E48EB5F22D9AA40800ACAEA3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
+				E48EB5F52D9AA41700ACAEA3 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
+				E48EB5F82D9AA42C00ACAEA3 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				E48EB5FB2D9AA43F00ACAEA3 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				E48EB6002D9AA49900ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				E48EB6032D9AA4D500ACAEA3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				E48EB6062D9AA50600ACAEA3 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
@@ -210,9 +210,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q653PU93R6;
+				EXCLUDED_ARCHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 정보를 사용해 근처 유기동물 보호소를 표시합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "앱에서 사진을 선택하려면 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -224,7 +227,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.PetApp;
+				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -244,9 +247,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q653PU93R6;
+				EXCLUDED_ARCHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PetApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "와랄라";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 정보를 사용해 근처 유기동물 보호소를 표시합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "앱에서 사진을 선택하려면 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -258,7 +264,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.PetApp;
+				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -322,7 +328,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -379,7 +385,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -413,15 +419,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		E48EB4A12D997F9D00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */ = {
+		E48EB5EF2D9AA3FE00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Yummypets/YPImagePicker.git";
 			requirement = {
@@ -429,55 +427,7 @@
 				minimumVersion = 5.2.2;
 			};
 		};
-		E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
-		E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.3.1;
-			};
-		};
-		E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.9.0;
-			};
-		};
-		E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
-			};
-		};
-		E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/scalessec/Toast-Swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.1.1;
-			};
-		};
-		E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.2;
-			};
-		};
-		E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
+		E48EB5F22D9AA40800ACAEA3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper.git";
 			requirement = {
@@ -485,58 +435,114 @@
 				minimumVersion = 1.0.4;
 			};
 		};
+		E48EB5F52D9AA41700ACAEA3 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scalessec/Toast-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
+		E48EB5F82D9AA42C00ACAEA3 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.0;
+			};
+		};
+		E48EB5FB2D9AA43F00ACAEA3 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.5.0;
+			};
+		};
+		E48EB6002D9AA49900ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.42.0;
+			};
+		};
+		E48EB6032D9AA4D500ACAEA3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		E48EB6062D9AA50600ACAEA3 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.4.4;
+			};
+		};
+		E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E48EB3552D97E9BB00ACAEA3 /* RealmSwift */ = {
+		E48EB5F02D9AA3FE00ACAEA3 /* YPImagePicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E48EB3542D97E9BB00ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-		E48EB4A22D997F9D00ACAEA3 /* YPImagePicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E48EB4A12D997F9D00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */;
+			package = E48EB5EF2D9AA3FE00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */;
 			productName = YPImagePicker;
 		};
-		E49726872D8D296100716594 /* SnapKit */ = {
+		E48EB5F32D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E49726862D8D296100716594 /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = SnapKit;
+			package = E48EB5F22D9AA40800ACAEA3 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
+			productName = YouTubeiOSPlayerHelper;
 		};
-		E497268A2D8D296900716594 /* Kingfisher */ = {
+		E48EB5F62D9AA41700ACAEA3 /* Toast */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E49726892D8D296900716594 /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
-		};
-		E497268D2D8D297700716594 /* RxCocoa */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */;
-			productName = RxCocoa;
-		};
-		E497268F2D8D297700716594 /* RxSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E497268C2D8D297700716594 /* XCRemoteSwiftPackageReference "RxSwift" */;
-			productName = RxSwift;
-		};
-		E49726922D8D298C00716594 /* RxDataSources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E49726912D8D298B00716594 /* XCRemoteSwiftPackageReference "RxDataSources" */;
-			productName = RxDataSources;
-		};
-		E49726952D8D299600716594 /* Toast */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E49726942D8D299600716594 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
+			package = E48EB5F52D9AA41700ACAEA3 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
 			productName = Toast;
 		};
-		E49726982D8D29A000716594 /* Alamofire */ = {
+		E48EB5F92D9AA42C00ACAEA3 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E49726972D8D29A000716594 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = E48EB5F82D9AA42C00ACAEA3 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		E48EB5FC2D9AA43F00ACAEA3 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB5FB2D9AA43F00ACAEA3 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		E48EB5FE2D9AA43F00ACAEA3 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB5FB2D9AA43F00ACAEA3 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		E48EB6012D9AA49900ACAEA3 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB6002D9AA49900ACAEA3 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		E48EB6042D9AA4D500ACAEA3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB6032D9AA4D500ACAEA3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		E48EB6072D9AA50600ACAEA3 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48EB6062D9AA50600ACAEA3 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		E4972ED12D93E2E500716594 /* YouTubeiOSPlayerHelper */ = {
+		E48EB60A2D9AA56C00ACAEA3 /* RxDataSources */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E4972ED02D93E2E500716594 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
-			productName = YouTubeiOSPlayerHelper;
+			package = E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

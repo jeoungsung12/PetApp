@@ -15,6 +15,9 @@ final class MapViewController: BaseViewController {
     private let mapView = MKMapView()
     private let viewModel: MapViewModel
     private var disposeBag = DisposeBag()
+    private let locationManager = CLLocationManager()
+    private let authorizationStatusSubject = BehaviorRelay<CLAuthorizationStatus>(value: CLLocationManager.authorizationStatus())
+    private let locationButton = UIButton()
     
     init(viewModel: MapViewModel) {
         self.viewModel = viewModel
@@ -43,15 +46,17 @@ final class MapViewController: BaseViewController {
         let output = viewModel.transform(input)
         LoadingIndicator.showLoading()
         
-        let result = output.mapResult
-        result
+        output.mapResult
             .drive(with: self) { owner, entity in
                 owner.mapView.removeAnnotations(owner.mapView.annotations)
                 let annotations = entity.map { CustomAnnotation(entity: $0) }
                 owner.mapView.addAnnotations(annotations)
                 
-                let coordinates = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
-                let region = owner.calculateRegion(for: coordinates)
+                let _ = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
+                let region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780),
+                    span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                )
                 owner.mapView.setRegion(region, animated: true)
                 LoadingIndicator.hideLoading()
             }
@@ -65,54 +70,92 @@ final class MapViewController: BaseViewController {
                 owner.present(errorVC, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        locationButton.rx.tap
+            .withLatestFrom(authorizationStatusSubject)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] status in
+                guard let self = self else { return }
+                switch status {
+                case .notDetermined:
+                    self.locationManager.requestWhenInUseAuthorization()
+                case .restricted, .denied:
+                    self.showSettingsAlert()
+                case .authorizedWhenInUse, .authorizedAlways:
+                    self.moveToUserLocation()
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     override func configureView() {
         self.setNavigation(color: .clear)
         mapView.delegate = self
-        //TODO: 사용자 위치 허락
-//        mapView.showsUserLocation = true
+        mapView.showsUserLocation = true
+        locationManager.delegate = self
+        
+        locationButton.setImage(UIImage(systemName: "location.fill"), for: .normal)
+        locationButton.tintColor = .systemBlue
+        locationButton.backgroundColor = .white
+        locationButton.layer.cornerRadius = 25
+        locationButton.clipsToBounds = true
     }
     
     override func configureHierarchy() {
         self.view.addSubview(mapView)
+        self.view.addSubview(locationButton)
     }
     
     override func configureLayout() {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        locationButton.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(20)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            make.width.height.equalTo(50)
+        }
+    }
+    
+    private func moveToUserLocation() {
+        if let userLocation = locationManager.location?.coordinate {
+            let region = MKCoordinateRegion(
+                center: userLocation,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+            mapView.setRegion(region, animated: true)
+        }
+    }
+    
+    private func showSettingsAlert() {
+        let alert = UIAlertController(
+            title: "위치 권한 필요",
+            message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        present(alert, animated: true)
+    }
+}
+
+extension MapViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        authorizationStatusSubject.accept(status)
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
+            moveToUserLocation()
+        }
     }
 }
 
 extension MapViewController: MKMapViewDelegate {
-    
-    private func calculateRegion(for coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
-        guard !coordinates.isEmpty else {
-            return MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780),
-                span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-            )
-        }
-        let latitudes = coordinates.map { $0.latitude }
-        let longitudes = coordinates.map { $0.longitude }
-        
-        let minLat = latitudes.min() ?? 0
-        let maxLat = latitudes.max() ?? 0
-        let minLon = longitudes.min() ?? 0
-        let maxLon = longitudes.max() ?? 0
-        
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-        let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.5,
-            longitudeDelta: (maxLon - minLon) * 1.5
-        )
-        
-        return MKCoordinateRegion(center: center, span: span)
-    }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation { return nil }
