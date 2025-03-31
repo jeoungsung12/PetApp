@@ -49,12 +49,11 @@ extension ChatDetailViewModel {
         
         input.loadTrigger
             .withUnretained(self)
-            .flatMapLatest {
-                owner,
-                question in
+            .flatMapLatest { owner, question in
                 Single.create { single in
                     Task {
                         do {
+                            print(question)
                             chatResult.accept(owner.appendList(
                                 chatResult.value,
                                 ChatEntity(type: .mine, name: owner.entity.animal.name, message: question, thumbImage: owner.entity.animal.thumbImage))
