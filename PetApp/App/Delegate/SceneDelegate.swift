@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     private let realmRepo: RealmRepositoryType = RealmRepository.shared
@@ -51,7 +51,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let windowScene = scene as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
             DispatchQueue.main.async {
-                rootViewController.dismiss(animated: true)
+                if let presentedVC = rootViewController.presentedViewController as? ErrorViewController {
+                    presentedVC.dismiss(animated: true)
+                }
             }
         }
     }
