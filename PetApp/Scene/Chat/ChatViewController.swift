@@ -80,13 +80,15 @@ final class ChatViewController: BaseViewController {
             .drive(with: self) { owner, error in
                 let errorVM = ErrorViewModel(notiType: .player)
                 let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .fullScreen
+                errorVC.modalPresentationStyle = .overCurrentContext
                 owner.present(errorVC, animated: true)
             }
             .disposed(by: disposeBag)
         
-        
-        Observable.zip(collectionView.rx.itemSelected, collectionView.rx.modelSelected(HomeItem.self))
+        Observable.zip(
+            collectionView.rx.itemSelected,
+            collectionView.rx.modelSelected(HomeItem.self)
+        )
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, selected in
                 if let data = selected.1.data {
@@ -94,6 +96,7 @@ final class ChatViewController: BaseViewController {
                     let vc = ChatDetailViewController(viewModel: vm)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 } else {
+                    print("이거다이거")
                     let vc = ListViewController()
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
