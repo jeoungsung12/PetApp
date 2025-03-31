@@ -104,6 +104,8 @@ final class DetailViewController: BaseViewController {
 extension DetailViewController: ShareDelegate {
     
     func activityShare(_ entity: HomeEntity) {
+        //TODO: 앱 링크
+        let deepLink = "yourapp://animal/\(entity.animal.id)"
         let shareText = """
             와랄라에서 유기동물을 만나보세요! 🐾
             이름: \(entity.animal.name)
@@ -112,17 +114,11 @@ extension DetailViewController: ShareDelegate {
             성별: \(entity.animal.gender)
             중성화 여부: \(entity.animal.neut)
             새로운 가족을 기다리고 있어요! 💕
+            자세히 보기: \(deepLink)
             """
         
         let items: [Any] = [shareText]
-
         let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        
-//        if let popoverController = activityViewController.popoverPresentationController {
-//            popoverController.sourceView = view
-//            popoverController.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
-//            popoverController.permittedArrowDirections = []
-//        }
         
         present(activityViewController, animated: true, completion: nil)
     }

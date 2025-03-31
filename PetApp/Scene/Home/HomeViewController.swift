@@ -16,6 +16,11 @@ final class HomeViewController: BaseViewController {
     private let disposeBag = DisposeBag()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        LoadingIndicator.showLoading()
+    }
+    
     override func setBinding() {
         let input = HomeViewModel.Input(
             loadTrigger: Observable.just(())

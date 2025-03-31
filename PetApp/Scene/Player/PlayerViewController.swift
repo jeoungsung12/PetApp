@@ -17,6 +17,7 @@ final class PlayerViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        LoadingIndicator.showLoading()
     }
     
     override func setBinding() {

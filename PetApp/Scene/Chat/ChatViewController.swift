@@ -22,6 +22,11 @@ final class ChatViewController: BaseViewController {
     )
     private var disposeBag = DisposeBag()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        LoadingIndicator.showLoading()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         input.reloadRealm.accept(())
@@ -29,7 +34,6 @@ final class ChatViewController: BaseViewController {
     
     override func setBinding() {
         let output = viewModel.transform(input)
-        LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { [weak self] dataSource, collectionView, indexPath, item in
             switch ChatSectionType.allCases[indexPath.section] {
