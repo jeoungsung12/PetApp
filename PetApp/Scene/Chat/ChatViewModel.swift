@@ -26,6 +26,7 @@ final class ChatViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: Driver<[HomeSection]>
+        let errorResult: Driver<ChatError>
     }
     
 }
@@ -34,6 +35,7 @@ extension ChatViewModel {
     
     func transform(_ input: Input) -> Output {
         let homeResult = PublishRelay<[HomeSection]>()
+        let errorResult = PublishRelay<ChatError>()
         
         input.loadTrigger
             .flatMapLatest { [weak self] _ -> Single<[HomeSection]> in
@@ -53,7 +55,8 @@ extension ChatViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            homeResult: homeResult.asDriver(onErrorJustReturn: [])
+            homeResult: homeResult.asDriver(onErrorJustReturn: []),
+            errorResult: errorResult.asDriver(onErrorJustReturn: ChatError.unsupportedRegion)
         )
     }
     
