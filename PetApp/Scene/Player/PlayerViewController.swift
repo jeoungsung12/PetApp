@@ -39,7 +39,7 @@ final class PlayerViewController: BaseViewController {
             .drive(with: self) { owner, error in
                 let errorVM = ErrorViewModel(notiType: .player)
                 let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .fullScreen
+                errorVC.modalPresentationStyle = .overCurrentContext
                 owner.present(errorVC, animated: true)
             }
             .disposed(by: disposeBag)
