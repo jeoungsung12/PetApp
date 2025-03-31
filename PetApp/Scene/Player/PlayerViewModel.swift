@@ -48,8 +48,6 @@ extension PlayerViewModel {
                                 start: request.start,
                                 end: request.end
                             )
-                            
-                            guard let result = result else { return single(.failure(NSError()))}
                             single(.success(owner.AppendOriginValue(videoResult, result) ?? []))
                         } catch {
                             if let openSquareError = error as? OpenSquareError {
@@ -69,8 +67,8 @@ extension PlayerViewModel {
         
         
         return Output(
-            videoResult: videoResult,
-            errorResult: errorResult.asDriver(onErrorJustReturn: NSError())
+            errorResult: errorResult.asDriver(onErrorJustReturn: OpenSquareError.serverError),
+            videoResult: videoResult
         )
     }
     

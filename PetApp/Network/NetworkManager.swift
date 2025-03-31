@@ -8,6 +8,11 @@
 import Foundation
 import Alamofire
 
+struct NetworkError: Error {
+    let error: AFError
+    let responseData: Data?
+}
+
 protocol NetworkManagerType: AnyObject {
     func fetchData<T:Decodable,U:Router>(_ api: U) async throws -> T
 }
@@ -26,7 +31,11 @@ final class NetworkManager: NetworkManagerType {
         case let .success(data):
             return data
         case let .failure(error):
-            throw error
+            if let responseData = await response.response.data {
+                throw NetworkError(error: error, responseData: responseData)
+            } else {
+                throw error
+            }
         }
     }
 }

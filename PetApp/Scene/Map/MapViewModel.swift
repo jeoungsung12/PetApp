@@ -37,7 +37,7 @@ extension MapViewModel {
     
     func transform(_ input: Input) -> Output {
         let mapResult = BehaviorRelay<[MapEntity]>(value: [])
-        let errorResult = PublishRelay<OpenSquareError>()
+        let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
             .flatMapLatest {
@@ -48,7 +48,7 @@ extension MapViewModel {
                             single(.success(result))
                         } catch {
                             if let dataDreamError = error as? DataDreamError {
-                                errorResult.accept(openSquareError)
+                                errorResult.accept(dataDreamError)
                             } else {
                                 errorResult.accept(DataDreamError.serverError)
                             }
@@ -63,7 +63,7 @@ extension MapViewModel {
         
         return Output(
             mapResult: mapResult.asDriver(),
-            errorResult: errorResult.asDriver(onErrorJustReturn: [])
+            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
         )
     }
     
