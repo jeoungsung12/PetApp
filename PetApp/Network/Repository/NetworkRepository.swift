@@ -23,9 +23,10 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page))
             return result.toEntity()
         } catch {
-            if let afError = error.asAFError,
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
                let statusCode = afError.responseCode,
-               let responseData = afError.underlyingError?.asAFError?.responseData,
+               let responseData = networkError.responseData,
                let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
                let errorMessage = message["message"] as? String {
                 let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
@@ -47,9 +48,10 @@ final class NetworkRepository: NetworkRepositoryType {
                 return result.toEntity()
             }
         } catch {
-            if let afError = error.asAFError,
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
                let statusCode = afError.responseCode,
-               let responseData = afError.underlyingError?.asAFError?.responseData,
+               let responseData = networkError.responseData,
                let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
                let errorMessage = message["message"] as? String {
                 let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
@@ -65,12 +67,10 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: PlayerResponseDTO = try await network.fetchData(OpenSquareRouter.getVideo(startPage: start, endPage: end))
             return result.toEntity()
         } catch {
-            if let afError = error.asAFError,
-               let statusCode = afError.responseCode,
-               let responseData = afError.underlyingError?.asAFError?.responseData,
-               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-               let errorMessage = message["message"] as? String {
-                let customError = OpenSquareError.mapToOpenSquareError(statusCode: statusCode, message: errorMessage)
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
+               let statusCode = afError.responseCode {
+                let customError = OpenSquareError.mapToOpenSquareError(statusCode: "Error-\(statusCode)")
                 throw customError
             } else {
                 throw OpenSquareError.serverError
@@ -83,9 +83,10 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: ChatResponseDTO = try await network.fetchData(ChatRouter.getChatAnswer(entity: entity, question: question))
             return ChatEntity(type: .bot, name: entity.animal.name, message: result.choices.first?.message.content ?? "", thumbImage: entity.animal.thumbImage)
         } catch {
-            if let afError = error.asAFError,
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
                let statusCode = afError.responseCode,
-               let responseData = afError.underlyingError?.asAFError?.responseData,
+               let responseData = networkError.responseData,
                let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
                let errorMessage = message["message"] as? String {
                 let customError = ChatError.mapToChatError(statusCode: statusCode, message: errorMessage)

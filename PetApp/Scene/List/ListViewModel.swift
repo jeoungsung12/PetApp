@@ -20,6 +20,7 @@ final class ListViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: BehaviorRelay<[HomeEntity]>
+        let errorResult: Driver<DataDreamError>
     }
 }
 
@@ -27,6 +28,7 @@ extension ListViewModel {
     
     func transform(_ input: Input) -> Output {
         let homeResult = BehaviorRelay<[HomeEntity]>(value: [])
+        let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
             .flatMapLatest { [weak self] page -> Single<[HomeEntity]> in
@@ -38,7 +40,12 @@ extension ListViewModel {
                             let result = try await self?.fetchData(value, page)
                             single(.success(result ?? []))
                         } catch {
-                            single(.failure(error))
+                            if let dataDreamError = error as? DataDreamError {
+                                errorResult.accept(dataDreamError)
+                            } else {
+                                errorResult.accept(DataDreamError.serverError)
+                            }
+                            single(.success([]))
                         }
                     }
                     return Disposables.create()
@@ -48,7 +55,8 @@ extension ListViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            homeResult: homeResult
+            homeResult: homeResult,
+            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
         )
     }
     
