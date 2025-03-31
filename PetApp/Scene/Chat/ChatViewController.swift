@@ -13,17 +13,24 @@ import RxDataSources
 
 final class ChatViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
+    private let chatImageView = UIImageView()
     
     private let viewModel = ChatViewModel()
+    private lazy var input = ChatViewModel.Input(
+        loadTrigger: Observable.just(()),
+        reloadRealm: PublishRelay()
+    )
     private var disposeBag = DisposeBag()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        input.reloadRealm.accept(())
+    }
+    
     override func setBinding() {
-        let input = ChatViewModel.Input(
-            loadTrigger: Observable.just(())
-        )
         let output = viewModel.transform(input)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { dataSource, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { [weak self] dataSource, collectionView, indexPath, item in
             switch ChatSectionType.allCases[indexPath.section] {
             case .header:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChatHeaderCell.id, for: indexPath) as? ChatHeaderCell else { return UICollectionViewCell() }
@@ -36,7 +43,7 @@ final class ChatViewController: BaseViewController {
                 
             case .footer:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChatFooterCell.id, for: indexPath) as? ChatFooterCell else { return UICollectionViewCell() }
-                //TODO: Realm 데이터 사용
+                self?.chatImageView.isHidden = (item.data != nil)
                 cell.configure(item.data)
                 return cell
             }
@@ -61,6 +68,14 @@ final class ChatViewController: BaseViewController {
             .drive(collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        result
+            .drive(with: self) { owner, sections in
+                if let section = sections.last {
+                    owner.chatImageView.isHidden = !section.items.isEmpty
+                }
+            }
+            .disposed(by: disposeBag)
+        
         output.errorResult
             .drive(with: self) { owner, error in
                 let errorVM = ErrorViewModel(notiType: .player)
@@ -70,12 +85,18 @@ final class ChatViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        collectionView.rx.modelSelected(HomeItem.self)
-            .bind(with: self) { owner, item in
-                guard let data = item.data else { return }
-                let vm = ChatDetailViewModel(entity: data)
-                let vc = ChatDetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+        
+        Observable.zip(collectionView.rx.itemSelected, collectionView.rx.modelSelected(HomeItem.self))
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, selected in
+                if let data = selected.1.data {
+                    let vm = ChatDetailViewModel(entity: data)
+                    let vc = ChatDetailViewController(viewModel: vm)
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                } else {
+                    let vc = ListViewController()
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -84,6 +105,9 @@ final class ChatViewController: BaseViewController {
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
         
+        chatImageView.contentMode = .scaleAspectFit
+        chatImageView.image = UIImage(named: "chatBackDrop")
+        
         collectionView.backgroundColor = .customWhite
         collectionView.register(ChatHeaderCell.self, forCellWithReuseIdentifier: ChatHeaderCell.id)
         collectionView.register(ChatMiddleCell.self, forCellWithReuseIdentifier: ChatMiddleCell.id)
@@ -91,12 +115,20 @@ final class ChatViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        self.view.addSubview(collectionView)
+        [collectionView, chatImageView].forEach {
+            self.view.addSubview($0)
+        }
     }
     
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).offset(12)
+            make.bottom.horizontalEdges.equalToSuperview()
+        }
+        
+        chatImageView.snp.makeConstraints { make in
+            make.width.equalToSuperview()
+            make.height.equalTo(UIScreen.main.bounds.width)
             make.bottom.horizontalEdges.equalToSuperview()
         }
     }

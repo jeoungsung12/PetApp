@@ -10,6 +10,7 @@ import SnapKit
 import Toast
 import RxSwift
 import RxCocoa
+
 final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
     private let statusLabel = UILabel()
     private let heartBtn = UIButton()
@@ -99,7 +100,8 @@ final class DetailMiddleCell: BaseTableViewCell, ReusableIdentifier {
         guard let viewModel = viewModel else { return }
         
         let input = DetailMiddleViewModel.Input(
-            heartTapped: heartBtn.rx.tap
+            heartTapped: heartBtn.rx.tap,
+            shareTapped: shareBtn.rx.tap
         )
         let output = viewModel.transform(input)
         
