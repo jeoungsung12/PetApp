@@ -25,6 +25,7 @@ final class PlayerViewModel: BaseViewModel {
     }
     
     struct Output {
+        let errorResult: Driver<OpenSquareError>
         let videoResult: BehaviorRelay<[PlayerEntity]>
     }
     
@@ -34,22 +35,29 @@ extension PlayerViewModel {
     
     func transform(_ input: Input) -> Output {
         let videoResult = BehaviorRelay<[PlayerEntity]>(value: [])
+        let errorResult = PublishRelay<OpenSquareError>()
         
         input.loadTrigger
-            .flatMapLatest { [weak self] request -> Single<[PlayerEntity]> in
+            .withUnretained(self)
+            .flatMapLatest { owner, request -> Single<[PlayerEntity]> in
                 return Single<[PlayerEntity]>.create { single in
                     Task {
                         do {
-                            self?.playerRequest = request
-                            let result = try await self?.repository.getVideo(
+                            owner.playerRequest = request
+                            let result = try await owner.repository.getVideo(
                                 start: request.start,
                                 end: request.end
                             )
                             
                             guard let result = result else { return single(.failure(NSError()))}
-                            single(.success(self?.AppendOriginValue(videoResult, result) ?? []))
+                            single(.success(owner.AppendOriginValue(videoResult, result) ?? []))
                         } catch {
-                            single(.failure(error))
+                            if let openSquareError = error as? OpenSquareError {
+                                errorResult.accept(openSquareError)
+                            } else {
+                                errorResult.accept(OpenSquareError.serverError)
+                            }
+                            single(.success([]))
                         }
                     }
                     return Disposables.create()
@@ -58,8 +66,11 @@ extension PlayerViewModel {
             .bind(to: videoResult)
             .disposed(by: disposeBag)
         
+        
+        
         return Output(
-            videoResult: videoResult
+            videoResult: videoResult,
+            errorResult: errorResult.asDriver(onErrorJustReturn: NSError())
         )
     }
     

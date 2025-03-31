@@ -26,7 +26,6 @@ final class NetworkManager: NetworkManagerType {
         case let .success(data):
             return data
         case let .failure(error):
-            //TODO: Custom Error
             throw error
         }
     }

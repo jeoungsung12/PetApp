@@ -11,10 +11,10 @@ import RxCocoa
 import Network
 
 enum ErrorSenderType: String {
-    case exchange
-    case info
-    case search
-    case detail
+    case player
+    case map
+    case home
+    case chat
     case none
     case network = "네트워크 통신이 원활하지 않습니다."
 }
