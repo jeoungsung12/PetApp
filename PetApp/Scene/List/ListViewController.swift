@@ -15,6 +15,11 @@ final class ListViewController: BaseViewController {
     private let viewModel = ListViewModel()
     private var disposeBag = DisposeBag()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        LoadingIndicator.showLoading()
+    }
+    
     override func setBinding() {
         let input = ListViewModel.Input(
             loadTrigger: PublishRelay()

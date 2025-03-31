@@ -10,6 +10,7 @@ import RealmSwift
 protocol RealmRepositoryType {
     func saveLikedHomeEntity(_ homeEntity: HomeEntity)
     func removeLikedHomeEntity(id: String)
+    func removeAllLikedEntity()
     func getAllLikedHomeEntities() -> [HomeEntity]
     func isLiked(id: String) -> Bool
     
@@ -137,17 +138,36 @@ extension RealmRepository {
     }
     
     func saveLikedHomeEntity(_ homeEntity: HomeEntity) {
-        let realmEntity = toRealmEntity(homeEntity)
-        try! realm.write {
-            realm.add(realmEntity, update: .modified)
+        do {
+            let realmEntity = toRealmEntity(homeEntity)
+            try realm.write {
+                realm.add(realmEntity, update: .modified)
+            }
+        } catch {
+            print("관심등록 실패 \(error)")
+        }
+    }
+    
+    func removeAllLikedEntity() {
+        do {
+            try realm.write {
+                let allLikedEntities = realm.objects(RealmHomeEntity.self)
+                realm.delete(allLikedEntities)
+            }
+        } catch {
+            print("모든 좋아요 엔티티 삭제 실패: \(error)")
         }
     }
     
     func removeLikedHomeEntity(id: String) {
-        try! realm.write {
-            if let homeEntity = realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) {
-                realm.delete(homeEntity)
+        do {
+            try realm.write {
+                if let homeEntity = realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) {
+                    realm.delete(homeEntity)
+                }
             }
+        } catch {
+            print("관심 삭제 실패")
         }
     }
     
@@ -178,10 +198,14 @@ extension RealmRepository {
     }
     
     func saveUserInfo(_ userInfo: UserInfo) {
-        let realmUserInfo = toRealmUserInfo(userInfo)
-        deleteUserInfo()
-        try! realm.write {
-            realm.add(realmUserInfo)
+        do {
+            let realmUserInfo = toRealmUserInfo(userInfo)
+            deleteUserInfo()
+            try realm.write {
+                realm.add(realmUserInfo)
+            }
+        } catch {
+            print("사용자 정보 저장 실패")
         }
     }
     
@@ -191,8 +215,12 @@ extension RealmRepository {
     }
     
     func deleteUserInfo() {
-        try! realm.write {
-            realm.delete(realm.objects(RealmUserInfo.self))
+        do {
+            try realm.write {
+                realm.delete(realm.objects(RealmUserInfo.self))
+            }
+        } catch {
+            print("사용자 정보 삭제 실패")
         }
     }
 }

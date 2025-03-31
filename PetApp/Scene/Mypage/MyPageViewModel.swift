@@ -90,7 +90,8 @@ extension MyPageViewModel {
     
     func removeUserInfo() {
         realm.deleteUserInfo()
-        //TODO: 저장된 동물정보 삭제
+        realm.removeAllRecords()
+        realm.removeAllLikedEntity()
     }
     
     func getLikeAnimate() -> Int {
