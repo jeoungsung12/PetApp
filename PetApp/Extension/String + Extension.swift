@@ -9,11 +9,11 @@ import UIKit
 
 extension String {
     
-    func toDate(format: String = "yyyy-MM-dd") -> Date {
+    func toDate() -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd"
         formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.date(from: format) ?? Date()
+        return formatter.date(from: self) ?? Date()
     }
     
     static func currentDate() -> String {

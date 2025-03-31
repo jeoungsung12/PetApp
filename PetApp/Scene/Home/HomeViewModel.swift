@@ -46,6 +46,7 @@ final class HomeViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: Driver<[HomeSection]>
+        let errorResult: Driver<DataDreamError>
     }
     
 }
@@ -53,17 +54,24 @@ final class HomeViewModel: BaseViewModel {
 extension HomeViewModel {
     
     func transform(_ input: Input) -> Output {
-        let homeResult = PublishRelay<[HomeSection]>()
+        let homeResult = BehaviorRelay<[HomeSection]>(value: [])
+        let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
-            .flatMapLatest { [weak self] _ -> Single<[HomeSection]> in
+            .withUnretained(self)
+            .flatMapLatest { owner, _ -> Single<[HomeSection]> in
                 return Single<[HomeSection]>.create { single in
                     Task {
                         do {
-                            let result = try await self?.fetchData()
-                            single(.success(result ?? []))
+                            let result = try await owner.fetchData()
+                            single(.success(result))
                         } catch {
-                            single(.failure(error))
+                            if let dataDreamError = error as? DataDreamError {
+                                errorResult.accept(dataDreamError)
+                            } else {
+                                errorResult.accept(DataDreamError.serverError)
+                            }
+                            single(.success(homeResult.value))
                         }
                     }
                     return Disposables.create()
@@ -73,7 +81,8 @@ extension HomeViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            homeResult: homeResult.asDriver(onErrorJustReturn: [])
+            homeResult: homeResult.asDriver(onErrorJustReturn: []),
+            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
         )
     }
     

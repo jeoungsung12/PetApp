@@ -23,8 +23,17 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page))
             return result.toEntity()
         } catch {
-            //TODO: CustomError
-            throw error
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
+               let statusCode = afError.responseCode,
+               let responseData = networkError.responseData,
+               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+               let errorMessage = message["message"] as? String {
+                let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
+                throw customError
+            } else {
+                throw DataDreamError.serverError
+            }
         }
     }
     
@@ -39,8 +48,17 @@ final class NetworkRepository: NetworkRepositoryType {
                 return result.toEntity()
             }
         } catch {
-            //TODO: CustomError
-            throw error
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
+               let statusCode = afError.responseCode,
+               let responseData = networkError.responseData,
+               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+               let errorMessage = message["message"] as? String {
+                let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
+                throw customError
+            } else {
+                throw DataDreamError.serverError
+            }
         }
     }
     
@@ -49,7 +67,14 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: PlayerResponseDTO = try await network.fetchData(OpenSquareRouter.getVideo(startPage: start, endPage: end))
             return result.toEntity()
         } catch {
-            throw error
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
+               let statusCode = afError.responseCode {
+                let customError = OpenSquareError.mapToOpenSquareError(statusCode: "Error-\(statusCode)")
+                throw customError
+            } else {
+                throw OpenSquareError.serverError
+            }
         }
     }
     
@@ -58,7 +83,17 @@ final class NetworkRepository: NetworkRepositoryType {
             let result: ChatResponseDTO = try await network.fetchData(ChatRouter.getChatAnswer(entity: entity, question: question))
             return ChatEntity(type: .bot, name: entity.animal.name, message: result.choices.first?.message.content ?? "", thumbImage: entity.animal.thumbImage)
         } catch {
-            throw error
+            if let networkError = error as? NetworkError,
+               let afError = networkError.error.asAFError,
+               let statusCode = afError.responseCode,
+               let responseData = networkError.responseData,
+               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
+               let errorMessage = message["message"] as? String {
+                let customError = ChatError.mapToChatError(statusCode: statusCode, message: errorMessage)
+                throw customError
+            } else {
+                throw ChatError.invalidAuthentication
+            }
         }
     }
     

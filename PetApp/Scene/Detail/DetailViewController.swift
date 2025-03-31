@@ -48,6 +48,7 @@ final class DetailViewController: BaseViewController {
                 cell.selectionStyle = .none
                 
                 let vm = DetailMiddleViewModel(entity: item.data)
+                vm.delegate = self
                 cell.configure(item.data, viewModel: vm)
                 return cell
                 
@@ -80,7 +81,8 @@ final class DetailViewController: BaseViewController {
     
     override func configureLayout() {
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
         
         loadingIndicator.snp.makeConstraints { make in
@@ -99,7 +101,31 @@ final class DetailViewController: BaseViewController {
     }
 }
 
-extension DetailViewController {
+extension DetailViewController: ShareDelegate {
+    
+    func activityShare(_ entity: HomeEntity) {
+        let shareText = """
+            와랄라에서 유기동물을 만나보세요! 🐾
+            이름: \(entity.animal.name)
+            상태: \(entity.animal.state)
+            구조된 장소: \(entity.shelter.discplc)
+            성별: \(entity.animal.gender)
+            중성화 여부: \(entity.animal.neut)
+            새로운 가족을 기다리고 있어요! 💕
+            """
+        
+        let items: [Any] = [shareText]
+
+        let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        
+//        if let popoverController = activityViewController.popoverPresentationController {
+//            popoverController.sourceView = view
+//            popoverController.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+//            popoverController.permittedArrowDirections = []
+//        }
+        
+        present(activityViewController, animated: true, completion: nil)
+    }
     
     private func configureTableView() {
         tableView.separatorStyle = .none
@@ -110,4 +136,6 @@ extension DetailViewController {
         tableView.register(DetailMiddleCell.self, forCellReuseIdentifier: DetailMiddleCell.id)
         tableView.register(DetailFooterCell.self, forCellReuseIdentifier: DetailFooterCell.id)
     }
+    
+    
 }

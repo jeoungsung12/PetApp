@@ -35,6 +35,11 @@ final class ChatDetailViewController: BaseViewController {
         self.tabBarController?.tabBar.isHidden = true
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        self.keyboardView.textField.becomeFirstResponder()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
@@ -45,6 +50,7 @@ final class ChatDetailViewController: BaseViewController {
             loadTrigger: PublishRelay()
         )
         let output = viewModel.transform(input)
+        LoadingIndicator.showLoading()
         
         let result = output.chatResult
         
@@ -57,13 +63,25 @@ final class ChatDetailViewController: BaseViewController {
         
         result
             .drive(with: self) { owner, entity in
-                owner.tableView.scrollToRow(at: IndexPath(row: entity.count-1, section: 0), at: .middle, animated: true)
+                LoadingIndicator.hideLoading()
+                owner.tableView.scrollToRow(at: IndexPath(row: entity.count-1, section: 0), at: .top, animated: true)
             }
             .disposed(by: disposeBag)
         
         keyboardView.sendButton.rx.tap
             .bind(with: self) { owner, _ in
                 guard let text = owner.keyboardView.textField.text else { return }
+                LoadingIndicator.showLoading()
+                input.loadTrigger.accept(text)
+                owner.keyboardView.textField.text = nil
+            }
+            .disposed(by: disposeBag)
+        
+        keyboardView.textField.rx.controlEvent(.editingDidEndOnExit)
+            .withLatestFrom(keyboardView.textField.rx.text)
+            .bind(with: self) { owner, text in
+                guard let text = owner.keyboardView.textField.text else { return }
+                LoadingIndicator.showLoading()
                 input.loadTrigger.accept(text)
                 owner.keyboardView.textField.text = nil
             }
@@ -98,7 +116,7 @@ final class ChatDetailViewController: BaseViewController {
         
         keyboardView.snp.makeConstraints { make in
             make.height.equalTo(60)
-            make.bottom.horizontalEdges.equalToSuperview().inset(8)
+            make.bottom.horizontalEdges.equalToSuperview().inset(12)
         }
         
         tableView.snp.makeConstraints { make in
