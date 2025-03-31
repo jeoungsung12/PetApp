@@ -35,6 +35,15 @@ final class PlayerViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        output.errorResult
+            .drive(with: self) { owner, error in
+                let errorVM = ErrorViewModel(notiType: .player)
+                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
+                errorVC.modalPresentationStyle = .fullScreen
+                owner.present(errorVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.prefetchRows
             .bind(with: self) { owner, IndexPaths in
                 if let lastIndex = IndexPaths.last.map({ $0.row }),
@@ -52,21 +61,6 @@ final class PlayerViewController: BaseViewController {
                 //TODO: 네트워크 요청 취소
             }
             .disposed(by: disposeBag)
-        
-        //        tableView.rx.willDisplayCell
-        //            .bind(with: self, onNext: { owner, event in
-        //                guard let cell = event.cell as? PlayerTableViewCell else { return }
-        //                cell.playVideo()
-        //            })
-        //            .disposed(by: disposeBag)
-        //
-        //
-        //        tableView.rx.didEndDisplayingCell
-        //            .bind(with: self, onNext: { owner, event in
-        //                guard let cell = event.cell as? PlayerTableViewCell else { return }
-        //                cell.stopVideo()
-        //            })
-        //            .disposed(by: disposeBag)
     }
     
     override func configureView() {

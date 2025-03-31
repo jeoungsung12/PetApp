@@ -8,11 +8,11 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
+    
     var window: UIWindow?
     private let realmRepo: UserRepositoryType = RealmUserRepository.shared
     private var networkMonitor: NetworkMonitorManagerType = NetworkMonitorManager()
-
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         sleep(1)
         guard let scene = (scene as? UIWindowScene) else { return }
