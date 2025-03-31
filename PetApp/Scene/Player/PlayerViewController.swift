@@ -25,6 +25,7 @@ final class PlayerViewController: BaseViewController {
         )
         let output = viewModel.transform(input)
         input.loadTrigger.accept(.init(start: 1, end: 10))
+        LoadingIndicator.showLoading()
         
         let result = output.videoResult.asDriver(onErrorJustReturn: [])
         
@@ -32,6 +33,12 @@ final class PlayerViewController: BaseViewController {
             .drive(tableView.rx.items(cellIdentifier: PlayerTableViewCell.id, cellType: PlayerTableViewCell.self)) { row, element, cell in
                 cell.selectionStyle = .none
                 cell.configure(element)
+            }
+            .disposed(by: disposeBag)
+        
+        result
+            .drive(with: self) { owner, _ in
+                LoadingIndicator.hideLoading()
             }
             .disposed(by: disposeBag)
         
@@ -50,6 +57,7 @@ final class PlayerViewController: BaseViewController {
                    let request = owner.viewModel.playerRequest,
                    (output.videoResult.value.count - 2) < lastIndex
                 {
+                    LoadingIndicator.showLoading()
                     //TODO: 캐싱
                     input.loadTrigger.accept(.init(start: 1 + request.end, end: request.end + 10))
                 }

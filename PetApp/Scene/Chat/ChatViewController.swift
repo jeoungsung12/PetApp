@@ -29,6 +29,7 @@ final class ChatViewController: BaseViewController {
     
     override func setBinding() {
         let output = viewModel.transform(input)
+        LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { [weak self] dataSource, collectionView, indexPath, item in
             switch ChatSectionType.allCases[indexPath.section] {
@@ -73,6 +74,7 @@ final class ChatViewController: BaseViewController {
                 if let section = sections.last {
                     owner.chatImageView.isHidden = !section.items.isEmpty
                 }
+                LoadingIndicator.hideLoading()
             }
             .disposed(by: disposeBag)
         
@@ -96,7 +98,6 @@ final class ChatViewController: BaseViewController {
                     let vc = ChatDetailViewController(viewModel: vm)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 } else {
-                    print("이거다이거")
                     let vc = ListViewController()
                     owner.navigationController?.pushViewController(vc, animated: true)
                 }
