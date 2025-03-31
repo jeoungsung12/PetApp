@@ -33,12 +33,12 @@ final class ChatViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: Driver<[HomeSection]>
-        let errorResult: Driver<ChatError>
+        let errorResult: Driver<DataDreamError>
     }
     
     func transform(_ input: Input) -> Output {
         let homeResult = BehaviorRelay<[HomeSection]>(value: [])
-        let errorResult = PublishRelay<ChatError>()
+        let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
             .withUnretained(self)
@@ -49,10 +49,12 @@ final class ChatViewModel: BaseViewModel {
                             let result = try await owner.fetchData()
                             single(.success(result))
                         } catch {
-                            if let chatError = error as? ChatError {
-                                errorResult.accept(chatError)
+                            if let dataDreamError = error as? DataDreamError {
+                                errorResult.accept(dataDreamError)
+                            } else {
+                                errorResult.accept(DataDreamError.serverError)
                             }
-                            single(.success([]))
+                            single(.success(homeResult.value))
                         }
                     }
                     return Disposables.create()
@@ -78,7 +80,7 @@ final class ChatViewModel: BaseViewModel {
         
         return Output(
             homeResult: homeResult.asDriver(onErrorJustReturn: []),
-            errorResult: errorResult.asDriver(onErrorJustReturn: .unsupportedRegion)
+            errorResult: errorResult.asDriver(onErrorJustReturn: .serverError)
         )
     }
     

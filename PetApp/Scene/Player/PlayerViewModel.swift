@@ -48,14 +48,14 @@ extension PlayerViewModel {
                                 start: request.start,
                                 end: request.end
                             )
-                            single(.success(owner.AppendOriginValue(videoResult, result) ?? []))
+                            single(.success(owner.AppendOriginValue(videoResult, result)))
                         } catch {
                             if let openSquareError = error as? OpenSquareError {
                                 errorResult.accept(openSquareError)
                             } else {
                                 errorResult.accept(OpenSquareError.serverError)
                             }
-                            single(.success([]))
+                            single(.success(videoResult.value))
                         }
                     }
                     return Disposables.create()
