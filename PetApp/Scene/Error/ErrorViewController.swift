@@ -49,6 +49,7 @@ final class ErrorViewController: BaseViewController {
                     owner.view.makeToast(ErrorSenderType.network.rawValue, duration: 1, position: .center)
                 default:
                     owner.dismiss(animated: true)
+                    //TODO: 새로 통신 Trigger
                 }
             }
             .disposed(by: disposeBag)
