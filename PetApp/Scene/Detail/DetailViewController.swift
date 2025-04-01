@@ -104,8 +104,7 @@ final class DetailViewController: BaseViewController {
 extension DetailViewController: ShareDelegate {
     
     func activityShare(_ entity: HomeEntity) {
-        //TODO: 앱 링크
-        let deepLink = "yourapp://animal/\(entity.animal.id)"
+        let deepLink = "https://apps.apple.com/kr/app/%EC%99%80%EB%9E%84%EB%9D%BC-warala/id6744003128"
         let shareText = """
             와랄라에서 유기동물을 만나보세요! 🐾
             이름: \(entity.animal.name)
@@ -117,10 +116,24 @@ extension DetailViewController: ShareDelegate {
             자세히 보기: \(deepLink)
             """
         
-        let items: [Any] = [shareText]
-        let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        var items: [Any] = [shareText]
         
-        present(activityViewController, animated: true, completion: nil)
+        guard let imageUrl = URL(string: entity.animal.fullImage) else {
+            let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            present(activityViewController, animated: true, completion: nil)
+            return
+        }
+        
+        //TODO: 이미지 통신
+        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
+            DispatchQueue.main.async {
+                if let data = data, let image = UIImage(data: data) {
+                    items.append(image)
+                }
+                let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
+                self.present(activityViewController, animated: true, completion: nil)
+            }
+        }.resume()
     }
     
     private func configureTableView() {
