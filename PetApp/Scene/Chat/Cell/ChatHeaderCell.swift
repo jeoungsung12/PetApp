@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -14,6 +14,7 @@ final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        thumbImageView.image = nil
     }
     
     override func configureView() {
@@ -29,14 +30,15 @@ final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
     }
     
     override func configureLayout() {
-        thumbImageView.snp.makeConstraints { make in            make.size.equalTo(100)
+        thumbImageView.snp.makeConstraints { make in
+            make.size.equalTo(100)
             make.center.equalToSuperview()
         }
     }
     
     func configure(_ image: String) {
         if let url = URL(string: image) {
-            thumbImageView.kf.setImage(with: url)
+            thumbImageView.snSetImage(with: url, storageOption: .memory)
         }
     }
     

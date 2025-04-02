@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Kingfisher
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -35,7 +34,6 @@ final class HomeHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
         stopAutoScrollTimer()
         startAutoScrollTimer()
     }
-    
     
     override func configureView() {
         posterCollectionView.delegate = self
@@ -101,7 +99,7 @@ extension HomeHeaderCell {
     private func startAutoScrollTimer() {
         stopAutoScrollTimer()
         timer = Timer
-            .scheduledTimer(withTimeInterval: 7.0, repeats: true) { [weak self] _ in
+            .scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
                 self.scrollToNextPage()
             }
@@ -156,8 +154,23 @@ extension HomeHeaderCell: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageWidth = posterCollectionView.frame.width
-        currentPage = Int((posterCollectionView.contentOffset.x + pageWidth / 2) / pageWidth) % posterImages.count
-        updatePageControl()
+        let newPage = Int((posterCollectionView.contentOffset.x + pageWidth / 2) / pageWidth)
+        
+        if newPage == posterImages.count - 1 {
+            currentPage = newPage
+            updatePageControl()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self else { return }
+                self.currentPage = 0
+                let resetIndexPath = IndexPath(item: 0, section: 0)
+                self.posterCollectionView.scrollToItem(at: resetIndexPath, at: .centeredHorizontally, animated: false)
+                self.updatePageControl()
+            }
+        } else {
+            currentPage = newPage % posterImages.count
+            updatePageControl()
+        }
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {

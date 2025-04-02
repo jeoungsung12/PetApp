@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class CharacteristicView: BaseView {
@@ -104,7 +104,7 @@ fileprivate class IconAttributeView: BaseView {
     
     func configure(image: String, endDate: String) {
         if let url = URL(string: image) {
-            iconImageView.kf.setImage(with: url)
+            iconImageView.snSetImage(with: url, storageOption: .memory)
         }
         
         let date: Date = endDate.toDate()

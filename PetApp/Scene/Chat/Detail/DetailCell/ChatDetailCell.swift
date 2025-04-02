@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
@@ -103,7 +103,7 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         messageLabel.text = entity.message
         
         if let url = URL(string: entity.thumbImage) {
-            thumbImageView.kf.setImage(with: url)
+            thumbImageView.snSetImage(with: url, storageOption: .memory)
         }
         
         configureView()

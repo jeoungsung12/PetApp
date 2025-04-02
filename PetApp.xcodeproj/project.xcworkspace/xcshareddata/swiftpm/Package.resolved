@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d8564545b943f2f9f6364dac06a6ffe0f216289061a22acccbd2fc60af1f2c6",
+  "originHash" : "5f648ff0b52c8b3fcdf8a8fd1b7b3d5a194ebc5d06c6f7dc45a63d637daf3ad0",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "snkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jeoungsung12/SNKit.git",
+      "state" : {
+        "revision" : "d9d56ea1e92bee54a9f782064c88f5c2e01326c5",
+        "version" : "1.0.1"
       }
     },
     {
