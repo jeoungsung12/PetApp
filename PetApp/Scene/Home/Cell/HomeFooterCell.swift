@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -15,6 +15,11 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let subTitleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let statusLabel = UILabel()
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        thumbImageview.image = nil
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -99,7 +104,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         descriptionLabel.text = model.animal.description
         
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.kf.setImage(with: url)
+            thumbImageview.snSetImage(with: url, storageOption: .memory)
         }
     }
     

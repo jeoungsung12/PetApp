@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -102,7 +102,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         hashTagLabel.text = model.animal.description
         descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.kf.setImage(with: url)
+            thumbImageview.snSetImage(with: url, storageOption: .memory)
         }
     }
     

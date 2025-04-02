@@ -1,25 +1,20 @@
 //
-//  ListTableViewCell.swift
+//  LikeTableViewCell.swift
 //  PetApp
 //
-//  Created by 정성윤 on 3/27/25.
+//  Created by 정성윤 on 4/2/25.
 //
 
 import UIKit
 import SNKit
 import SnapKit
 
-final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
+final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
     private let thumbImageview = UIImageView()
     private let titleLabel = UILabel()
     private let subTitleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let statusLabel = UILabel()
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        thumbImageview.image = nil
-    }
     
     override func configureView() {
         thumbImageview.clipsToBounds = true
@@ -101,7 +96,7 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
         descriptionLabel.text = model.animal.description
         
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(with: url, storageOption: .memory)
+            thumbImageview.snSetImage(with: url, storageOption: .hybrid)
         }
     }
     

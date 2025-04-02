@@ -30,7 +30,7 @@ final class LikeViewController: BaseViewController {
         let result = output.likeResult.asDriver()
         
         result
-            .drive(tableView.rx.items(cellIdentifier: ListTableViewCell.id, cellType: ListTableViewCell.self)) { row, element, cell in
+            .drive(tableView.rx.items(cellIdentifier: LikeTableViewCell.id, cellType: LikeTableViewCell.self)) { row, element, cell in
                 cell.configure(element)
                 cell.selectionStyle = .none
             }
@@ -51,7 +51,7 @@ final class LikeViewController: BaseViewController {
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
         tableView.rowHeight = 150
-        tableView.register(ListTableViewCell.self, forCellReuseIdentifier: ListTableViewCell.id)
+        tableView.register(LikeTableViewCell.self, forCellReuseIdentifier: LikeTableViewCell.id)
     }
     
     override func configureHierarchy() {

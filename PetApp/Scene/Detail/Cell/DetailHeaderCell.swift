@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
@@ -14,6 +14,10 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     private let titleLabel = UILabel()
     private let subTitleLabel = UILabel()
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        backdropImageView.image = nil
+    }
     
     override func configureView() {
         backdropImageView.clipsToBounds = true
@@ -59,7 +63,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
         subTitleLabel.text = entity.animal.age + " " + entity.animal.weight
         
         if let url = URL(string: entity.animal.fullImage) {
-            backdropImageView.kf.setImage(with: url)
+            backdropImageView.snSetImage(with: url, storageOption: .memory)
         }
     }
     

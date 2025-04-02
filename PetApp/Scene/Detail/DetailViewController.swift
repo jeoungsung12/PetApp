@@ -106,13 +106,10 @@ extension DetailViewController: ShareDelegate {
     func activityShare(_ entity: HomeEntity) {
         let deepLink = "https://apps.apple.com/kr/app/%EC%99%80%EB%9E%84%EB%9D%BC-warala/id6744003128"
         let shareText = """
-            와랄라에서 유기동물을 만나보세요! 🐾
+            와랄라에서 도움이 필요한 친구들을 만나보세요! 🐾
             이름: \(entity.animal.name)
             상태: \(entity.animal.state)
             구조된 장소: \(entity.shelter.discplc)
-            성별: \(entity.animal.gender)
-            중성화 여부: \(entity.animal.neut)
-            새로운 가족을 기다리고 있어요! 💕
             자세히 보기: \(deepLink)
             """
         

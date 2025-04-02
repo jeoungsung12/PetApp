@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SNKit
 import SnapKit
 
 final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -14,6 +14,11 @@ final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let titleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let shelterLabel = UILabel()
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        thumbImageView.image = nil
+    }
     
     override func configureView() {
         thumbImageView.clipsToBounds = true
@@ -69,7 +74,8 @@ final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         shelterLabel.text = entity.shelter.name
         
         if let url = URL(string: entity.animal.thumbImage) {
-            thumbImageView.kf.setImage(with: url)
+            //하이브리드 캐싱
+            thumbImageView.snSetImage(with: url, storageOption: .hybrid)
         }
     }
 }
