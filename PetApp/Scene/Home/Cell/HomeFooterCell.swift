@@ -16,13 +16,18 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     private let descriptionLabel = UILabel()
     private let statusLabel = UILabel()
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        self.contentView.clipsToBounds = true
+        self.contentView.layer.cornerRadius = 10
+        self.contentView.layer.borderWidth = 1
+        self.contentView.layer.borderColor = UIColor.customLightGray.cgColor
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         thumbImageview.image = nil
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
     }
     
     override func configureView() {
@@ -65,7 +70,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
     override func configureLayout() {
         thumbImageview.snp.makeConstraints { make in
             make.size.equalTo(120)
-            make.top.leading.equalToSuperview()
+            make.top.leading.equalToSuperview().inset(12)
         }
         
         statusLabel.snp.makeConstraints { make in

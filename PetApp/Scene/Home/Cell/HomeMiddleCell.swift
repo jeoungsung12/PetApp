@@ -105,7 +105,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
             thumbImageview.snSetImage(
                 with: url,
                 storageOption: .memory,
-                processingOption: .downsample(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.5))
+                processingOption: .downsample(CGSize(width: 150, height: 150))
             )
         }
     }
