@@ -208,14 +208,14 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
         case .middle, .footer:
             groupSize = type == .middle
             ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
-            : NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+            : NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(200))
             
             group = type == .middle
             ? NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             : NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
             group.contentInsets = type == .middle ?
             NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6) :
-            NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            NSDirectionalEdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0)
             
             section = NSCollectionLayoutSection(group: group)
             section.orthogonalScrollingBehavior = type == .middle ? .continuous : .none
