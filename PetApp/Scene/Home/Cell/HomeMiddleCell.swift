@@ -102,7 +102,11 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         hashTagLabel.text = model.animal.description
         descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(with: url, storageOption: .memory)
+            thumbImageview.snSetImage(
+                with: url,
+                storageOption: .memory,
+                processingOption: .downsample(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.5))
+            )
         }
     }
     

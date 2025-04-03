@@ -19,17 +19,17 @@ struct MapEntity {
 
 extension ShelterResponseDTO {
     func toEntity() -> [MapEntity] {
-        return (self.OrganicAnimalProtectionFacilit[1].row ?? []).map {
-            MapEntity(
-                name: $0.entrpsNm,
-                number: $0.entrpsTelno,
-                address: $0.refineLotnoAddr,
-                roadAddress: $0.refineRoadnmAddr,
-                numAddress: $0.refineZipCD,
-                lon: Double($0.refineWgs84Logt) ?? 0.0,
-                lat: Double($0.refineWgs84Lat) ?? 0.0
+        return response.body?.items.item.map {
+            return MapEntity(
+                name: $0.careNm ?? "",
+                number: $0.careTel ?? "",
+                address: $0.careAddr ?? "",
+                roadAddress: $0.orgNm ?? "",
+                numAddress: $0.jibunAddr ?? "",
+                lon: $0.lng ?? 0.0,
+                lat: $0.lat ?? 0.0
             )
-        }
+        } ?? []
     }
 }
 

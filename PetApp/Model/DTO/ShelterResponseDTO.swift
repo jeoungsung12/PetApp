@@ -8,37 +8,29 @@
 import Foundation
 
 struct ShelterResponseDTO: Decodable {
-    let OrganicAnimalProtectionFacilit: [AnimalProtectionDTO]
-    
-    struct AnimalProtectionDTO: Decodable {
-        let row: [ShelterRowDTO]?
-    }
+    let response: ShelterResponse
 }
 
-struct ShelterRowDTO: Decodable {
-    let sumYy, sigunNm, sigunCD, entrpsNm: String
-    let reprsntvNm: String
-    let aceptncAbltyCnt: Int
-    let entrpsTelno, contractPerd: String
-    let corprAnimalHosptlDtls, rmMatr: String?
-    let refineLotnoAddr, refineRoadnmAddr, refineZipCD, refineWgs84Logt: String
-    let refineWgs84Lat: String
+struct ShelterResponse: Decodable {
+    let body: ShelterBody?
     
-    enum CodingKeys: String, CodingKey {
-        case sumYy = "SUM_YY"
-        case sigunNm = "SIGUN_NM"
-        case sigunCD = "SIGUN_CD"
-        case entrpsNm = "ENTRPS_NM"
-        case reprsntvNm = "REPRSNTV_NM"
-        case aceptncAbltyCnt = "ACEPTNC_ABLTY_CNT"
-        case entrpsTelno = "ENTRPS_TELNO"
-        case contractPerd = "CONTRACT_PERD"
-        case corprAnimalHosptlDtls = "CORPR_ANIMAL_HOSPTL_DTLS"
-        case rmMatr = "RM_MATR"
-        case refineLotnoAddr = "REFINE_LOTNO_ADDR"
-        case refineRoadnmAddr = "REFINE_ROADNM_ADDR"
-        case refineZipCD = "REFINE_ZIP_CD"
-        case refineWgs84Logt = "REFINE_WGS84_LOGT"
-        case refineWgs84Lat = "REFINE_WGS84_LAT"
+    
+    struct ShelterBody: Decodable {
+        let items: ShelterItems
+        let numOfRows, pageNo, totalCount: Int
     }
+    
+    struct ShelterItems: Codable {
+        let item: [ShelterItem]
+    }
+    
+    struct ShelterItem: Codable {
+        let careNm, careRegNo, orgNm, divisionNm: String?
+        let saveTrgtAnimal, careAddr, jibunAddr: String?
+        let lat, lng: Double?
+        let dsignationDate, weekOprStime, weekOprEtime, closeDay: String?
+        let vetPersonCnt, specsPersonCnt: Int?
+        let careTel, dataStdDt: String?
+    }
+    
 }
