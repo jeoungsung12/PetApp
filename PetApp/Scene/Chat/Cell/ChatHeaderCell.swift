@@ -38,7 +38,11 @@ final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
     
     func configure(_ image: String) {
         if let url = URL(string: image) {
-            thumbImageView.snSetImage(with: url, storageOption: .memory)
+            thumbImageView.snSetImage(
+                with: url,
+                storageOption: .memory,
+                processingOption: .downsample(CGSize(width: 100, height: 100))
+            )
         }
     }
     

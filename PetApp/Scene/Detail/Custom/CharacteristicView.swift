@@ -104,7 +104,11 @@ fileprivate class IconAttributeView: BaseView {
     
     func configure(image: String, endDate: String) {
         if let url = URL(string: image) {
-            iconImageView.snSetImage(with: url, storageOption: .memory)
+            iconImageView.snSetImage(
+                with: url,
+                storageOption: .memory,
+                processingOption: .downsample(CGSize(width: 80, height: 80))
+            )
         }
         
         let date: Date = endDate.toDate()

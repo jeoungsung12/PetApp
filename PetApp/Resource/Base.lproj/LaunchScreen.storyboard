@@ -23,13 +23,23 @@
                                     <constraint firstAttribute="height" constant="40" id="7fP-ze-ha9"/>
                                 </constraints>
                             </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash" translatesAutoresizingMaskIntoConstraints="NO" id="Axc-HA-nC8">
+                                <rect key="frame" x="12" y="350" width="369" height="450"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="450" id="7j3-1G-Fqe"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstAttribute="bottom" secondItem="Axc-HA-nC8" secondAttribute="bottom" constant="52" id="4yh-XP-AAL"/>
+                            <constraint firstItem="Axc-HA-nC8" firstAttribute="top" relation="greaterThanOrEqual" secondItem="nFN-ZF-qrF" secondAttribute="bottom" constant="10" id="8wF-Mu-UCR"/>
                             <constraint firstItem="nFN-ZF-qrF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="24" id="BON-8I-SAc"/>
+                            <constraint firstItem="Axc-HA-nC8" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="12" id="Qqh-rc-hIP"/>
                             <constraint firstItem="nFN-ZF-qrF" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="200" id="cAI-QO-HAJ"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nFN-ZF-qrF" secondAttribute="trailing" constant="24" id="oeh-ly-o2y"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Axc-HA-nC8" secondAttribute="trailing" constant="12" id="tHU-3m-Icd"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -40,6 +50,7 @@
     </scenes>
     <resources>
         <image name="logo" width="230" height="46.666667938232422"/>
+        <image name="splash" width="290" height="394"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -99,8 +99,6 @@ extension RealmRepository {
         shelter.discplc = homeEntity.shelter.discplc
         shelter.beginDate = homeEntity.shelter.beginDate
         shelter.endDate = homeEntity.shelter.endDate
-        shelter.lon = homeEntity.shelter.lon
-        shelter.lat = homeEntity.shelter.lat
         
         realmHomeEntity.animal = animal
         realmHomeEntity.shelter = shelter
@@ -129,9 +127,7 @@ extension RealmRepository {
             address: realmEntity.shelter?.address ?? "",
             discplc: realmEntity.shelter?.discplc ?? "",
             beginDate: realmEntity.shelter?.beginDate ?? "",
-            endDate: realmEntity.shelter?.endDate ?? "",
-            lon: realmEntity.shelter?.lon ?? "",
-            lat: realmEntity.shelter?.lat ?? ""
+            endDate: realmEntity.shelter?.endDate ?? ""
         )
         
         return HomeEntity(animal: animal, shelter: shelter)

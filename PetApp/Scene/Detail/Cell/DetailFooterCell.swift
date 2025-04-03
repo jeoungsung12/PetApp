@@ -14,7 +14,6 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
     private let shelterLabel = UILabel()
     private let numberLabel = UILabel()
     private let addressLabel = UILabel()
-    private let mapView = MKMapView()
     
     override func configureView() {
         titleLabel.font = .largeBold
@@ -29,17 +28,13 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
         shelterLabel.textColor = .customBlack
         numberLabel.textColor = .customLightGray
         addressLabel.textColor = .customBlack
-        
-        mapView.clipsToBounds = true
-        mapView.layer.cornerRadius = 10
-        
         [titleLabel, shelterLabel, numberLabel, addressLabel].forEach {
             $0.textAlignment = .left
         }
     }
     
     override func configureHierarchy() {
-        [titleLabel, shelterLabel, numberLabel, addressLabel, mapView].forEach {
+        [titleLabel, shelterLabel, numberLabel, addressLabel].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -61,15 +56,8 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
         }
         
         addressLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(24)
+            make.bottom.horizontalEdges.equalToSuperview().inset(24)
             make.top.equalTo(numberLabel.snp.bottom).offset(8)
-        }
-        
-        mapView.snp.makeConstraints { make in
-            make.height.equalTo(200)
-            make.top.equalTo(addressLabel.snp.bottom).offset(24)
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalToSuperview().inset(64)
         }
     }
     
@@ -77,23 +65,6 @@ final class DetailFooterCell: BaseTableViewCell, ReusableIdentifier {
         shelterLabel.text = entity.shelter.name
         numberLabel.text = entity.shelter.number
         addressLabel.text = entity.shelter.address
-        
-        
-        if let latitude = Double(entity.shelter.lat),
-           let longitude = Double(entity.shelter.lon) {
-            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-            let region = MKCoordinateRegion(
-                center: location,
-                latitudinalMeters: 1000,
-                longitudinalMeters: 1000
-            )
-            mapView.setRegion(region, animated: true)
-            
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = location
-            annotation.title = entity.shelter.name
-            mapView.addAnnotation(annotation)
-        }
     }
     
 }

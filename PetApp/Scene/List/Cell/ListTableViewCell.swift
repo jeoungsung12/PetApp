@@ -101,7 +101,11 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
         descriptionLabel.text = model.animal.description
         
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(with: url, storageOption: .memory)
+            thumbImageview.snSetImage(
+                with: url,
+                storageOption: .memory,
+                processingOption: .downsample(CGSize(width: 120, height: 120))
+            )
         }
     }
     

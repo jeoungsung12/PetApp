@@ -34,7 +34,7 @@ final class CustomAnnotationView: MKAnnotationView {
     }
     
     private func configureView() {
-        self.image = UIImage(named: ["sponsor1", "sponsor2", "sponsor3", "sponsor4", "sponsor5", "sponsor6", "sponsor7", "sponsor8"].randomElement() ?? "sponsor1")
+        self.image = UIImage(named: "annotation")
         self.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
         self.centerOffset = CGPoint(x: 0, y: -self.frame.size.height / 2)
         

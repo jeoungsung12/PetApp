@@ -63,7 +63,11 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
         subTitleLabel.text = entity.animal.age + " " + entity.animal.weight
         
         if let url = URL(string: entity.animal.fullImage) {
-            backdropImageView.snSetImage(with: url, storageOption: .memory)
+            backdropImageView.snSetImage(
+                with: url,
+                storageOption: .memory,
+                processingOption: .downsample(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.1))
+            )
         }
     }
     

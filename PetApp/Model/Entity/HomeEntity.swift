@@ -33,38 +33,34 @@ struct HomeShelterEntity {
     let discplc: String
     let beginDate: String
     let endDate: String
-    let lon: String
-    let lat: String
 }
 
 extension HomeResponseDTO {
     func toEntity() -> [HomeEntity] {
-        return (abdmAnimalProtect[1].row ?? []).map {
-            HomeEntity(
+        return response.body?.items.item.map {
+            return HomeEntity(
                 animal: HomeAnimalEntity(
-                    id: $0.abdmIdntfyNo,
-                    name: $0.speciesNm,
-                    description: $0.sfetrInfo,
-                    color: $0.colorNm,
-                    age: $0.ageInfo,
-                    weight: $0.bdwghInfo,
-                    thumbImage: $0.thumbImageCours,
-                    fullImage: $0.imageCours,
-                    state: $0.stateNm,
-                    gender: ($0.sexNm == "M") ? "🚹" : "🚺",
-                    neut: ($0.neutYn == "N") ? "❌" : "⭕️"
+                    id: $0.desertionNo ?? "\(UUID())",
+                    name: $0.kindNm ?? "",
+                    description: $0.specialMark ?? "",
+                    color: $0.colorCD ?? "",
+                    age: $0.age ?? "",
+                    weight: $0.weight ?? "",
+                    thumbImage: $0.popfile1 ?? "",
+                    fullImage: $0.popfile2 ?? "",
+                    state: $0.processState ?? "",
+                    gender: ($0.sexCD == "M" ? "🚹" : "🚺") ?? "",
+                    neut: ($0.neuterYn == "Y" ? "⭕️" : "❌") ?? ""
                 ),
                 shelter: HomeShelterEntity(
-                    name: $0.shterNm,
-                    number: $0.shterTelno,
-                    address: $0.protectPLC,
-                    discplc: $0.discvryPLCInfo,
-                    beginDate: $0.pblancBeginDe,
-                    endDate: $0.pblancEndDe,
-                    lon: $0.refineWgs84Logt,
-                    lat: $0.refineWgs84Lat
+                    name: $0.careNm ?? "-",
+                    number: $0.careTel ?? "-",
+                    address: $0.careAddr ?? "-",
+                    discplc: $0.happenPlace ?? "",
+                    beginDate: $0.noticeSdt ?? "",
+                    endDate: $0.noticeEdt ?? ""
                 )
             )
-        }
+        } ?? []
     }
 }

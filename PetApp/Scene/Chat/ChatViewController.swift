@@ -133,7 +133,8 @@ final class ChatViewController: BaseViewController {
         chatImageView.snp.makeConstraints { make in
             make.width.equalToSuperview()
             make.height.equalTo(UIScreen.main.bounds.width / 1.8)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
 }
