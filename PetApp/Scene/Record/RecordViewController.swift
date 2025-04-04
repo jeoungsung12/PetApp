@@ -60,6 +60,7 @@ final class RecordViewController: BaseViewController {
     }
     
     override func configureView() {
+        self.setTabBar()
         self.setNavigation(logo: true)
         self.view.backgroundColor = .customWhite
         searchBar.searchBarStyle = .minimal

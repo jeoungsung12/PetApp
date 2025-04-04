@@ -114,6 +114,7 @@ final class ChatViewController: BaseViewController {
     }
     
     override func configureView() {
+        setTabBar()
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
         

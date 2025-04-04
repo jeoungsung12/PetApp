@@ -28,7 +28,7 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.backgroundColor = .customLightGray
         
         titleLabel.textColor = .customLightGray
-        titleLabel.font = .mediumBold
+        titleLabel.font = .mediumRegular
         titleLabel.textAlignment = .left
         titleLabel.numberOfLines = 1
         
