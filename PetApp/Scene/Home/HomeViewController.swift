@@ -40,6 +40,11 @@ final class HomeViewController: BaseViewController {
                 cell.configure(item.data)
                 return cell
                 
+            case .middlePhoto:
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomePosterCell.id, for: indexPath) as? HomePosterCell else { return UICollectionViewCell() }
+                cell.configure(with: item.data?.animal.fullImage)
+                return cell
+                
             case .footer:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFooterCell.id, for: indexPath) as? HomeFooterCell else { return UICollectionViewCell() }
                 cell.configure(item.data)
@@ -79,6 +84,7 @@ final class HomeViewController: BaseViewController {
                 if let data = selected.1.data {
                     switch HomeSectionType.allCases[selected.0.section] {
                     case .middle,
+                            .middlePhoto,
                             .footer:
                         let vm = DetailViewModel(model: data)
                         let vc = DetailViewController(viewModel: vm)
@@ -170,6 +176,7 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
         collectionView.register(HomeMiddleCell.self, forCellWithReuseIdentifier: HomeMiddleCell.id)
         collectionView.register(HomeFooterCell.self, forCellWithReuseIdentifier: HomeFooterCell.id)
         collectionView.register(HomeEtcCell.self, forCellWithReuseIdentifier: HomeEtcCell.id)
+        collectionView.register(HomePosterCell.self, forCellWithReuseIdentifier: HomePosterCell.id)
     }
     
     private func createLayout() -> UICollectionViewLayout {
@@ -205,25 +212,46 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             section.orthogonalScrollingBehavior = .groupPagingCentered
             section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 24, trailing: 0)
             
-        case .middle, .footer:
-            groupSize = type == .middle
-            ? NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
-            : NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(200))
-            
-            group = type == .middle
-            ? NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            : NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-            group.contentInsets = type == .middle ?
-            NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6) :
-            NSDirectionalEdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0)
+        case .middle:
+            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
+            group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6)
             
             section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = type == .middle ? .continuous : .none
+            section.orthogonalScrollingBehavior = .continuous
             section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 12, bottom: 24, trailing: 12)
             
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute((type == .middle) ? 20 : 50)
+                heightDimension: .absolute(20)
+            )
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .topLeading
+            )
+            section.boundarySupplementaryItems = [sectionHeader]
+            
+        case .middlePhoto:
+            groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalWidth(0.33)
+            )
+            let subitemSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0/3.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+            let subitem = NSCollectionLayoutItem(layoutSize: subitemSize)
+            subitem.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
+            group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [subitem, subitem, subitem])
+            group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            
+            section = NSCollectionLayoutSection(group: group)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 12, bottom: 24, trailing: 12)
+            
+            let headerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(20)
             )
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,
@@ -242,7 +270,35 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(80))
             group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
             section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 48, trailing: 12)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 12, bottom: 48, trailing: 12)
+            
+        case .footer:
+            groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(200)
+            )
+            let subitemSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(0.5),
+                heightDimension: .fractionalHeight(1.0)
+            )
+            let subitem = NSCollectionLayoutItem(layoutSize: subitemSize)
+            subitem.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6)
+            group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [subitem, subitem])
+            group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            
+            section = NSCollectionLayoutSection(group: group)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 12, bottom: 24, trailing: 12)
+            
+            let headerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(50)
+            )
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .topLeading
+            )
+            section.boundarySupplementaryItems = [sectionHeader]
         }
         
         return section
