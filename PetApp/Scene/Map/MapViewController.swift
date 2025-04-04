@@ -97,7 +97,7 @@ final class MapViewController: BaseViewController {
         locationManager.delegate = self
         
         locationButton.setImage(UIImage(systemName: "location.fill"), for: .normal)
-        locationButton.tintColor = .systemBlue
+        locationButton.tintColor = .point
         locationButton.backgroundColor = .white
         locationButton.layer.cornerRadius = 25
         locationButton.clipsToBounds = true
@@ -114,8 +114,8 @@ final class MapViewController: BaseViewController {
         }
         
         locationButton.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(20)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            make.trailing.equalToSuperview().inset(20)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.width.height.equalTo(50)
         }
     }
