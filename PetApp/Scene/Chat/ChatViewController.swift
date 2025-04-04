@@ -64,7 +64,7 @@ final class ChatViewController: BaseViewController {
                 return UICollectionReusableView()
             }
             
-            headerView.configure(dataSource.sectionModels[indexPath.section].title, true)
+            headerView.configure(dataSource.sectionModels[indexPath.section].title, true, type: .header)
             
             return headerView
         }

@@ -78,7 +78,7 @@ final class HomeViewController: BaseViewController {
             }
             
             headerView.delegate = self
-            headerView.configure(dataSource.sectionModels[indexPath.section].title)
+            headerView.configure(dataSource.sectionModels[indexPath.section].title, type: HomeSectionType.allCases[indexPath.section])
             
             return headerView
         }
@@ -152,9 +152,14 @@ final class HomeViewController: BaseViewController {
 
 extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
     
-    func moreBtnTapped() {
+    func moreBtnTapped(_ type: HomeSectionType) {
         //TODO: Coordinator
-        self.navigationController?.pushViewController(ListViewController(), animated: true)
+        switch type {
+        case .middlePhoto:
+            self.navigationController?.pushViewController(PhotoViewController(), animated: true)
+        default:
+            self.navigationController?.pushViewController(ListViewController(), animated: true)
+        }
     }
     
     func didTapCategory(_ type: CategoryType) {
