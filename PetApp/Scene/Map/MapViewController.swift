@@ -10,7 +10,6 @@ import SnapKit
 import MapKit
 import RxSwift
 import RxCocoa
-
 final class MapViewController: BaseViewController {
     private let mapView = MKMapView()
     private let viewModel: MapViewModel
@@ -18,6 +17,7 @@ final class MapViewController: BaseViewController {
     private let locationManager = CLLocationManager()
     private let authorizationStatusSubject = BehaviorRelay<CLAuthorizationStatus>(value: CLLocationManager.authorizationStatus())
     private let locationButton = UIButton()
+    private let refreshButton = UIButton()
     
     init(viewModel: MapViewModel) {
         self.viewModel = viewModel
@@ -27,6 +27,13 @@ final class MapViewController: BaseViewController {
     @MainActor
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        LoadingIndicator.showLoading()
+        
+        locationManager.requestWhenInUseAuthorization()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -44,7 +51,6 @@ final class MapViewController: BaseViewController {
             loadTrigger: Observable.just(())
         )
         let output = viewModel.transform(input)
-        LoadingIndicator.showLoading()
         
         output.mapResult
             .drive(with: self) { owner, entity in
@@ -52,9 +58,11 @@ final class MapViewController: BaseViewController {
                 let annotations = entity.map { CustomAnnotation(entity: $0) }
                 owner.mapView.addAnnotations(annotations)
                 
-                let _ = entity.map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lon) }
+                let center = owner.viewModel.mapType == .hospital && owner.locationManager.location != nil
+                ? owner.locationManager.location!.coordinate
+                : CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780)
                 let region = MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780),
+                    center: center,
                     span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
                 )
                 owner.mapView.setRegion(region, animated: true)
@@ -74,17 +82,36 @@ final class MapViewController: BaseViewController {
         locationButton.rx.tap
             .withLatestFrom(authorizationStatusSubject)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] status in
-                guard let self = self else { return }
+            .bind(with: self, onNext: { owner, status in
                 switch status {
                 case .notDetermined:
-                    self.locationManager.requestWhenInUseAuthorization()
+                    owner.locationManager.requestWhenInUseAuthorization()
                 case .restricted, .denied:
-                    self.showSettingsAlert()
+                    owner.showSettingsAlert()
                 case .authorizedWhenInUse, .authorizedAlways:
-                    self.moveToUserLocation()
+                    owner.moveToUserLocation()
                 default:
                     break
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        refreshButton.rx.tap
+            .withUnretained(self)
+            .filter { owner, _ in owner.viewModel.mapType == .hospital }
+            .withLatestFrom(authorizationStatusSubject)
+            .bind(with: self, onNext: { owner, status in
+                if status == .authorizedWhenInUse || status == .authorizedAlways {
+                    LoadingIndicator.showLoading()
+                    let newInput = MapViewModel.Input(loadTrigger: Observable.just(()))
+                    let newOutput = owner.viewModel.transform(newInput)
+                    newOutput.mapResult.drive(with: self, onNext: { owner, entity in
+                        owner.mapView.removeAnnotations(owner.mapView.annotations)
+                        let annotations = entity.map { CustomAnnotation(entity: $0) }
+                        owner.mapView.addAnnotations(annotations)
+                        owner.moveToUserLocation()
+                        LoadingIndicator.hideLoading()
+                    }).disposed(by: owner.disposeBag)
                 }
             })
             .disposed(by: disposeBag)
@@ -101,11 +128,19 @@ final class MapViewController: BaseViewController {
         locationButton.backgroundColor = .white
         locationButton.layer.cornerRadius = 25
         locationButton.clipsToBounds = true
+        
+        refreshButton.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
+        refreshButton.tintColor = .point
+        refreshButton.backgroundColor = .white
+        refreshButton.layer.cornerRadius = 25
+        refreshButton.clipsToBounds = true
+        refreshButton.isHidden = viewModel.mapType != .hospital
     }
     
     override func configureHierarchy() {
-        self.view.addSubview(mapView)
-        self.view.addSubview(locationButton)
+        [mapView, locationButton, refreshButton].forEach {
+            self.view.addSubview($0)
+        }
     }
     
     override func configureLayout() {
@@ -116,6 +151,12 @@ final class MapViewController: BaseViewController {
         locationButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(20)
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.width.height.equalTo(50)
+        }
+        
+        refreshButton.snp.makeConstraints { make in
+            make.trailing.equalTo(locationButton.snp.leading).offset(-12)
+            make.centerY.equalTo(locationButton)
             make.width.height.equalTo(50)
         }
     }
@@ -156,7 +197,6 @@ extension MapViewController: CLLocationManagerDelegate {
 }
 
 extension MapViewController: MKMapViewDelegate {
-    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation { return nil }
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: CustomAnnotation.id)
