@@ -16,6 +16,11 @@ final class HomeViewController: BaseViewController {
     private let disposeBag = DisposeBag()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setTabBar()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         LoadingIndicator.showLoading()
@@ -133,14 +138,13 @@ final class HomeViewController: BaseViewController {
     
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.bottom.top.equalTo(view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
         }
     }
     
     override func configureView() {
-        setTabBar()
-        setNavigation(logo: true)
+        self.setNavigation(logo: true)
         view.backgroundColor = .customWhite
         configureCollectionView()
     }

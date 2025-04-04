@@ -29,6 +29,7 @@ final class ChatViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setTabBar()
         input.reloadRealm.accept(())
     }
     
@@ -114,7 +115,6 @@ final class ChatViewController: BaseViewController {
     }
     
     override func configureView() {
-        setTabBar()
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
         
@@ -135,7 +135,8 @@ final class ChatViewController: BaseViewController {
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).offset(12)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
         }
         
         chatImageView.snp.makeConstraints { make in

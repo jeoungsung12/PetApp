@@ -22,6 +22,11 @@ final class PlayerViewController: BaseViewController {
         LoadingIndicator.showLoading()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setTabBar(color: .customBlack)
+    }
+    
     override func setBinding() {
         let input = PlayerViewModel.Input(
             loadTrigger: PublishRelay()
@@ -90,7 +95,6 @@ final class PlayerViewController: BaseViewController {
     }
     
     override func configureView() {
-        self.setTabBar(color: .customBlack)
         self.setNavigation(logo: true, color: .customBlack)
         self.view.backgroundColor = .customBlack
         tableView.separatorStyle = .none

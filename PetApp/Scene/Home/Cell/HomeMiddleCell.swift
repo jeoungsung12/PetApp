@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -122,11 +123,12 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         dateLabel.text = "공고마감 \(model.shelter.endDate.toDate())일전!"
         descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(
-                with: url,
-                storageOption: .memory,
-                processingOption: .downsample(CGSize(width: 150, height: 150))
-            )
+//            thumbImageview.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 150, height: 150))
+//            )
+            thumbImageview.kf.setImage(with: url)
         }
     }
     
