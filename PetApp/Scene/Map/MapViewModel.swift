@@ -15,10 +15,12 @@ enum MapType {
     case hospital
 }
 
-struct MapViewModel: BaseViewModel {
+final class MapViewModel: BaseViewModel {
     private let repository: NetworkRepositoryType = NetworkRepository()
     private var disposeBag = DisposeBag()
     private(set) var mapType: MapType
+    private let locationManager = CLLocationManager()
+    
     struct Input {
         let loadTrigger: Observable<Void>
     }
@@ -31,20 +33,26 @@ struct MapViewModel: BaseViewModel {
     init(mapType: MapType) {
         self.mapType = mapType
     }
-}
-
-extension MapViewModel {
     
     func transform(_ input: Input) -> Output {
         let mapResult = BehaviorRelay<[MapEntity]>(value: [])
         let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
-            .flatMapLatest {
+            .withUnretained(self)
+            .flatMapLatest { owner, _ in
                 Single.create { single in
                     Task {
                         do {
-                            let result = try await repository.getMap(mapType)
+                            var result = try await owner.repository.getMap(owner.mapType)
+                            if owner.mapType == .hospital,
+                               let userLocation = owner.locationManager.location?.coordinate {
+                                result = result.filter { entity in
+                                    let location = CLLocation(latitude: entity.lat, longitude: entity.lon)
+                                    let userLoc = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
+                                    return location.distance(from: userLoc) <= 10000
+                                }
+                            }
                             single(.success(result))
                         } catch {
                             if let dataDreamError = error as? DataDreamError {
@@ -66,5 +74,4 @@ extension MapViewModel {
             errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
         )
     }
-    
 }
