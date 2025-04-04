@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
@@ -96,11 +97,12 @@ final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
         descriptionLabel.text = model.animal.description
         
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(
-                with: url,
-                storageOption: .hybrid,
-                processingOption: .downsample(CGSize(width: 120, height: 120))
-            )
+//            thumbImageview.snSetImage(
+//                with: url,
+//                storageOption: .hybrid,
+//                processingOption: .downsample(CGSize(width: 120, height: 120))
+//            )
+            thumbImageview.kf.setImage(with: url)
         }
     }
     

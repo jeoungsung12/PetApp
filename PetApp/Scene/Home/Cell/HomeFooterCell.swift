@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -99,11 +100,12 @@ final class HomeFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
         
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(
-                with: url,
-                storageOption: .memory,
-                processingOption: .downsample(CGSize(width: 120, height: 120))
-            )
+//            thumbImageview.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 120, height: 120))
+//            )
+            thumbImageview.kf.setImage(with: url)
         }
     }
     

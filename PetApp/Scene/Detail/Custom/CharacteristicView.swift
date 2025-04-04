@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class CharacteristicView: BaseView {
@@ -104,11 +105,12 @@ fileprivate class IconAttributeView: BaseView {
     
     func configure(image: String, endDate: String) {
         if let url = URL(string: image) {
-            iconImageView.snSetImage(
-                with: url,
-                storageOption: .memory,
-                processingOption: .downsample(CGSize(width: 80, height: 80))
-            )
+//            iconImageView.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 80, height: 80))
+//            )
+            iconImageView.kf.setImage(with: url)
         }
         
         let title = "공고 마감까지 단 \n\(endDate.toDate())일!"

@@ -130,7 +130,7 @@ final class MyPageViewController: BaseViewController {
     }
     
     override func configureView() {
-        self.setTabBar()
+        self.setTabBar(color: .white)
         self.setNavigation(logo: true)
         self.view.backgroundColor = .customWhite
         likeBoxsButton.tag = 0

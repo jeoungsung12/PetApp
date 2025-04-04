@@ -26,6 +26,7 @@ final class RecordViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         input.loadTrigger.accept(())
+        setTabBar()
     }
     
     override func setBinding() {
@@ -60,7 +61,6 @@ final class RecordViewController: BaseViewController {
     }
     
     override func configureView() {
-        self.setTabBar()
         self.setNavigation(logo: true)
         self.view.backgroundColor = .customWhite
         searchBar.searchBarStyle = .minimal
