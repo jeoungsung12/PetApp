@@ -7,13 +7,9 @@
 
 import UIKit
 import SnapKit
-import AVKit
-import AVFoundation
 import YouTubeiOSPlayerHelper
 
 final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
-//    private var player: AVPlayer?
-//    private var playerVC: AVPlayerViewController?
     private var playerView: YTPlayerView?
     private var videoID: String?
     
@@ -25,28 +21,28 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        playerView?.stopVideo()
         videoID = nil
+        playerView?.stopVideo()
+        playerView?.load(withVideoId: "")
     }
     
     override func configureView() {
-        containerView.clipsToBounds = true
-        containerView.backgroundColor = .customLightGray
-        containerView.layer.cornerRadius = 10
+        self.contentView.backgroundColor = .customBlack
+        containerView.backgroundColor = .customBlack
         
-        locationLabel.textColor = .customLightGray
-        locationLabel.font = .smallSemibold
+        locationLabel.textColor = .customWhite
+        locationLabel.font = .smallBold
         locationLabel.textAlignment = .right
         
-        titleLabel.textColor = .customBlack
+        titleLabel.textColor = .customWhite
         titleLabel.font = .largeBold
         
-        descriptionLabel.textColor = .customBlack
-        descriptionLabel.font = .mediumRegular
+        descriptionLabel.textColor = .customWhite
+        descriptionLabel.font = .mediumBold
         descriptionLabel.numberOfLines = 0
         
         statusLabel.textColor = .point
-        statusLabel.font = .smallSemibold
+        statusLabel.font = .smallBold
         statusLabel.textAlignment = .right
         
         [titleLabel, descriptionLabel].forEach {
@@ -56,43 +52,49 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
     
     override func configureHierarchy() {
         playerView = YTPlayerView()
+        playerView?.isUserInteractionEnabled = false
         if let playerView = playerView {
-            containerView.addSubview(playerView)
+            self.contentView.addSubview(playerView)
         }
-        [containerView, locationLabel, titleLabel, descriptionLabel, statusLabel].forEach {
-            self.contentView.addSubview($0)
+        [
+            locationLabel,
+            titleLabel,
+            descriptionLabel,
+            statusLabel
+        ].forEach {
+            containerView.addSubview($0)
         }
+        self.contentView.addSubview(containerView)
     }
     
     override func configureLayout() {
         containerView.snp.makeConstraints { make in
-            make.height.equalTo(250)
-            make.top.horizontalEdges.equalToSuperview().inset(12)
+            make.height.equalTo(100)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
         playerView?.snp.makeConstraints { make in
-            make.edges.equalTo(containerView)
+            make.edges.equalToSuperview()
         }
         
         locationLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(12)
-            make.top.equalTo(containerView.snp.bottom).offset(8)
+            make.top.trailing.equalToSuperview().inset(12)
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(12)
-            make.top.equalTo(containerView.snp.bottom).offset(8)
+            make.top.leading.equalToSuperview().inset(12)
             make.trailing.greaterThanOrEqualTo(locationLabel.snp.leading).inset(12)
         }
         
         descriptionLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview().inset(12)
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
         }
         
         statusLabel.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
-            make.top.equalTo(descriptionLabel.snp.bottom).offset(2)
+            make.top.equalTo(descriptionLabel.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(12)
+            make.bottom.lessThanOrEqualToSuperview().inset(12)
         }
     }
     
@@ -103,10 +105,12 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
         descriptionLabel.text = "\(entity.weight) \(entity.age)"
         
         videoID = extractYouTubeVideoID(from: entity.videoURL)
-        //TODO: 수정
         playerView?.load(withVideoId: videoID ?? "")
-        //        configurePlayer(entity.videoURL)
     }
+    
+}
+
+extension PlayerTableViewCell {
     
     func playVideo() {
         guard let videoID = videoID else { return }
@@ -124,7 +128,6 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
         playerView?.stopVideo()
     }
     
-    //TODO: ViewModel
     private func extractYouTubeVideoID(from url: String) -> String? {
         let pattern = "youtu.be/([a-zA-Z0-9_-]+)"
         guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return nil }
@@ -137,34 +140,5 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
         }
         return nil
     }
-}
-
-extension PlayerTableViewCell {
-    
-//    private func configurePlayer(_ url: String) {
-//        if let videoURL = URL(string: url) {
-//            player = AVPlayer(url: videoURL)
-//            
-//            playerVC = AVPlayerViewController()
-//            playerVC?.player = player
-//            if let playerVC = playerVC {
-//                playerVC.view.clipsToBounds = true
-//                playerVC.view.layer.cornerRadius = 10
-//                containerView.addSubview(playerVC.view)
-//                playerVC.view.snp.makeConstraints { make in
-//                    make.edges.equalToSuperview()
-//                }
-//                startPlayer()
-//            }
-//        }
-//    }
-    
-//    func startPlayer() {
-//        player?.play()
-//    }
-//    
-//    func stopPlayer() {
-//        player?.pause()
-//    }
     
 }

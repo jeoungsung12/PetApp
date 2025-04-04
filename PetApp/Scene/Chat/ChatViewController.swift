@@ -22,6 +22,11 @@ final class ChatViewController: BaseViewController {
     )
     private var disposeBag = DisposeBag()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        LoadingIndicator.showLoading()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         input.reloadRealm.accept(())
@@ -72,9 +77,12 @@ final class ChatViewController: BaseViewController {
         result
             .drive(with: self) { owner, sections in
                 if let section = sections.last {
-                    owner.chatImageView.isHidden = !section.items.isEmpty
+                    owner.chatImageView.image = (!section.items.isEmpty) ? nil : UIImage(named: "chatBackDrop")
                 }
-                LoadingIndicator.hideLoading()
+                
+                if !sections.isEmpty {
+                    LoadingIndicator.hideLoading()
+                }
             }
             .disposed(by: disposeBag)
         
@@ -91,18 +99,18 @@ final class ChatViewController: BaseViewController {
             collectionView.rx.itemSelected,
             collectionView.rx.modelSelected(HomeItem.self)
         )
-            .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, selected in
-                if let data = selected.1.data {
-                    let vm = ChatDetailViewModel(entity: data)
-                    let vc = ChatDetailViewController(viewModel: vm)
-                    owner.navigationController?.pushViewController(vc, animated: true)
-                } else {
-                    let vc = ListViewController()
-                    owner.navigationController?.pushViewController(vc, animated: true)
-                }
+        .observe(on: MainScheduler.instance)
+        .bind(with: self) { owner, selected in
+            if let data = selected.1.data {
+                let vm = ChatDetailViewModel(entity: data)
+                let vc = ChatDetailViewController(viewModel: vm)
+                owner.navigationController?.pushViewController(vc, animated: true)
+            } else {
+                let vc = ListViewController()
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
-            .disposed(by: disposeBag)
+        }
+        .disposed(by: disposeBag)
     }
     
     override func configureView() {
@@ -110,7 +118,6 @@ final class ChatViewController: BaseViewController {
         view.backgroundColor = .customWhite
         
         chatImageView.contentMode = .scaleAspectFit
-        chatImageView.image = UIImage(named: "chatBackDrop")
         
         collectionView.backgroundColor = .customWhite
         collectionView.register(ChatHeaderCell.self, forCellWithReuseIdentifier: ChatHeaderCell.id)
