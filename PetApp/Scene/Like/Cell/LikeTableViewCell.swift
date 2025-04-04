@@ -43,7 +43,7 @@ final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
         statusLabel.font = .mediumBold
         statusLabel.layer.cornerRadius = 5
         statusLabel.textColor = .customWhite
-        statusLabel.backgroundColor = .black.withAlphaComponent(0.5)
+        statusLabel.backgroundColor = .point.withAlphaComponent(0.8)
         statusLabel.textAlignment = .center
     }
     
