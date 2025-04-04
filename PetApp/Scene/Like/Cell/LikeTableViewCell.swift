@@ -25,8 +25,8 @@ final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
     private var disposeBag = DisposeBag()
     
     override func setBinding() {
-        let input = ListTableViewModel.Input()
-        let output = viewModel.transform(input)
+//        let input = ListTableViewModel.Input()
+//        let output = viewModel.transform(input)
         
         
     }
