@@ -42,7 +42,7 @@ extension HomeResponseDTO {
                 animal: HomeAnimalEntity(
                     id: $0.desertionNo ?? "\(UUID())",
                     name: $0.kindNm ?? "",
-                    description: $0.specialMark ?? "",
+                    description: ($0.specialMark ?? "") == "." ? "- 정보 없음" : ($0.specialMark ?? ""),
                     color: $0.colorCD ?? "",
                     age: $0.age ?? "",
                     weight: $0.weight ?? "",

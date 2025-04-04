@@ -20,6 +20,16 @@ final class PlayerViewController: BaseViewController {
         LoadingIndicator.showLoading()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.isHidden = false
+    }
+    
     override func setBinding() {
         let input = PlayerViewModel.Input(
             loadTrigger: PublishRelay()
@@ -59,7 +69,6 @@ final class PlayerViewController: BaseViewController {
                    (output.videoResult.value.count - 2) < lastIndex
                 {
                     LoadingIndicator.showLoading()
-                    //TODO: 캐싱
                     input.loadTrigger.accept(.init(start: 1 + request.end, end: request.end + 10))
                 }
             }
@@ -67,16 +76,35 @@ final class PlayerViewController: BaseViewController {
         
         tableView.rx.cancelPrefetchingForRows
             .bind(with: self) { owner, IndexPaths in
-                //TODO: 네트워크 요청 취소
+                
+            }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.willDisplayCell
+            .bind(with: self) { owner, cellInfo in
+                if let cell = cellInfo.cell as? PlayerTableViewCell {
+                    cell.playVideo()
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.didEndDisplayingCell
+            .bind(with: self) { owner, cellInfo in
+                if let cell = cellInfo.cell as? PlayerTableViewCell {
+                    cell.stopVideo()
+                }
             }
             .disposed(by: disposeBag)
     }
     
     override func configureView() {
-        self.setNavigation(logo: true)
-        tableView.separatorStyle = .singleLine
-        tableView.backgroundColor = .customWhite
-        tableView.rowHeight = UITableView.automaticDimension
+        self.view.backgroundColor = .customBlack
+        let tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .customBlack
+        tableView.isPagingEnabled = true
+        tableView.contentInsetAdjustmentBehavior = .never
+        tableView.rowHeight = self.view.frame.height - tabBarHeight
         tableView.register(PlayerTableViewCell.self, forCellReuseIdentifier: PlayerTableViewCell.id)
     }
     
@@ -86,8 +114,8 @@ final class PlayerViewController: BaseViewController {
     
     override func configureLayout() {
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
 }

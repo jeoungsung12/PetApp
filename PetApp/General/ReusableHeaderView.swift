@@ -53,11 +53,12 @@ extension ReusableHeaderView {
         
         spacer.backgroundColor = .customBlack
         
+        let buttonColor: UIColor = .point.withAlphaComponent(0.5)
         moreBtn.setTitle("더보기", for: .normal)
-        moreBtn.setTitleColor(.customLightGray, for: .normal)
+        moreBtn.setTitleColor(buttonColor, for: .normal)
         moreBtn.setImage(.arrowRight, for: .normal)
         moreBtn.titleLabel?.font = .largeBold
-        moreBtn.tintColor = .customLightGray
+        moreBtn.tintColor = buttonColor
         
         moreBtn.semanticContentAttribute = .forceRightToLeft
     }
