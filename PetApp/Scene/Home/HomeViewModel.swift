@@ -14,6 +14,7 @@ enum HomeSectionType: CaseIterable {
     case header
     case middle
     case middleBtn
+    case middlePhoto
     case middleAds
     case footer
 }
@@ -88,22 +89,23 @@ extension HomeViewModel {
     
     private func fetchData() async throws -> [HomeSection] {
         do {
-            let result = try await repository.getAnimal(1)
-            let firstResult = result.prefix(5)
-            let secondResult = result.dropFirst(5).prefix(5)
+            async let firstResult = repository.getAnimal(1)
+            async let secondResult = repository.getAnimal(2)
             
-            return  [
+            return try await [
                 HomeSection(title: "", items: [.init(data: nil)]),
-                HomeSection(title: "도움이 필요해요!", items: firstResult.map {
+                HomeSection(title: "도움이 필요해요!", items: firstResult.prefix(5).map {
                     return HomeItem(data: $0)
                 }),
                 HomeSection(title: "", items: [.init(data: nil)]),
+                HomeSection(title: "사진 📸", items: firstResult.dropFirst(4).prefix(6).map {
+                    return HomeItem(data: $0)
+                }),
                 HomeSection(title: "", items: [.init(data: nil)]),
                 HomeSection(title: "따스한 손길이\n필요한 친구들 🐾", items: secondResult.map {
                     return HomeItem(data: $0)
                 })
             ]
-            
         } catch {
             throw error
         }
