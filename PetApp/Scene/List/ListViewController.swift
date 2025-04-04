@@ -85,7 +85,7 @@ final class ListViewController: BaseViewController {
         
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
-        tableView.rowHeight = 150
+        tableView.rowHeight = 200
         tableView.register(ListTableViewCell.self, forCellReuseIdentifier: ListTableViewCell.id)
     }
     
