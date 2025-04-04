@@ -139,6 +139,7 @@ final class HomeViewController: BaseViewController {
     }
     
     override func configureView() {
+        setTabBar()
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
         configureCollectionView()

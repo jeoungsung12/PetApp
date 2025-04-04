@@ -11,6 +11,8 @@ import RxSwift
 import RxCocoa
 
 final class PlayerViewController: BaseViewController {
+    private lazy var tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
+    private lazy var naviHeight = navigationController?.navigationBar.frame.height ?? 0
     private let tableView = UITableView()
     private let viewModel = PlayerViewModel()
     private var disposeBag = DisposeBag()
@@ -18,16 +20,6 @@ final class PlayerViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         LoadingIndicator.showLoading()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.isHidden = false
     }
     
     override func setBinding() {
@@ -98,13 +90,14 @@ final class PlayerViewController: BaseViewController {
     }
     
     override func configureView() {
+        self.setTabBar(color: .customBlack)
+        self.setNavigation(logo: true, color: .customBlack)
         self.view.backgroundColor = .customBlack
-        let tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
         tableView.separatorStyle = .none
         tableView.backgroundColor = .customBlack
         tableView.isPagingEnabled = true
         tableView.contentInsetAdjustmentBehavior = .never
-        tableView.rowHeight = self.view.frame.height - tabBarHeight
+        tableView.rowHeight = self.view.frame.height - tabBarHeight - naviHeight
         tableView.register(PlayerTableViewCell.self, forCellReuseIdentifier: PlayerTableViewCell.id)
     }
     
@@ -114,8 +107,9 @@ final class PlayerViewController: BaseViewController {
     
     override func configureLayout() {
         tableView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalToSuperview().offset(naviHeight)
+            make.bottom.equalToSuperview().inset(tabBarHeight)
         }
     }
 }

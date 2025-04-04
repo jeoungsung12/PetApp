@@ -27,10 +27,11 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
     }
     
     override func configureView() {
+        self.backgroundColor = .customBlack
         self.contentView.backgroundColor = .customBlack
         containerView.backgroundColor = .customBlack
         
-        locationLabel.textColor = .customWhite
+        locationLabel.textColor = .customLightGray
         locationLabel.font = .smallBold
         locationLabel.textAlignment = .right
         

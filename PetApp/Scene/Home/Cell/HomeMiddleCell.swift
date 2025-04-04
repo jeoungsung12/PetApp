@@ -36,10 +36,10 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.backgroundColor = .customLightGray
         
         shelterLabel.textColor = .customLightGray
-        shelterLabel.font = .mediumBold
+        shelterLabel.font = .mediumRegular
         
         hashTagLabel.textColor = .customBlack
-        hashTagLabel.font = .mediumRegular
+        hashTagLabel.font = .mediumSemibold
         
         dateLabel.textColor = .systemRed
         dateLabel.font = .mediumRegular
