@@ -11,38 +11,42 @@ import SnapKit
 
 final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
     private let imageView = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        configureView()
-        configureHierarchy()
-        configureLayout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    private let descriptionLabel = UILabel()
     
     override func configureView() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        
+        descriptionLabel.font = .largeBold
+        descriptionLabel.numberOfLines = 2
+        descriptionLabel.textColor = .customWhite
+        descriptionLabel.layer.shadowOpacity = 0.5
+        descriptionLabel.layer.shadowOffset = CGSize(width: 0, height: 0)
+        descriptionLabel.layer.shadowColor = UIColor.customBlack.cgColor
     }
     
     override func configureHierarchy() {
-        contentView.addSubview(imageView)
+        [imageView, descriptionLabel].forEach {
+            contentView.addSubview($0)
+        }
     }
     
     override func configureLayout() {
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        descriptionLabel.snp.makeConstraints { make in
+            make.horizontalEdges.bottom.equalToSuperview().inset(8)
+        }
     }
     
-    func configure(_ imageUrl: String, completion: ((CGFloat) -> Void)? = nil) {
-        guard let url = URL(string: imageUrl) else {
+    func configure(_ model: HomeEntity, completion: ((CGFloat) -> Void)? = nil) {
+        guard let url = URL(string: model.animal.fullImage) else {
             completion?(1.0)
             return
         }
+        descriptionLabel.text = "\(model.animal.name)\n\(model.animal.age)-\(model.animal.weight)"
         imageView.kf.setImage(with: url) { [weak self] result in
             guard let self = self else { return }
             switch result {

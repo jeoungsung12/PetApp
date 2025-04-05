@@ -25,8 +25,8 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
     private var disposeBag = DisposeBag()
     
     override func setBinding() {
-//        let input = ListTableViewModel.Input()
-//        let output = viewModel.transform(input)
+        //        let input = ListTableViewModel.Input()
+        //        let output = viewModel.transform(input)
         
         
     }
@@ -157,15 +157,15 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
     }
     
     private func configureSubTitle(model: HomeEntity) {
-        let colorText = model.animal.color
+        let genderText = (model.animal.gender == "🚹") ? "남" : "여"
         let nameText = model.animal.name
-        let fullText = "\(colorText) \(nameText)"
-
+        let fullText = "\(genderText), \(nameText)"
+        
         let attributedString = NSMutableAttributedString(string: fullText)
-
-        let colorRange = (fullText as NSString).range(of: colorText)
+        
+        let colorRange = (fullText as NSString).range(of: genderText)
         attributedString.addAttribute(.foregroundColor, value: UIColor.point, range: colorRange)
-
+        
         let nameRange = (fullText as NSString).range(of: nameText)
         attributedString.addAttribute(.foregroundColor, value: UIColor.customBlack, range: nameRange)
         subTitleLabel.attributedText = attributedString

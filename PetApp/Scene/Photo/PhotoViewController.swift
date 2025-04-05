@@ -19,7 +19,6 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
     override func viewDidLoad() {
         super.viewDidLoad()
         LoadingIndicator.showLoading()
-        collectionView.delegate = self
     }
     
     override func setBinding() {
@@ -46,7 +45,7 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
                 let width = (self.collectionView.frame.width - 28) / 2
                 self.itemSizes[row] = CGSize(width: width, height: 200)
                 
-                cell.configure(element.animal.fullImage) { aspectRatio in
+                cell.configure(element) { aspectRatio in
                     let width = (self.collectionView.frame.width - 28) / 2
                     if row < self.itemSizes.count {
                         self.itemSizes[row] = CGSize(width: width, height: width * aspectRatio)
@@ -99,7 +98,7 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
     override func configureView() {
         self.setNavigation()
         self.view.backgroundColor = .white
-        
+        collectionView.delegate = self
         collectionView.backgroundColor = .white
         collectionView.showsVerticalScrollIndicator = false
         collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.id)
