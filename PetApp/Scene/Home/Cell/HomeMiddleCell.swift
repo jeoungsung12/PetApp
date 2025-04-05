@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -15,6 +16,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     private let shelterLabel = UILabel()
     private let hashTagLabel = UILabel()
     private let statusLabel = UILabel()
+    private let dateLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,11 +36,15 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.layer.cornerRadius = 10
         thumbImageview.backgroundColor = .customLightGray
         
-        shelterLabel.textColor = .customBlack
-        shelterLabel.font = .mediumBold
+        shelterLabel.textColor = .customLightGray
+        shelterLabel.font = .mediumRegular
         
-        hashTagLabel.textColor = .customLightGray
-        hashTagLabel.font = .mediumRegular
+        hashTagLabel.textColor = .customBlack
+        hashTagLabel.font = .mediumSemibold
+        
+        dateLabel.textColor = .systemRed
+        dateLabel.font = .mediumRegular
+        dateLabel.textAlignment = .center
         
         descriptionLabel.font = .mediumBold
         descriptionLabel.numberOfLines = 2
@@ -55,12 +61,19 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         statusLabel.font = .mediumBold
         statusLabel.layer.cornerRadius = 5
         statusLabel.textColor = .customWhite
-        statusLabel.backgroundColor = .black.withAlphaComponent(0.5)
+        statusLabel.backgroundColor = .point.withAlphaComponent(0.8)
         statusLabel.textAlignment = .center
     }
     
     override func configureHierarchy() {
-        [thumbImageview, statusLabel, descriptionLabel, shelterLabel, hashTagLabel].forEach {
+        [
+            thumbImageview,
+            descriptionLabel,
+            shelterLabel,
+            hashTagLabel,
+            statusLabel,
+            dateLabel
+        ].forEach {
             self.contentView.addSubview($0)
         }
     }
@@ -68,19 +81,12 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     override func configureLayout() {
         thumbImageview.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.height.equalToSuperview().dividedBy(1.5)
-        }
-        
-        statusLabel.snp.makeConstraints { make in
-            make.top.equalTo(thumbImageview.snp.top).inset(12)
-            make.trailing.equalTo(thumbImageview.snp.trailing).inset(12)
-            make.width.equalTo(50)
-            make.height.equalTo(25)
+            make.height.equalToSuperview().dividedBy(1.8)
         }
         
         descriptionLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(12)
-            make.bottom.equalTo(thumbImageview.snp.bottom).inset(12)
+            make.bottom.equalTo(thumbImageview.snp.bottom).inset(8)
+            make.horizontalEdges.equalTo(thumbImageview.snp.horizontalEdges).inset(8)
         }
         
         shelterLabel.snp.makeConstraints { make in
@@ -91,7 +97,21 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         hashTagLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
             make.top.equalTo(shelterLabel.snp.bottom).offset(8)
+        }
+        
+        statusLabel.snp.makeConstraints { make in
+            make.top.equalTo(hashTagLabel.snp.bottom).offset(12)
+            make.leading.equalToSuperview()
+            make.width.equalTo(50)
+            make.height.equalTo(25)
             make.bottom.lessThanOrEqualToSuperview().inset(4)
+        }
+        
+        dateLabel.snp.makeConstraints { make in
+            make.top.equalTo(statusLabel.snp.top)
+            make.bottom.equalTo(statusLabel.snp.bottom)
+            make.leading.equalTo(statusLabel.snp.trailing).offset(4)
+            make.trailing.equalToSuperview()
         }
     }
     
@@ -100,9 +120,15 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         statusLabel.text = model.animal.state
         shelterLabel.text = model.shelter.name
         hashTagLabel.text = model.animal.description
+        dateLabel.text = "공고마감 \(model.shelter.endDate.toDate())일전!"
         descriptionLabel.text = model.animal.name + "\n" + model.animal.age + model.animal.weight
         if let url = URL(string: model.animal.fullImage) {
-            thumbImageview.snSetImage(with: url, storageOption: .memory)
+//            thumbImageview.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 150, height: 150))
+//            )
+            thumbImageview.kf.setImage(with: url)
         }
     }
     

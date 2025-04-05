@@ -9,11 +9,14 @@ import UIKit
 
 extension String {
     
-    func toDate() -> Date {
+    func toDate() -> Int {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd"
         formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.date(from: self) ?? Date()
+        let endDate = formatter.date(from: self) ?? Date()
+        let today = Date()
+        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: endDate).day ?? 0
+        return daysRemaining
     }
     
     static func currentDate() -> String {

@@ -7,12 +7,27 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class CustomCalloutView: BaseView {
     private let numLabel = UILabel()
     private let addressLabel = UILabel()
     private let loadLabel = UILabel()
-    private let numberLabel = UILabel()
+    private let numberBtn = UIButton()
+    
+    private var disposeBag = DisposeBag()
+    override func setBinding() {
+        numberBtn.rx.tap
+            .bind(with: self) { owner, _ in
+                guard let number = owner.numberBtn.titleLabel?.text, !number.isEmpty else { return }
+                let cleanedNumber = number.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
+                if let url = URL(string: "tel://\(cleanedNumber)"), UIApplication.shared.canOpenURL(url) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            }
+            .disposed(by: disposeBag)
+    }
     
     override func configureView() {
         numLabel.font = .largeBold
@@ -27,13 +42,12 @@ class CustomCalloutView: BaseView {
         loadLabel.textColor = .darkGray
         loadLabel.numberOfLines = 0
         
-        numberLabel.font = .smallSemibold
-        numberLabel.textColor = .point
-        numberLabel.numberOfLines = 0
+        numberBtn.titleLabel?.font = .smallSemibold
+        numberBtn.setTitleColor(.point, for: .normal)
     }
     
     override func configureHierarchy() {
-        [numLabel, addressLabel, loadLabel, numberLabel].forEach {
+        [numLabel, addressLabel, loadLabel, numberBtn].forEach {
             addSubview($0)
         }
     }
@@ -53,7 +67,7 @@ class CustomCalloutView: BaseView {
             make.leading.trailing.equalToSuperview().inset(8)
         }
         
-        numberLabel.snp.makeConstraints { make in
+        numberBtn.snp.makeConstraints { make in
             make.top.equalTo(loadLabel.snp.bottom).offset(4)
             make.leading.trailing.equalToSuperview().inset(8)
             make.bottom.equalToSuperview().inset(8)
@@ -63,6 +77,6 @@ class CustomCalloutView: BaseView {
     func configure(with entity: MapEntity) {
         numLabel.text = entity.numAddress
         addressLabel.text = entity.address
-        numberLabel.text = entity.number
+        numberBtn.setTitle("☎️ \(entity.number)", for: .normal)
     }
 }

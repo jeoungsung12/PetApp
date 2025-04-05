@@ -42,7 +42,6 @@ extension UIViewController {
         self.present(alertVC, animated: true)
     }
     
-    
     func setNavigation(
         logo: Bool = false,
         title: String? = nil,
@@ -54,7 +53,7 @@ extension UIViewController {
         
         if logo {
             let logoImageView = UIImageView()
-            logoImageView.image = UIImage(named: "navigationLogo")
+            logoImageView.image = UIImage(named: "NavigationLogo")
             logoImageView.contentMode = .scaleAspectFit
             let titleItem = UIBarButtonItem(customView: logoImageView)
             self.navigationItem.leftBarButtonItem = titleItem
@@ -71,5 +70,14 @@ extension UIViewController {
         navigationBar.tintColor = .point
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    func setTabBar(color: UIColor = .white) {
+        let tabBarAppearance = UITabBarAppearance()
+        
+        tabBarAppearance.configureWithOpaqueBackground()
+        tabBarAppearance.backgroundColor = color
+        
+        tabBarController?.tabBar.standardAppearance = tabBarAppearance
     }
 }

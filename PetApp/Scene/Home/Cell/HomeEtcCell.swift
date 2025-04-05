@@ -16,6 +16,7 @@ enum HomeEtcType {
 final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
     private let adsImageView = UIImageView()
     private let mapView = IconLabelButton()
+    private let seperateView = SeperateView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -44,18 +45,32 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
     }
     
     override func configureHierarchy() {
-        [adsImageView, mapView].forEach {
+        [adsImageView, mapView, seperateView].forEach {
             contentView.addSubview($0)
         }
     }
     
     override func configureLayout() {
         adsImageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(12)
+            make.height.equalTo(80)
         }
         
         mapView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(12)
+            make.height.equalTo(50)
+        }
+        
+        seperateView.snp.makeConstraints { make in
+            if adsImageView.isHidden {
+                make.top.equalTo(mapView.snp.bottom).offset(24)
+            } else {
+                make.top.equalTo(adsImageView.snp.bottom).offset(24)
+            }
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.lessThanOrEqualToSuperview()
         }
     }
     
@@ -66,5 +81,6 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
         case .ads:
             mapView.isHidden = true
         }
+        configureHierarchy()
     }
 }

@@ -88,6 +88,7 @@ final class LineItemView: BaseView {
         subTitleLabel.font = .mediumSemibold
         subTitleLabel.textColor = .customLightGray
         subTitleLabel.text = subTitleString
+        subTitleLabel.numberOfLines = 0
         
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = alignment

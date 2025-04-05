@@ -20,7 +20,7 @@ final class LoadingIndicator {
                 loadingIndicatorView = UIActivityIndicatorView(style: .large)
                 loadingIndicatorView.frame = window.frame
                 loadingIndicatorView.color = .customLightGray
-                loadingIndicatorView.style = .medium
+                loadingIndicatorView.style = .large
                 window.addSubview(loadingIndicatorView)
             }
             
