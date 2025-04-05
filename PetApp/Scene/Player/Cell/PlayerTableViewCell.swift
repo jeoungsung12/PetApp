@@ -53,6 +53,7 @@ final class PlayerTableViewCell: BaseTableViewCell, ReusableIdentifier {
     
     override func configureHierarchy() {
         playerView = YTPlayerView()
+        playerView?.backgroundColor = .customBlack
         playerView?.isUserInteractionEnabled = false
         if let playerView = playerView {
             self.contentView.addSubview(playerView)

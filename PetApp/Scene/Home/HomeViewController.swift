@@ -271,16 +271,16 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             section.boundarySupplementaryItems = [sectionHeader]
             
         case .middleBtn:
-            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(50))
+            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(100))
             group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
             section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: -24, leading: 12, bottom: 24, trailing: 12)
+            section.contentInsets = NSDirectionalEdgeInsets(top: -24, leading: 0, bottom: 24, trailing: 0)
             
         case .middleAds:
-            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(80))
+            groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(130))
             group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
             section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 24, leading: 12, bottom: 48, trailing: 12)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 0, bottom: 24, trailing: 0)
             
         case .footer:
             groupSize = NSCollectionLayoutSize(

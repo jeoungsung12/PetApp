@@ -77,6 +77,6 @@ class CustomCalloutView: BaseView {
     func configure(with entity: MapEntity) {
         numLabel.text = entity.numAddress
         addressLabel.text = entity.address
-        numberBtn.setTitle(entity.number, for: .normal)
+        numberBtn.setTitle("☎️ \(entity.number)", for: .normal)
     }
 }
