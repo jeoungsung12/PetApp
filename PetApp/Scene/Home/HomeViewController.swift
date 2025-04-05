@@ -6,10 +6,10 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 import RxDataSources
-import SnapKit
 
 final class HomeViewController: BaseViewController {
     private let viewModel = HomeViewModel()
