@@ -89,10 +89,10 @@ extension HomeViewModel {
     
     private func fetchData() async throws -> [HomeSection] {
         do {
-            async let firstResult = repository.getAnimal(1)
-            async let secondResult = repository.getAnimal(2)
+            let firstResult = try await repository.getAnimal(1)
+            let secondResult = firstResult.dropFirst(10).prefix(10)
             
-            return try await [
+            return [
                 HomeSection(title: "", items: [.init(data: nil)]),
                 HomeSection(title: "도움이 필요해요!", items: firstResult.prefix(5).map {
                     return HomeItem(data: $0)
