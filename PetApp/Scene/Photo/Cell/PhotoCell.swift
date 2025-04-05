@@ -10,7 +10,7 @@ import Kingfisher
 import SnapKit
 
 final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
-    let imageView = UIImageView()
+    private let imageView = UIImageView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,16 +38,21 @@ final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
         }
     }
     
-    func configure(_ image: String) {
-        guard let url = URL(string: image) else { return }
-        
+    func configure(_ imageUrl: String, completion: ((CGFloat) -> Void)? = nil) {
+        guard let url = URL(string: imageUrl) else {
+            completion?(1.0)
+            return
+        }
         imageView.kf.setImage(with: url) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success:
+            case .success(let value):
+                let aspectRatio = value.image.size.height / value.image.size.width
+                completion?(aspectRatio)
                 self.layoutIfNeeded()
             case .failure(let error):
                 print("이미지 로드 실패: \(error)")
+                completion?(1.0)
             }
         }
     }

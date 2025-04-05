@@ -19,6 +19,7 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
     override func viewDidLoad() {
         super.viewDidLoad()
         LoadingIndicator.showLoading()
+        collectionView.delegate = self
     }
     
     override func setBinding() {
@@ -29,26 +30,33 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
         input.loadTrigger.accept(viewModel.page)
         LoadingIndicator.showLoading()
         
-        let result = output.homeResult.asDriver()
+        output.homeResult.asDriver()
+            .drive(with: self) { owner, entities in
+                owner.itemSizes = Array(repeating: CGSize.zero, count: entities.count)
+            }
+            .disposed(by: disposeBag)
         
-        result
+        output.homeResult.asDriver()
             .drive(collectionView.rx.items(cellIdentifier: PhotoCell.id, cellType: PhotoCell.self)) { [weak self] row, element, cell in
                 guard let self = self else { return }
-                cell.configure(element.animal.fullImage)
+                if row >= self.itemSizes.count {
+                    self.itemSizes.append(CGSize.zero)
+                }
                 
-                if let image = cell.imageView.image {
-                    let aspectRatio = image.size.height / image.size.width
-                    let width = (self.collectionView.frame.width - 30) / 2
-                    let height = width * aspectRatio
-                    self.itemSizes.append(CGSize(width: width, height: height))
-                } else {
-                    let width = (self.collectionView.frame.width - 30) / 2
-                    self.itemSizes.append(CGSize(width: width, height: 200))
+                let width = (self.collectionView.frame.width - 28) / 2
+                self.itemSizes[row] = CGSize(width: width, height: 200)
+                
+                cell.configure(element.animal.fullImage) { aspectRatio in
+                    let width = (self.collectionView.frame.width - 28) / 2
+                    if row < self.itemSizes.count {
+                        self.itemSizes[row] = CGSize(width: width, height: width * aspectRatio)
+                        self.collectionView.collectionViewLayout.invalidateLayout()
+                    }
                 }
             }
             .disposed(by: disposeBag)
         
-        result
+        output.homeResult.asDriver()
             .drive(with: self) { owner, _ in
                 LoadingIndicator.hideLoading()
             }
@@ -92,8 +100,8 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
         self.setNavigation()
         self.view.backgroundColor = .white
         
-        collectionView.delegate = self
         collectionView.backgroundColor = .white
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.id)
     }
     
@@ -103,25 +111,24 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
     
     override func configureLayout() {
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(4)
+            make.verticalEdges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
     private func createLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumInteritemSpacing = 4
+        let layout = MasonryLayout()
+        layout.minimumInteritemSpacing = 2
         layout.minimumLineSpacing = 4
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+        layout.sectionInset = UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12)
         return layout
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if indexPath.item < itemSizes.count {
-            return itemSizes[indexPath.item]
+        if indexPath.row < itemSizes.count, itemSizes[indexPath.row] != .zero {
+            return itemSizes[indexPath.row]
         }
-        let width = (collectionView.frame.width - 30) / 2
+        let width = (collectionView.frame.width - 28) / 2
         return CGSize(width: width, height: 200)
     }
 }
