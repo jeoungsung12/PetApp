@@ -80,7 +80,7 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
         
         collectionView.rx.prefetchItems
             .bind(with: self) { owner, IndexPaths in
-                if let lastIndex = IndexPaths.last.map({ $0.row }),
+                if let lastIndex = IndexPaths.last.map({ $0.item }),
                    (output.homeResult.value.count - 2) < lastIndex
                 {
                     LoadingIndicator.showLoading()

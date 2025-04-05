@@ -81,5 +81,6 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
         case .ads:
             mapView.isHidden = true
         }
+        configureHierarchy()
     }
 }
