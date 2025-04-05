@@ -26,6 +26,7 @@ final class RecordViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         input.loadTrigger.accept(())
+        setTabBar()
     }
     
     override func setBinding() {

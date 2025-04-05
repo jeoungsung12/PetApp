@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class CharacteristicView: BaseView {
@@ -104,19 +105,19 @@ fileprivate class IconAttributeView: BaseView {
     
     func configure(image: String, endDate: String) {
         if let url = URL(string: image) {
-            iconImageView.snSetImage(with: url, storageOption: .memory)
+//            iconImageView.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 80, height: 80))
+//            )
+            iconImageView.kf.setImage(with: url)
         }
         
-        let date: Date = endDate.toDate()
-        print(endDate)
-        let today = Date()
-        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: date).day ?? 0
-        
-        let title = "공고 마감까지\n\(daysRemaining)일 남음"
+        let title = "공고 마감까지 단 \n\(endDate.toDate())일!"
         
         let attributedString = NSMutableAttributedString(string: title)
         
-        if let range = title.range(of: "\(daysRemaining)일 남음") {
+        if let range = title.range(of: "\(endDate.toDate())일!") {
             let nsRange = NSRange(range, in: title)
             attributedString.addAttributes([
                 .font: UIFont.boldSystemFont(ofSize: 20),
@@ -126,5 +127,5 @@ fileprivate class IconAttributeView: BaseView {
         
         titleLabel.attributedText = attributedString
     }
-
+    
 }

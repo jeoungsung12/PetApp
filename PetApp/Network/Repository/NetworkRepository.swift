@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import MapKit
 
 protocol NetworkRepositoryType: AnyObject {
     func getAnimal(_ page: Int) async throws -> [HomeEntity]
@@ -44,8 +45,24 @@ final class NetworkRepository: NetworkRepositoryType {
                 let result: ShelterResponseDTO = try await network.fetchData(DataDreamRouter.getShelter)
                 return result.toEntity()
             case .hospital:
-                let result: HospitalResponseDTO = try await network.fetchData(DataDreamRouter.getHospital)
-                return result.toEntity()
+                let request = MKLocalSearch.Request()
+                request.naturalLanguageQuery = "동물병원"
+                
+                let search = MKLocalSearch(request: request)
+                let response = try await search.start()
+                
+                let mapEntities = response.mapItems.map { item in
+                    MapEntity(
+                        name: item.name ?? "알 수 없는 병원",
+                        number: item.phoneNumber ?? "전화번호 없음",
+                        address: item.placemark.title ?? "주소 없음",
+                        roadAddress: item.placemark.thoroughfare ?? "도로명 주소 없음",
+                        numAddress: item.placemark.subThoroughfare ?? "지번 주소 없음",
+                        lon: item.placemark.coordinate.longitude,
+                        lat: item.placemark.coordinate.latitude
+                    )
+                }
+                return mapEntities
             }
         } catch {
             if let networkError = error as? NetworkError,

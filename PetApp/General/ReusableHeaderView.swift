@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 protocol MoreBtnDelegate: AnyObject {
-    func moreBtnTapped()
+    func moreBtnTapped(_ type: HomeSectionType)
 }
 
 final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
@@ -20,6 +20,7 @@ final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
     private let moreBtn = UIButton()
     private var disposeBag = DisposeBag()
     weak var delegate: MoreBtnDelegate?
+    private var type: HomeSectionType?
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureView()
@@ -36,7 +37,7 @@ final class ReusableHeaderView: UICollectionReusableView, ReusableIdentifier {
     private func setBinding() {
         moreBtn.rx.tap
             .bind(with: self) { owner, _ in
-                owner.delegate?.moreBtnTapped()
+                owner.delegate?.moreBtnTapped(owner.type ?? .middle)
             }
             .disposed(by: disposeBag)
     }
@@ -53,11 +54,12 @@ extension ReusableHeaderView {
         
         spacer.backgroundColor = .customBlack
         
+        let buttonColor: UIColor = .point.withAlphaComponent(0.5)
         moreBtn.setTitle("더보기", for: .normal)
-        moreBtn.setTitleColor(.customLightGray, for: .normal)
+        moreBtn.setTitleColor(buttonColor, for: .normal)
         moreBtn.setImage(.arrowRight, for: .normal)
         moreBtn.titleLabel?.font = .largeBold
-        moreBtn.tintColor = .customLightGray
+        moreBtn.tintColor = buttonColor
         
         moreBtn.semanticContentAttribute = .forceRightToLeft
     }
@@ -86,8 +88,9 @@ extension ReusableHeaderView {
         }
     }
     
-    func configure(_ title: String,_ isMore: Bool = false) {
+    func configure(_ title: String,_ isMore: Bool = false, type: HomeSectionType) {
         titleLabel.text = title
         moreBtn.isHidden = (isMore)
+        self.type = type
     }
 }

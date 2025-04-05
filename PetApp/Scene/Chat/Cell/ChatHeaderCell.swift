@@ -7,6 +7,7 @@
 
 import UIKit
 import SNKit
+import Kingfisher
 import SnapKit
 
 final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -22,7 +23,7 @@ final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageView.contentMode = .scaleAspectFill
         thumbImageView.layer.borderWidth = 2
         thumbImageView.layer.borderColor = UIColor.point.cgColor
-        thumbImageView.layer.cornerRadius = 50
+        thumbImageView.layer.cornerRadius = self.contentView.frame.width / 2
     }
     
     override func configureHierarchy() {
@@ -31,14 +32,19 @@ final class ChatHeaderCell: BaseCollectionViewCell, ReusableIdentifier {
     
     override func configureLayout() {
         thumbImageView.snp.makeConstraints { make in
-            make.size.equalTo(100)
+            make.size.equalTo(self.contentView.frame.width)
             make.center.equalToSuperview()
         }
     }
     
     func configure(_ image: String) {
         if let url = URL(string: image) {
-            thumbImageView.snSetImage(with: url, storageOption: .memory)
+//            thumbImageView.snSetImage(
+//                with: url,
+//                storageOption: .memory,
+//                processingOption: .downsample(CGSize(width: 100, height: 100))
+//            )
+            thumbImageView.kf.setImage(with: url)
         }
     }
     
