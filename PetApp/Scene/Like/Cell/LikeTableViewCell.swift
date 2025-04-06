@@ -146,12 +146,12 @@ final class LikeTableViewCell: BaseTableViewCell, ReusableIdentifier {
         weightLabel.text = "\(model.animal.age) \(model.animal.weight)"
         
         if let url = URL(string: model.animal.fullImage) {
-            //            thumbImageview.snSetImage(
-            //                with: url,
-            //                storageOption: .memory,
-            //                processingOption: .downsample(CGSize(width: 120, height: 120))
-            //            )
-            thumbImageview.kf.setImage(with: url)
+            thumbImageview.snSetImage(
+                with: url,
+                storageOption: .hybrid,
+                processingOption: .downsample(CGSize(width: 180, height: 180))
+            )
+//            thumbImageview.kf.setImage(with: url)
         }
         configureSubTitle(model: model)
     }

@@ -37,8 +37,8 @@ final class HomePosterCell: BaseCollectionViewCell, ReusableIdentifier {
     
     func configure(with image: String?) {
         if let url = URL(string: image ?? "") {
-//            imageView.snSetImage(with: url)
-            imageView.kf.setImage(with: url)
+            imageView.snSetImage(with: url)
+//            imageView.kf.setImage(with: url)
         }
     }
 }

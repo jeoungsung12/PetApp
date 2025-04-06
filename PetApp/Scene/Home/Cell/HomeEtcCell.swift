@@ -64,13 +64,8 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
         }
         
         seperateView.snp.makeConstraints { make in
-            if adsImageView.isHidden {
-                make.top.equalTo(mapView.snp.bottom).offset(24)
-            } else {
-                make.top.equalTo(adsImageView.snp.bottom).offset(24)
-            }
             make.horizontalEdges.equalToSuperview()
-            make.bottom.lessThanOrEqualToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
     
@@ -81,6 +76,5 @@ final class HomeEtcCell: BaseCollectionViewCell, ReusableIdentifier {
         case .ads:
             mapView.isHidden = true
         }
-        configureHierarchy()
     }
 }

@@ -75,12 +75,12 @@ final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
         shelterLabel.text = entity.shelter.name
         
         if let url = URL(string: entity.animal.thumbImage) {
-//            thumbImageView.snSetImage(
-//                with: url,
-//                storageOption: .hybrid,
-//                processingOption: .downsample(CGSize(width: 50, height: 50))
-//            )
-            thumbImageView.kf.setImage(with: url)
+            thumbImageView.snSetImage(
+                with: url,
+                storageOption: .hybrid,
+                processingOption: .downsample(CGSize(width: 50, height: 50))
+            )
+//            thumbImageView.kf.setImage(with: url)
         }
     }
 }

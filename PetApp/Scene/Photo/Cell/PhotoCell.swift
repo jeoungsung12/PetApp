@@ -7,6 +7,7 @@
 
 import UIKit
 import Kingfisher
+import SNKit
 import SnapKit
 
 final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
@@ -14,6 +15,7 @@ final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
     private let descriptionLabel = UILabel()
     
     override func configureView() {
+        imageView.layer.cornerRadius = 5
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
@@ -59,5 +61,20 @@ final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
                 completion?(1.0)
             }
         }
+//        imageView.snSetImage(
+//            with: url,
+//            storageOption: .hybrid,
+//            processingOption: .downsample(CGSize(width: 180, height: 180))
+//        ) { result in
+//            switch result {
+//            case .success(let value):
+//                let aspectRatio = value.size.height / value.size.width
+//                completion?(aspectRatio)
+//                self.layoutIfNeeded()
+//            case .failure(let error):
+//                print("이미지 로드 실패: \(error)")
+//                completion?(1.0)
+//            }
+//        }
     }
 }
