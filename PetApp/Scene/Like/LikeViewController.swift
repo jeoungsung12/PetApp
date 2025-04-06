@@ -50,7 +50,7 @@ final class LikeViewController: BaseViewController {
         self.view.backgroundColor = .white
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
-        tableView.rowHeight = 150
+        tableView.rowHeight = 200
         tableView.register(LikeTableViewCell.self, forCellReuseIdentifier: LikeTableViewCell.id)
     }
     

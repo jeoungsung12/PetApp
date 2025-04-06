@@ -146,12 +146,19 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
         weightLabel.text = "\(model.animal.age) \(model.animal.weight)"
         
         if let url = URL(string: model.animal.fullImage) {
-            //            thumbImageview.snSetImage(
-            //                with: url,
-            //                storageOption: .memory,
-            //                processingOption: .downsample(CGSize(width: 120, height: 120))
-            //            )
-            thumbImageview.kf.setImage(with: url)
+            thumbImageview.snSetImage(
+                with: url,
+                storageOption: .hybrid,
+                processingOption: .downsample(CGSize(width: 180, height: 180))
+            ) { result in
+                switch result {
+                case .success(let image):
+                    print("이미지 로드 성공 \(image)")
+                case .failure(let error):
+                    print("이미지 로드 에러 \(error)")
+                }
+            }
+//            thumbImageview.kf.setImage(with: url)
         }
         configureSubTitle(model: model)
     }
