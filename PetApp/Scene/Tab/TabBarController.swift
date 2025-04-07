@@ -13,7 +13,6 @@ final class TabBarController: UITabBarController {
         super.viewDidLoad()
         configure()
     }
-    
 }
 
 extension TabBarController {

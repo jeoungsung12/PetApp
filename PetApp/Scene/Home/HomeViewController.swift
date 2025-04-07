@@ -232,7 +232,7 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(20)
+                heightDimension: .absolute(50)
             )
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,

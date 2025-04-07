@@ -33,7 +33,8 @@ final class NetworkRepository: NetworkRepositoryType {
             } else {
                 regionCode = nil
             }
-            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, regionCode: regionCode))
+            //TODO: 지역코드 변환
+            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, regionCode: nil))
             return result.toEntity()
         } catch {
             if let networkError = error as? NetworkError,
