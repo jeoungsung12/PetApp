@@ -10,7 +10,6 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import RxDataSources
-
 final class HomeViewController: BaseViewController {
     private let viewModel = HomeViewModel()
     private let disposeBag = DisposeBag()
