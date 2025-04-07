@@ -43,4 +43,5 @@ jobs:
           MATCH_KEYCHAIN_PASSWORD: temp
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
         run: bundle exec fastlane beta
