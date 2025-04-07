@@ -57,19 +57,6 @@ final class MapViewController: BaseViewController {
             .bind(to: authorizationStatusSubject)
             .disposed(by: disposeBag)
         
-        locationRepository.currentLocation
-            .compactMap { $0 }
-            .distinctUntilChanged { $0.latitude == $1.latitude && $0.longitude == $1.longitude }
-            .bind(with: self) { owner, location in
-                let regionCode = RegionCodeMapper.getRegionCode(
-                    latitude: location.latitude,
-                    longitude: location.longitude
-                )
-                
-                owner.viewModel.updateRegionCode(regionCode)
-            }
-            .disposed(by: disposeBag)
-        
         output.mapResult
             .drive(with: self) { owner, entity in
                 owner.mapView.removeAnnotations(owner.mapView.annotations)
