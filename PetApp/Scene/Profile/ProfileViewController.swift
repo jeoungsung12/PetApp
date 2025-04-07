@@ -11,7 +11,7 @@ import Toast
 import RxSwift
 import RxCocoa
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: BaseViewController {
     private lazy var hideGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
     private let profileButton = CustomProfileButton(120, true)
     private let nameTextField = UITextField()
@@ -30,20 +30,12 @@ final class ProfileViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setBinding()
-        configureView()
-        configureHierarchy()
-        configureLayout()
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         nameTextField.becomeFirstResponder()
     }
     
-    private func setBinding() {
+    override func setBinding() {
         let output = viewModel.transform(inputTrigger)
         
         output.configureViewResult
@@ -109,14 +101,14 @@ final class ProfileViewController: UIViewController {
         inputTrigger.configureViewTrigger.onNext(())
     }
     
-    private func configureHierarchy() {
+    override func configureHierarchy() {
         [profileButton, nameTextField, spacingView, descriptionLabel, successButton].forEach {
             self.view.addSubview($0)
         }
         self.view.addGestureRecognizer(hideGesture)
     }
     
-    private func configureLayout() {
+    override func configureLayout() {
         profileButton.snp.makeConstraints { make in
             make.size.equalTo(150)
             make.centerX.equalToSuperview().offset(10)
@@ -146,7 +138,7 @@ final class ProfileViewController: UIViewController {
         }
     }
     
-    private func configureView() {
+    override func configureView() {
         self.setNavigation(logo: true)
         self.view.backgroundColor = .customWhite
         
