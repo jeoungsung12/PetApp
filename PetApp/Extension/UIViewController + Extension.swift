@@ -24,6 +24,21 @@ extension UIViewController {
         window.rootViewController = rootVC
     }
     
+    func showSettingsAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: "위치 권한 필요",
+            message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        present(alert, animated: true)
+    }
+    
     func customAlert(_ title: String = "",_ message: String = "",_ action: [AlertType] = [.Ok],_ method: @escaping () -> Void) {
         let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
         for type in action {
