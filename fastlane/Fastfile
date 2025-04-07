@@ -26,16 +26,13 @@ platform :ios do
       in_house: false
     )
     
-    # match 대신 certificate와 sigh 직접 사용
-    # match 부분을 제거하고 바로 빌드로 넘어가기
-    
     # 빌드 번호 증가
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
     
     # 앱 빌드 - 자동 프로비저닝 사용
     build_app(
       scheme: "PetApp",
-      xcodeproj: "./PetApp.xcodeproj",
+      project: "./PetApp.xcodeproj",  # xcodeproj 대신 project 사용
       export_options: {
         method: "app-store",
         provisioningProfiles: {
