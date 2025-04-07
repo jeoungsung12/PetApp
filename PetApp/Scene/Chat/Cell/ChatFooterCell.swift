@@ -80,7 +80,7 @@ final class ChatFooterCell: BaseCollectionViewCell, ReusableIdentifier {
                 storageOption: .hybrid,
                 processingOption: .downsample(CGSize(width: 50, height: 50))
             )
-//            thumbImageView.kf.setImage(with: url)
+            //            thumbImageView.kf.setImage(with: url)
         }
     }
 }
