@@ -148,3 +148,63 @@ extension LocationRepository: CLLocationManagerDelegate {
         }
     }
 }
+
+//private var locationBtn = LocationButton()
+//private let image = UIImage(systemName: "mappin.and.ellipse")
+//
+//private func bindView() {
+//    locationBtn.rx.tap
+//        .bind(with: self) { owner, _ in
+//            owner.handleLocationButtonTap()
+//        }
+//        .disposed(by: disposeBag)
+//}
+//
+//private func setupLocationButton() {
+//    let locationRepository = LocationRepository.shared
+//    locationBtn.configure(image: image, title: "위치 확인 중..")
+//    navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationBtn)
+//
+//    if locationRepository.authorizationStatus.value == .authorizedWhenInUse ||
+//        locationRepository.authorizationStatus.value == .authorizedAlways {
+//        locationRepository.startUpdatingLocation(forceUpdate: true)
+//
+//        locationRepository.currentCity
+//            .compactMap { $0 }
+//            .take(1)
+//            .bind(with: self) { owner, city in
+//                owner.locationBtn.configure(image: owner.image, title: city)
+//                owner.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: owner.locationBtn)
+//            }
+//            .disposed(by: disposeBag)
+//    } else {
+//        locationBtn.configure(image: image, title: "전국")
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationBtn)
+//    }
+//}
+//
+//private func handleLocationButtonTap() {
+//    let locationRepository = LocationRepository.shared
+//
+//    switch locationRepository.authorizationStatus.value {
+//    case .authorizedWhenInUse, .authorizedAlways:
+//        locationRepository.startUpdatingLocation(forceUpdate: true)
+//        
+//        locationRepository.currentCity
+//            .compactMap { $0 }
+//            .take(1)
+//            .bind(with: self) { owner, city in
+//                owner.locationBtn.configure(image: owner.image, title: city)
+//                owner.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: owner.locationBtn)
+//            }
+//            .disposed(by: disposeBag)
+//
+//    case .denied, .restricted, .notDetermined:
+//        showSettingsAlert(
+//            title: "위치 권한 필요",
+//            message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요."
+//        )
+//    @unknown default:
+//        break
+//    }
+//}

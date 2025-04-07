@@ -15,7 +15,7 @@ final class MapViewController: BaseViewController {
     private let mapView = MKMapView()
     private let viewModel: MapViewModel
     private var disposeBag = DisposeBag()
-    private let locationManager = CLLocationManager()
+    private let locationRepository = LocationRepository.shared
     private let authorizationStatusSubject = BehaviorRelay<CLAuthorizationStatus>(value: CLLocationManager.authorizationStatus())
     private let locationButton = UIButton()
     private let refreshButton = UIButton()
@@ -34,7 +34,7 @@ final class MapViewController: BaseViewController {
         super.viewDidLoad()
         LoadingIndicator.showLoading()
         
-        locationManager.requestWhenInUseAuthorization()
+        locationRepository.requestLocationAuthorization()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -53,15 +53,33 @@ final class MapViewController: BaseViewController {
         )
         let output = viewModel.transform(input)
         
+        locationRepository.authorizationStatus
+            .bind(to: authorizationStatusSubject)
+            .disposed(by: disposeBag)
+        
+        locationRepository.currentLocation
+            .compactMap { $0 }
+            .distinctUntilChanged { $0.latitude == $1.latitude && $0.longitude == $1.longitude }
+            .bind(with: self) { owner, location in
+                let regionCode = RegionCodeMapper.getRegionCode(
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                )
+                
+                owner.viewModel.updateRegionCode(regionCode)
+            }
+            .disposed(by: disposeBag)
+        
         output.mapResult
             .drive(with: self) { owner, entity in
                 owner.mapView.removeAnnotations(owner.mapView.annotations)
                 let annotations = entity.map { CustomAnnotation(entity: $0) }
                 owner.mapView.addAnnotations(annotations)
                 
-                let center = owner.viewModel.mapType == .hospital && owner.locationManager.location != nil
-                ? owner.locationManager.location!.coordinate
+                let center = owner.viewModel.mapType == .hospital && owner.locationRepository.currentLocation.value != nil
+                ? owner.locationRepository.currentLocation.value!
                 : CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780)
+                
                 let region = MKCoordinateRegion(
                     center: center,
                     span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
@@ -86,7 +104,7 @@ final class MapViewController: BaseViewController {
             .bind(with: self, onNext: { owner, status in
                 switch status {
                 case .notDetermined:
-                    owner.locationManager.requestWhenInUseAuthorization()
+                    owner.locationRepository.requestLocationAuthorization()
                 case .restricted, .denied:
                     owner.showSettingsAlert(title: "위치 권한 필요", message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.")
                 case .authorizedWhenInUse, .authorizedAlways:
@@ -122,7 +140,6 @@ final class MapViewController: BaseViewController {
         self.setNavigation(color: .clear)
         mapView.delegate = self
         mapView.showsUserLocation = true
-        locationManager.delegate = self
         
         locationButton.setImage(UIImage(systemName: "location.fill"), for: .normal)
         locationButton.tintColor = .point
@@ -163,22 +180,7 @@ final class MapViewController: BaseViewController {
     }
     
     private func moveToUserLocation() {
-        if let userLocation = locationManager.location?.coordinate {
-            let region = MKCoordinateRegion(
-                center: userLocation,
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            )
-            mapView.setRegion(region, animated: true)
-        }
-    }
-}
-
-extension MapViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        authorizationStatusSubject.accept(status)
-        if status == .authorizedWhenInUse || status == .authorizedAlways {
-            moveToUserLocation()
-        }
+        locationRepository.startUpdatingLocation(forceUpdate: true)
     }
 }
 

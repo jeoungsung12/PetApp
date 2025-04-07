@@ -94,11 +94,11 @@ extension HomeViewModel {
             
             return [
                 HomeSection(title: "", items: [.init(data: nil)]),
-                HomeSection(title: "도움이 필요해요!", items: firstResult.prefix(5).map {
+                HomeSection(title: "전국에서 도움을\n기다리고 있어요! 🏡", items: firstResult.prefix(5).map {
                     return HomeItem(data: $0)
                 }),
                 HomeSection(title: "", items: [.init(data: nil)]),
-                HomeSection(title: "사진 📸", items: firstResult.dropFirst(4).prefix(6).map {
+                HomeSection(title: "전국 보호소 스냅 📸", items: firstResult.dropFirst(4).prefix(6).map {
                     return HomeItem(data: $0)
                 }),
                 HomeSection(title: "", items: [.init(data: nil)]),
