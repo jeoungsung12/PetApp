@@ -10,9 +10,11 @@ import RxSwift
 import RxCocoa
 
 final class PhotoViewModel: BaseViewModel {
+    private let locationRepo = LocationRepository.shared
     private let repository: NetworkRepositoryType = NetworkRepository.shared
     private var disposeBag = DisposeBag()
     private(set) var page: Int = 1
+    private var locationCode: Int?
     
     struct Input {
         let loadTrigger: PublishRelay<Int>

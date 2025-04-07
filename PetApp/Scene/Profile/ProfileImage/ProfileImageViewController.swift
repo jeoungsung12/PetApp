@@ -14,7 +14,7 @@ protocol ProfileImageDelegate: AnyObject {
     func returnImage(_ image: String?) -> Void
 }
 
-final class ProfileImageViewController: BaseViewController {
+final class ProfileImageViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewLayout())
     private let profileButton = CustomProfileButton(120, true)
     
@@ -26,6 +26,10 @@ final class ProfileImageViewController: BaseViewController {
     private var disposeBag = DisposeBag()
     override func viewDidLoad() {
         super.viewDidLoad()
+        setBinding()
+        configureView()
+        configureHierarchy()
+        configureLayout()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -33,7 +37,7 @@ final class ProfileImageViewController: BaseViewController {
         inputTrigger.backButtonTrigger.onNext(())
     }
     
-    override func setBinding() {
+    private func setBinding() {
         let output = viewModel.transform(inputTrigger)
         
         output.backButtonResult
@@ -42,13 +46,13 @@ final class ProfileImageViewController: BaseViewController {
             }).disposed(by: disposeBag)
     }
     
-    override func configureHierarchy() {
+    private func configureHierarchy() {
         [profileButton, collectionView].forEach({
             self.view.addSubview($0)
         })
     }
     
-    override func configureLayout() {
+    private func configureLayout() {
         profileButton.snp.makeConstraints { make in
             make.size.equalTo(150)
             make.centerX.equalToSuperview().offset(10)
@@ -61,7 +65,7 @@ final class ProfileImageViewController: BaseViewController {
         }
     }
     
-    override func configureView() {
+    private func configureView() {
         self.setNavigation()
         self.view.backgroundColor = .white
         
