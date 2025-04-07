@@ -27,7 +27,11 @@ platform :ios do
     )
 
     # 인증서, 프로파일 가져오기
-    match(type: "development", readonly: false)
+    match(
+  type: "development", 
+  readonly: false,
+  git_basic_authorization: Base64.strict_encode64("#{ENV['GIT_USERNAME']}:#{ENV['GIT_TOKEN']}")
+)
     match(type: "appstore", readonly: false)
     
     # 빌드 번호 증가
@@ -36,10 +40,11 @@ platform :ios do
     # 앱 빌드
     build_app(
       scheme: "PetApp",
-      export_options: {
-        allowProvisioningUpdates: true
-      }
-    )
+       export_options: {
+         allowProvisioningUpdates: true
+       },
+         xcargs: "-skipPackagePluginValidation -disableAutomaticPackageResolution" # 이 부분 추가
+       )
     
     # 테스트플라이트에 업로드
     upload_to_testflight
