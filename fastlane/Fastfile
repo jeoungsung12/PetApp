@@ -26,35 +26,30 @@ platform :ios do
       in_house: false
     )
     
-    # 인증서, 프로파일 가져오기 - readonly: true로 변경하고 force_for_new_certificates 추가
-    match(
-      type: "development", 
-      readonly: true,  # 이 부분 true로 변경
-      git_basic_authorization: Base64.strict_encode64("#{ENV['GIT_USERNAME']}:#{ENV['GIT_TOKEN']}"),
-      force_for_new_certificates: false  # 이 부분 추가
-    )
-    
-    match(
-      type: "appstore", 
-      readonly: true,  # 이 부분도 true로 변경
-      force_for_new_certificates: false  # 이 부분 추가
-    )
+    # match 대신 certificate와 sigh 직접 사용
+    # match 부분을 제거하고 바로 빌드로 넘어가기
     
     # 빌드 번호 증가
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
     
-    # 앱 빌드 - xcodeproj 파라미터 추가
+    # 앱 빌드 - 자동 프로비저닝 사용
     build_app(
       scheme: "PetApp",
-      xcodeproj: "./PetApp.xcodeproj",  # 이 줄 추가
+      xcodeproj: "./PetApp.xcodeproj",
       export_options: {
-        allowProvisioningUpdates: true,
-        method: "app-store"  # 이 줄 추가
+        method: "app-store",
+        provisioningProfiles: {
+          "WEDLE.Warala" => "match AppStore WEDLE.Warala"
+        }
       },
-      xcargs: "-skipPackagePluginValidation -disableAutomaticPackageResolution"
+      export_xcargs: "-allowProvisioningUpdates",
+      skip_profile_detection: true,
+      xcargs: "-skipPackagePluginValidation -disableAutomaticPackageResolution -allowProvisioningUpdates"
     )
     
     # 테스트플라이트에 업로드
-    upload_to_testflight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
   end
 end
