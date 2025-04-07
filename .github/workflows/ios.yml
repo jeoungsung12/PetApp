@@ -24,4 +24,4 @@ jobs:
         run: bundle install
 
       - name: Run Fastlane
-        run: bundle exec fastlane your_lane_name
+        run: bundle exec fastlane beta
