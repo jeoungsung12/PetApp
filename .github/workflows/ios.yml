@@ -1,31 +1,43 @@
-name: iOS CI/CD
+name: Fastlane Build and Deploy
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - develop
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Ruby
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0'
-          bundler-cache: true
 
-      - name: Install Fastlane
+      - name: Reset macOS environment
         run: |
-          gem install bundler
-          bundle install
-          brew install fastlane
+          brew update
+          brew install rbenv
+          rbenv init
+          eval "$(rbenv init -)"
+
+      - name: Update gem sources
+        run: gem sources --add https://rubygems.org/ --remove https://rubygems.org/
+
+      - name: Remove existing Bundler
+        run: gem uninstall bundler --all --executables || true
+
+      - name: Install Bundler
+        run: gem install bundler -v 2.4.22
+
+      - name: Clean gem cache
+        run: gem cleanup
+
+      - name: Install Dependencies
+        run: bundle install
 
       - name: Run Fastlane
-        run: fastlane beta
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        run: bundle exec fastlane your_lane_name
