@@ -9,7 +9,7 @@ import Foundation
 import MapKit
 
 protocol NetworkRepositoryType: AnyObject {
-    func getAnimal(_ page: Int) async throws -> [HomeEntity]
+    func getAnimal(_ page: Int,_ location: Int?) async throws -> [HomeEntity]
     func getMap(_ type: MapType) async throws -> [MapEntity]
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
     func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity
@@ -19,9 +19,9 @@ final class NetworkRepository: NetworkRepositoryType {
     static let shared: NetworkRepositoryType = NetworkRepository()
     private let network: NetworkManagerType = NetworkManager.shared
     
-    func getAnimal(_ page: Int) async throws -> [HomeEntity] {
+    func getAnimal(_ page: Int,_ location: Int?) async throws -> [HomeEntity] {
         do {
-            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page))
+            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, location: location))
             return result.toEntity()
         } catch {
             if let networkError = error as? NetworkError,
