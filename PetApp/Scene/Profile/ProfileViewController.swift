@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 
 final class ProfileViewController: BaseViewController {
-    private lazy var hideGesture = UITapGestureRecognizer(target: self, action: #selector(self.tabGestureAction))
+    private lazy var hideGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
     private let profileButton = CustomProfileButton(120, true)
     private let nameTextField = UITextField()
     private let spacingView = UIView()

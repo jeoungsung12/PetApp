@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 extension UIViewController {
     
@@ -15,7 +17,7 @@ extension UIViewController {
     }
     
     @objc
-    func tabGestureAction() {
+    func dismissKeyboard() {
         self.view.endEditing(true)
     }
     
@@ -26,8 +28,8 @@ extension UIViewController {
     
     func showSettingsAlert(title: String, message: String) {
         let alert = UIAlertController(
-            title: "위치 권한 필요",
-            message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.",
+            title: title,
+            message: message,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
