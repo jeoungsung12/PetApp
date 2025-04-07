@@ -26,22 +26,32 @@ platform :ios do
       in_house: false
     )
     
+    # Xcode 프로젝트 설정 업데이트
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "PetApp.xcodeproj",
+      team_id: "Q653PU93R6",
+      code_sign_identity: "Apple Distribution",
+      profile_name: "match AppStore WEDLE.Warala",
+      bundle_identifier: "WEDLE.Warala"
+    )
+    
     # 빌드 번호 증가
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
     
-    # 앱 빌드 - 자동 프로비저닝 사용
+    # 앱 빌드
     build_app(
       scheme: "PetApp",
-      project: "./PetApp.xcodeproj",  # xcodeproj 대신 project 사용
+      project: "./PetApp.xcodeproj",
+      export_method: "app-store",
       export_options: {
-        method: "app-store",
         provisioningProfiles: {
           "WEDLE.Warala" => "match AppStore WEDLE.Warala"
-        }
+        },
+        signingStyle: "manual"
       },
-      export_xcargs: "-allowProvisioningUpdates",
       skip_profile_detection: true,
-      xcargs: "-skipPackagePluginValidation -disableAutomaticPackageResolution -allowProvisioningUpdates"
+      xcargs: "-allowProvisioningUpdates"
     )
     
     # 테스트플라이트에 업로드
