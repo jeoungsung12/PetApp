@@ -10,6 +10,7 @@ import SnapKit
 import MapKit
 import RxSwift
 import RxCocoa
+
 final class MapViewController: BaseViewController {
     private let mapView = MKMapView()
     private let viewModel: MapViewModel
@@ -87,7 +88,7 @@ final class MapViewController: BaseViewController {
                 case .notDetermined:
                     owner.locationManager.requestWhenInUseAuthorization()
                 case .restricted, .denied:
-                    owner.showSettingsAlert()
+                    owner.showSettingsAlert(title: "위치 권한 필요", message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.")
                 case .authorizedWhenInUse, .authorizedAlways:
                     owner.moveToUserLocation()
                 default:
@@ -169,21 +170,6 @@ final class MapViewController: BaseViewController {
             )
             mapView.setRegion(region, animated: true)
         }
-    }
-    
-    private func showSettingsAlert() {
-        let alert = UIAlertController(
-            title: "위치 권한 필요",
-            message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
-            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(settingsURL)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
-        present(alert, animated: true)
     }
 }
 
