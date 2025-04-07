@@ -14,7 +14,7 @@ import RxSwift
 import RxCocoa
 
 final class WriteViewController: BaseViewController {
-    private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tabGestureAction))
+    private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
     private let saveButton = UIBarButtonItem(title: "저장", style: .plain, target: nil, action: nil)
     private let scrollView = UIScrollView()
     private let contentView = UIView()

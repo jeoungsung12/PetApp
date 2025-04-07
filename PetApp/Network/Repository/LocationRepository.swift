@@ -4,7 +4,6 @@
 //
 //  Created by 정성윤 on 4/7/25.
 //
-
 import Foundation
 import CoreLocation
 import MapKit
@@ -14,10 +13,16 @@ import RxCocoa
 final class LocationRepository: NSObject {
     static let shared = LocationRepository()
     private let locationManager = CLLocationManager()
+    private let geocoder = CLGeocoder()
     private var disposeBag = DisposeBag()
+    
+    private var lastLocationUpdateTime: Date?
+    private let minLocationUpdateInterval: TimeInterval = 5 * 60
     
     let currentLocation = BehaviorRelay<CLLocationCoordinate2D?>(value: nil)
     let authorizationStatus = BehaviorRelay<CLAuthorizationStatus>(value: CLLocationManager.authorizationStatus())
+    let currentAddress = BehaviorRelay<String?>(value: nil)
+    let currentCity = BehaviorRelay<String?>(value: nil)
     
     private override init() {
         super.init()
@@ -36,8 +41,18 @@ final class LocationRepository: NSObject {
         locationManager.requestWhenInUseAuthorization()
     }
     
-    func startUpdatingLocation() {
-        locationManager.startUpdatingLocation()
+    func startUpdatingLocation(forceUpdate: Bool = false) {
+        if forceUpdate || shouldUpdateLocation() {
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+    private func shouldUpdateLocation() -> Bool {
+        guard let lastUpdateTime = lastLocationUpdateTime else {
+            return true
+        }
+        
+        return Date().timeIntervalSince(lastUpdateTime) >= minLocationUpdateInterval
     }
     
     func stopUpdatingLocation() {
@@ -53,15 +68,66 @@ final class LocationRepository: NSObject {
         )
     }
     
-    @objc private func locationDidUpdate() {
+    @objc
+    private func locationDidUpdate() {
         if let location = locationManager.location?.coordinate {
             currentLocation.accept(location)
         }
     }
+    
+    func reverseGeocode(coordinate: CLLocationCoordinate2D, completion: ((String?, String?) -> Void)? = nil) {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+            guard let self = self,
+                  error == nil,
+                  let placemark = placemarks?.first else {
+                completion?(nil, nil)
+                return
+            }
+            
+            let address = self.createAddress(from: placemark)
+            let city = placemark.locality ?? placemark.administrativeArea
+            
+            self.currentAddress.accept(address)
+            self.currentCity.accept(city)
+            
+            completion?(address, city)
+        }
+    }
+    
+    private func createAddress(from placemark: CLPlacemark) -> String {
+        var address = ""
+        
+        if let country = placemark.country {
+            address += country
+        }
+        
+        if let administrativeArea = placemark.administrativeArea {
+            address += " " + administrativeArea
+        }
+        
+        if let locality = placemark.locality {
+            address += " " + locality
+        }
+        
+        if let subLocality = placemark.subLocality {
+            address += " " + subLocality
+        }
+        
+        if let thoroughfare = placemark.thoroughfare {
+            address += " " + thoroughfare
+            
+            if let subThoroughfare = placemark.subThoroughfare {
+                address += " " + subThoroughfare
+            }
+        }
+        
+        return address.trimmingCharacters(in: .whitespaces)
+    }
 }
 
 extension LocationRepository: CLLocationManagerDelegate {
-    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         authorizationStatus.accept(status)
         
@@ -72,8 +138,13 @@ extension LocationRepository: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last?.coordinate else { return }
+        lastLocationUpdateTime = Date()
+        
         currentLocation.accept(location)
         NotificationCenter.default.post(name: NSNotification.Name("locationDidUpdate"), object: nil)
+        
+        reverseGeocode(coordinate: location) { [weak self] _, _ in
+            self?.stopUpdatingLocation()
+        }
     }
-    
 }
