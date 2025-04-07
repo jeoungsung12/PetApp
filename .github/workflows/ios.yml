@@ -15,26 +15,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
-
-      - name: Reset macOS environment
-        run: |
-          brew update
-          brew install rbenv
-          rbenv init
-          eval "$(rbenv init -)"
-
-      - name: Update gem sources
-        run: gem sources --add https://rubygems.org/ --remove https://rubygems.org/
-
-      - name: Remove existing Bundler
-        run: gem uninstall bundler --all --executables || true
+          ruby-version: '3.1'
 
       - name: Install Bundler
-        run: gem install bundler -v 2.4.22
-
-      - name: Clean gem cache
-        run: gem cleanup
+        run: gem install bundler -v 2.6.3
 
       - name: Install Dependencies
         run: bundle install
