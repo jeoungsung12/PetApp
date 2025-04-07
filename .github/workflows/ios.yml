@@ -12,14 +12,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Remove Old Ruby
-        run: rm -rf /Users/runner/hostedtoolcache/Ruby/*
-
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-
+        with: 
+          ruby-version: '3.1' 
 
       - name: Install Bundler
         run: gem install bundler
@@ -31,4 +27,3 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: bundle exec fastlane beta
-
