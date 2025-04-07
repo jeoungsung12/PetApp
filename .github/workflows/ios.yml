@@ -17,11 +17,14 @@ jobs:
         with: 
           ruby-version: '3.1' 
 
+      - name: Clean Bundle Cache
+        run: rm -rf ~/.bundle && rm -rf vendor/cache && rm -rf Gemfile.lock
+
       - name: Install Bundler
         run: gem install bundler
 
       - name: Install Dependencies
-        run: bundle install
+        run: bundle install --jobs 4 --retry 3
 
       - name: Run Fastlane
         env:
