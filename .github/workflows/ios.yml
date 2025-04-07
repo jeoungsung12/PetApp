@@ -47,7 +47,8 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
-          # 타임아웃 설정 추가
-          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 60
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
           FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 10
+          DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
+          FL_XCODE_VERSION: 16.2
         run: bundle exec fastlane beta
