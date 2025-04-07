@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Select Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
       - name: Setup Keychain
         run: |
