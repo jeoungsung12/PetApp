@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol ProfileCoordinatorDelegate: AnyObject {
-    func didFinishProfile()
-}
-
 final class ProfileCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: ProfileCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -32,6 +32,7 @@ final class ProfileCoordinator: Coordinator {
         profileImageVC.profileCoord = self
         profileImageVC.profileImage = currentImage
         profileImageVC.profileDelegate = delegate
+        
         navigationController.pushViewController(profileImageVC, animated: true)
     }
     
@@ -41,8 +42,13 @@ final class ProfileCoordinator: Coordinator {
         
         appCoordinator.childCoordinators.removeAll()
         appCoordinator.showMainTabBar()
+        finish()
     }
     
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
+    }
     
     deinit {
         print(#function, self)

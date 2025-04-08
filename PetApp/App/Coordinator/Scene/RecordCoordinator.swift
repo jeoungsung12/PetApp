@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol RecordCoordinatorDelegate: AnyObject {
-    func recordCoordinatorDidFinish(_ coordinator: RecordCoordinator)
-}
-
 final class RecordCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: RecordCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -46,6 +46,11 @@ final class RecordCoordinator: Coordinator {
         }
         
         navigationController.present(alertController, animated: true)
+    }
+    
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
     }
     
     deinit {

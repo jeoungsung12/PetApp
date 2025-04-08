@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol MyPageCoordinatorDelegate: AnyObject {
-    func myPageCoordinatorDidFinish(_ coordinator: MyPageCoordinator)
-}
-
 final class MyPageCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: MyPageCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -98,6 +98,7 @@ final class MyPageCoordinator: Coordinator {
         
         appCoordinator.childCoordinators.removeAll()
         appCoordinator.showLogin()
+        finish()
     }
     
     func popSheetProfile() {
@@ -106,6 +107,11 @@ final class MyPageCoordinator: Coordinator {
         sheetProfileVC.coordinator = self
         
         navigationController.popViewController(animated: true)
+    }
+    
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
     }
     
     deinit {

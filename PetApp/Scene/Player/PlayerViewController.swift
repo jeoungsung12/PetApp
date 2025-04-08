@@ -124,4 +124,8 @@ final class PlayerViewController: BaseViewController {
             make.bottom.equalToSuperview().inset(tabBarHeight)
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }

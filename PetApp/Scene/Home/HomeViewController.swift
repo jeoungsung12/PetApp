@@ -154,6 +154,10 @@ final class HomeViewController: BaseViewController {
         view.backgroundColor = .customWhite
         configureCollectionView()
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }
 
 extension HomeViewController: MoreBtnDelegate, CategoryDelegate {

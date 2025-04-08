@@ -41,6 +41,6 @@ final class TabBarController: UITabBarController {
     }
     
     deinit {
-        print("TabBarController 해제됨")
+        print(#function, self)
     }
 }

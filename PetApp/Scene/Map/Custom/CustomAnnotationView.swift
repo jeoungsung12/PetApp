@@ -33,12 +33,32 @@ final class CustomAnnotationView: MKAnnotationView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        detailCalloutAccessoryView = nil
+    }
+    
+    override var annotation: MKAnnotation? {
+        didSet {
+            updateCalloutView()
+        }
+    }
+    
     private func configureView() {
         self.image = UIImage(named: "annotation")
         self.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
         self.centerOffset = CGPoint(x: 0, y: -self.frame.size.height / 2)
         
         self.canShowCallout = true
+        if let customAnnotation = annotation as? CustomAnnotation {
+            let calloutView = CustomCalloutView(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+            calloutView.configure(with: customAnnotation.entity)
+            self.detailCalloutAccessoryView = calloutView
+        }
+    }
+    
+    private func updateCalloutView() {
+        detailCalloutAccessoryView = nil
         if let customAnnotation = annotation as? CustomAnnotation {
             let calloutView = CustomCalloutView(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
             calloutView.configure(with: customAnnotation.entity)

@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol PlayerCoordinatorDelegate: AnyObject {
-    func playerCoordinatorDidFinish(_ coordinator: PlayerCoordinator)
-}
-
 final class PlayerCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: PlayerCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -32,6 +32,11 @@ final class PlayerCoordinator: Coordinator {
         errorVC.coordinator = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
+    }
+    
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
     }
     
     deinit {

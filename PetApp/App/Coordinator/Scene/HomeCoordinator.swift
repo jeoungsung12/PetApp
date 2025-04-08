@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol HomeCoordinatorDelegate: AnyObject {
-    func homeCoordinatorDidFinish(_ coordinator: HomeCoordinator)
-}
-
 final class HomeCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: HomeCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -66,6 +66,11 @@ final class HomeCoordinator: Coordinator {
         let sponsorVC = SponsorViewController(viewModel: sponsorVM)
         sponsorVC.coordinator = self
         navigationController.pushViewController(sponsorVC, animated: true)
+    }
+    
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
     }
     
     deinit {

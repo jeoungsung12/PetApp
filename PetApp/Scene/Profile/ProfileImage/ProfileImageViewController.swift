@@ -27,7 +27,6 @@ final class ProfileImageViewController: BaseViewController {
     
     weak var mypageCoord: MyPageCoordinator?
     weak var profileCoord: ProfileCoordinator?
-    weak var sheetProfileCoord: SheetProfileCoordinator?
     init(viewModel: ProfileImageViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
