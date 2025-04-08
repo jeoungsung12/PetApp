@@ -25,14 +25,14 @@ final class AppCoordinator: Coordinator {
         }
     }
     
-    private func showLogin() {
+    func showLogin() {
+        navigationController.isNavigationBarHidden = false
         let loginCoordinator = ProfileCoordinator(navigationController: navigationController)
         childCoordinators.append(loginCoordinator)
-        loginCoordinator.delegate = self
         loginCoordinator.start()
     }
     
-    private func showMainTabBar() {
+    func showMainTabBar() {
         let tabBarController = TabBarController()
         tabBarController.coordinator = self
         
@@ -92,12 +92,5 @@ final class AppCoordinator: Coordinator {
         }
         
         tabBarController.tabBar.tintColor = .point
-    }
-}
-
-extension AppCoordinator: ProfileCoordinatorDelegate {
-    func didFinishProfile() {
-        childCoordinators.removeAll { $0 is ProfileCoordinator }
-        showMainTabBar()
     }
 }

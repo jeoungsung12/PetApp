@@ -35,9 +35,14 @@ final class ProfileCoordinator: Coordinator {
         navigationController.pushViewController(profileImageVC, animated: true)
     }
     
-    func finishProfile() {
-        delegate?.didFinishProfile()
+    func navigateToTabBar() {
+        guard let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate,
+              let appCoordinator = sceneDelegate.appCoordinator else { return }
+        
+        appCoordinator.childCoordinators.removeAll()
+        appCoordinator.showMainTabBar()
     }
+    
     
     deinit {
         print(#function, self)
