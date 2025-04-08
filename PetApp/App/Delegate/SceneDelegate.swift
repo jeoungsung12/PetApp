@@ -10,18 +10,20 @@ import UIKit
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
-    private let realmRepo: RealmRepositoryType = RealmRepository.shared
+    var appCoordinator: AppCoordinator?
     private var networkMonitor: NetworkMonitorManagerType = NetworkMonitorManager()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         sleep(1)
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
-        if (realmRepo.getUserInfo()) != nil {
-            window?.rootViewController = TabBarController()
-        } else {
-            window?.rootViewController = UINavigationController(rootViewController: ProfileViewController())
-        }
+        
+        let navigationController = UINavigationController()
+        navigationController.isNavigationBarHidden = true
+        appCoordinator = AppCoordinator(navigationController: navigationController)
+        appCoordinator?.start()
+        
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
         networkMonitor.startMonitoring { [weak self] status in

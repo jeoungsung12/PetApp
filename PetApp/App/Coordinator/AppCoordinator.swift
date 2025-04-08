@@ -90,6 +90,8 @@ final class AppCoordinator: Coordinator {
             items[4].image = .personImage
             items[4].title = "프로필"
         }
+        
+        tabBarController.tabBar.tintColor = .point
     }
 }
 

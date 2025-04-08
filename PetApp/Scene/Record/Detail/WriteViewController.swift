@@ -26,8 +26,19 @@ final class WriteViewController: BaseViewController {
     private let descriptionTextView = UITextView()
     private let descriptionLabel = UILabel()
     
-    private let viewModel = WriteViewModel()
+    private let viewModel: WriteViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: RecordCoordinator?
+    init(viewModel: WriteViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private lazy var picker = YPImagePicker(configuration: self.configurePicker())
     private var selectedImages = BehaviorRelay<[UIImage]>(value: [])

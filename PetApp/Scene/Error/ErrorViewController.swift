@@ -21,6 +21,7 @@ final class ErrorViewController: BaseViewController {
     private let viewModel: ErrorViewModel
     private var disposeBag = DisposeBag()
     private var errorType: Error
+    weak var coordinator: Coordinator?
     init(viewModel: ErrorViewModel, errorType: Error) {
         self.viewModel = viewModel
         self.errorType = errorType

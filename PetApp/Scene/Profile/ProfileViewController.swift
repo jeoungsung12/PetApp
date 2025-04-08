@@ -20,7 +20,7 @@ final class ProfileViewController: BaseViewController {
     private let successButton = UIButton()
     private var profileImage: String?
     
-    private let viewModel = ProfileViewModel()
+    private let viewModel: ProfileViewModel
     private var inputTrigger = ProfileViewModel.Input(
         configureViewTrigger: PublishSubject<Void>(),
         nameTextFieldTrigger: PublishSubject<String?>(),
@@ -29,6 +29,17 @@ final class ProfileViewController: BaseViewController {
     )
     
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: ProfileCoordinator?
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -85,10 +96,7 @@ final class ProfileViewController: BaseViewController {
         
         profileButton.rx.tap
             .bind(with: self) { owner, _ in
-                let vc = ProfileImageViewController()
-                vc.profileImage = owner.profileImage
-                vc.profileDelegate = owner
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showProfileImageSelection(currentImage: owner.profileImage, delegate: owner)
             }
             .disposed(by: disposeBag)
         

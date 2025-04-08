@@ -21,7 +21,7 @@ final class SheetProfileViewController: BaseViewController {
     private let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: nil, action: nil)
     private var profileImage: String?
     
-    private let viewModel = ProfileViewModel()
+    private let viewModel: ProfileViewModel
     private var inputTrigger = ProfileViewModel.Input(
         configureViewTrigger: PublishSubject<Void>(),
         nameTextFieldTrigger: PublishSubject<String?>(),
@@ -30,6 +30,17 @@ final class SheetProfileViewController: BaseViewController {
     )
     
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: MyPageCoordinator?
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,7 +70,7 @@ final class SheetProfileViewController: BaseViewController {
         output.successButtonResult
             .drive(with: self, onNext: { owner, valid in
                 if let valid = valid, valid {
-                    owner.dismiss(animated: true)
+                    owner.coordinator?.popSheetProfile()
                 } else {
                     owner.view.makeToast("저장에 실패했습니다!", duration: 1, position: .center)
                 }
@@ -79,16 +90,13 @@ final class SheetProfileViewController: BaseViewController {
         
         cancelButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.dismiss(animated: true)
+                owner.coordinator?.popSheetProfile()
             }
             .disposed(by: disposeBag)
         
         profileButton.rx.tap
             .bind(with: self) { owner, _ in
-                let vc = ProfileImageViewController()
-                vc.profileImage = owner.profileImage
-                vc.profileDelegate = owner
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showProfileImageSelection(currentImage: owner.profileImage, delegate: owner)
             }
             .disposed(by: disposeBag)
         
