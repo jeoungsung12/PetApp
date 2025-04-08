@@ -18,6 +18,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
         
+        DIContainer.setupDependencies()
+        
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
         appCoordinator = AppCoordinator(navigationController: navigationController)

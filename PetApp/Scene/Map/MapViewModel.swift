@@ -16,10 +16,10 @@ enum MapType {
 }
 
 final class MapViewModel: BaseViewModel {
-    private let repository: NetworkRepositoryType = NetworkRepository()
+    private let repository: NetworkRepositoryType
+    private let locationManager: LocationRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var mapType: MapType
-    private let locationManager = CLLocationManager()
     
     struct Input {
         let loadTrigger: Observable<Void>
@@ -30,7 +30,13 @@ final class MapViewModel: BaseViewModel {
         let errorResult: Driver<DataDreamError>
     }
     
-    init(mapType: MapType) {
+    init(
+        repository: NetworkRepositoryType? = nil,
+        locationManager: LocationRepositoryType? = nil,
+        mapType: MapType
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepository.self)!
+        self.locationManager = locationManager ?? DIContainer.shared.resolve(type: LocationRepositoryType.self)!
         self.mapType = mapType
     }
     
@@ -46,7 +52,7 @@ final class MapViewModel: BaseViewModel {
                         do {
                             var result = try await owner.repository.getMap(owner.mapType)
                             if owner.mapType == .hospital,
-                               let userLocation = owner.locationManager.location?.coordinate {
+                               let userLocation = owner.locationManager.currentLocation.value {
                                 result = result.filter { entity in
                                     let location = CLLocation(latitude: entity.lat, longitude: entity.lon)
                                     let userLoc = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)

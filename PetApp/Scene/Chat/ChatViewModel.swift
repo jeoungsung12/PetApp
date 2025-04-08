@@ -17,12 +17,17 @@ enum ChatSectionType: CaseIterable {
 }
 
 final class ChatViewModel: BaseViewModel {
-    private let realmRepo: RealmRepositoryType = RealmRepository.shared
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let realmRepo: RealmRepositoryType
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private var likedEntities: [HomeEntity] = []
     
-    init() {
+    init(
+        realmRepo: RealmRepositoryType? = nil,
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.realmRepo = realmRepo ?? DIContainer.shared.resolve(type: RealmRepository.self)!
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepository.self)!
         loadRealm()
     }
     

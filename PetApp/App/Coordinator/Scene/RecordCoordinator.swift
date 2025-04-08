@@ -20,17 +20,19 @@ final class RecordCoordinator: Coordinator {
     }
     
     func start() {
-        let recordVM = RecordViewModel()
-        let recordVC = RecordViewController(viewModel: recordVM)
-        recordVC.recordCoordinator = self
-        navigationController.pushViewController(recordVC, animated: false)
+        if let recordVM = DIContainer.shared.resolveFactory(type: RecordViewModel.self) {
+            let recordVC = RecordViewController(viewModel: recordVM)
+            recordVC.recordCoordinator = self
+            navigationController.pushViewController(recordVC, animated: false)
+        }
     }
     
     func showWrite() {
-        let writeVM = WriteViewModel()
-        let writeVC = WriteViewController(viewModel: writeVM)
-        writeVC.coordinator = self
-        navigationController.pushViewController(writeVC, animated: true)
+        if let writeVM = DIContainer.shared.resolveFactory(type: WriteViewModel.self) {
+            let writeVC = WriteViewController(viewModel: writeVM)
+            writeVC.coordinator = self
+            navigationController.pushViewController(writeVC, animated: true)
+        }
     }
     
     func showAlert(title: String, message: String, actions: [AlertAction], completion: (() -> Void)?) {

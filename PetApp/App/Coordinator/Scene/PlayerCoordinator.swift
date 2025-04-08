@@ -20,10 +20,11 @@ final class PlayerCoordinator: Coordinator {
     }
     
     func start() {
-        let playerVM = PlayerViewModel()
-        let playerVC = PlayerViewController(viewModel: playerVM)
-        playerVC.coordinator = self
-        navigationController.pushViewController(playerVC, animated: false)
+        if let playerVM = DIContainer.shared.resolveFactory(type: PlayerViewModel.self) {
+            let playerVC = PlayerViewController(viewModel: playerVM)
+            playerVC.coordinator = self
+            navigationController.pushViewController(playerVC, animated: false)
+        }
     }
     
     func showError(error: Error) {

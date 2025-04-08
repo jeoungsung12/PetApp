@@ -14,7 +14,7 @@ protocol ShareDelegate: AnyObject {
 }
 
 final class DetailMiddleViewModel: BaseViewModel {
-    private let repo: RealmRepositoryType = RealmRepository.shared
+    private let repo: RealmRepositoryType
     private var disposeBag = DisposeBag()
     
     private let entity: HomeEntity
@@ -28,7 +28,11 @@ final class DetailMiddleViewModel: BaseViewModel {
         let isLikedResult: Driver<Bool>
     }
     
-    init(entity: HomeEntity) {
+    init(
+        repo: RealmRepositoryType? = nil,
+        entity: HomeEntity
+    ) {
+        self.repo = repo ?? DIContainer.shared.resolve(type: RealmRepositoryType.self)!
         self.entity = entity
     }
 }

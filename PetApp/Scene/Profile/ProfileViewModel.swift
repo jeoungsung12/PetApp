@@ -40,7 +40,7 @@ struct NickName {
 }
 
 final class ProfileViewModel: BaseViewModel {
-    private let db: RealmRepositoryType = RealmRepository.shared
+    private let db: RealmRepositoryType
     private var disposeBag = DisposeBag()
     
     struct Input {
@@ -57,8 +57,10 @@ final class ProfileViewModel: BaseViewModel {
         let configureViewResult: Driver<UserInfo?>
     }
     
-    init() {
-        print(#function, self)
+    init(
+        db: RealmRepositoryType? = nil
+    ) {
+        self.db = db ?? DIContainer.shared.resolve(type: RealmRepositoryType.self)!
     }
     
     deinit {

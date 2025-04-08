@@ -10,8 +10,8 @@ import RxSwift
 import RxCocoa
 
 final class PhotoViewModel: BaseViewModel {
-    private let locationRepo = LocationRepository.shared
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let locationRepo: LocationRepositoryType
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var page: Int = 1
     private var locationCode: Int?
@@ -23,6 +23,14 @@ final class PhotoViewModel: BaseViewModel {
     struct Output {
         let homeResult: BehaviorRelay<[HomeEntity]>
         let errorResult: Driver<DataDreamError>
+    }
+    
+    init(
+        locationRepo: LocationRepositoryType? = nil,
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.locationRepo = locationRepo ?? DIContainer.shared.resolve(type: LocationRepositoryType.self)!
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
     }
 }
 
