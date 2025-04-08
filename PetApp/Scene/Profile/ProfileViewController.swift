@@ -65,8 +65,8 @@ final class ProfileViewController: BaseViewController {
         output.successButtonResult
             .drive(with: self, onNext: { owner, valid in
                 if let valid = valid, valid {
-                    let rootVC = TabBarController()
-                    owner.setRootView(rootVC)
+                    owner.navigationController?.isNavigationBarHidden = true
+                    owner.coordinator?.navigateToTabBar()
                 }
             }).disposed(by: disposeBag)
         

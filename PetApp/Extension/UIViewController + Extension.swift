@@ -21,11 +21,6 @@ extension UIViewController {
         self.view.endEditing(true)
     }
     
-    func setRootView(_ rootVC: UIViewController) {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else { return }
-        window.rootViewController = rootVC
-    }
-    
     func showSettingsAlert(title: String, message: String) {
         let alert = UIAlertController(
             title: title,

@@ -52,8 +52,6 @@ final class MyPageCoordinator: Coordinator {
         let sheetProfileVC = SheetProfileViewController(viewModel: sheetProfileVM)
         sheetProfileVC.coordinator = self
         
-//        let navController = UINavigationController(rootViewController: sheetProfileVC)
-//        navController.modalPresentationStyle = .fullScreen
         navigationController.pushViewController(sheetProfileVC, animated: true)
     }
     
@@ -98,19 +96,8 @@ final class MyPageCoordinator: Coordinator {
         guard let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate,
               let appCoordinator = sceneDelegate.appCoordinator else { return }
         
-//        appCoordinator.removeAllChildCoordinators()
-        
-        let navigationController = UINavigationController()
-        let profileCoordinator = ProfileCoordinator(navigationController: navigationController)
-        profileCoordinator.delegate = appCoordinator
-        appCoordinator.childCoordinators.append(profileCoordinator)
-        
-        profileCoordinator.start()
-        
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = navigationController
-            window.makeKeyAndVisible()
-        }
+        appCoordinator.childCoordinators.removeAll()
+        appCoordinator.showLogin()
     }
     
     func popSheetProfile() {

@@ -6,7 +6,6 @@
 //
 import UIKit
 
-
 protocol ChatCoordinatorDelegate: AnyObject {
     func chatCoordinatorDidFinish(_ coordinator: ChatCoordinator)
 }
