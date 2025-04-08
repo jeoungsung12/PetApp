@@ -12,8 +12,20 @@ import RxCocoa
 
 final class ListViewController: BaseViewController {
     private let tableView = UITableView()
-    private let viewModel = ListViewModel()
+    private let viewModel: ListViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var homeCoord: HomeCoordinator?
+    weak var chatCoord: ChatCoordinator?
+    init(viewModel: ListViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,18 +57,13 @@ final class ListViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.chatCoord?.showError(error: error)
             }
             .disposed(by: disposeBag)
         
         tableView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
-                let vm = DetailViewModel(model: entity)
-                let vc = DetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.homeCoord?.showDetail(with: entity)
             }
             .disposed(by: disposeBag)
         
@@ -66,7 +73,6 @@ final class ListViewController: BaseViewController {
                    (output.homeResult.value.count - 2) < lastIndex
                 {
                     LoadingIndicator.showLoading()
-                    //TODO: 캐싱
                     input.loadTrigger.accept(owner.viewModel.page + 1)
                 }
             }

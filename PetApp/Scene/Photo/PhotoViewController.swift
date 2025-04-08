@@ -12,9 +12,20 @@ import RxCocoa
 
 final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlowLayout {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
-    private let viewModel = PhotoViewModel()
+    private let viewModel: PhotoViewModel
     private var disposeBag = DisposeBag()
     private var itemSizes: [CGSize] = []
+    
+    weak var coordinator: HomeCoordinator?
+    init(viewModel: PhotoViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,9 +83,7 @@ final class PhotoViewController: BaseViewController, UICollectionViewDelegateFlo
         
         collectionView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
-                let vm = DetailViewModel(model: entity)
-                let vc = DetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showDetail(with: entity)
             }
             .disposed(by: disposeBag)
         

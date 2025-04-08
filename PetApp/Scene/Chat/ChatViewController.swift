@@ -15,12 +15,23 @@ final class ChatViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
     private let chatImageView = UIImageView()
     
-    private let viewModel = ChatViewModel()
+    private let viewModel: ChatViewModel
     private lazy var input = ChatViewModel.Input(
         loadTrigger: Observable.just(()),
         reloadRealm: PublishRelay()
     )
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: ChatCoordinator?
+    init(viewModel: ChatViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -103,12 +114,9 @@ final class ChatViewController: BaseViewController {
         .observe(on: MainScheduler.instance)
         .bind(with: self) { owner, selected in
             if let data = selected.1.data {
-                let vm = ChatDetailViewModel(entity: data)
-                let vc = ChatDetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showChatDetail(with: data)
             } else {
-                let vc = ListViewController()
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showList()
             }
         }
         .disposed(by: disposeBag)

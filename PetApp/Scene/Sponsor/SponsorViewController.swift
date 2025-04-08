@@ -18,8 +18,19 @@ final class SponsorViewController: BaseViewController {
     private let descriptionLabel = UILabel()
     private let regularSponsorButton = UIButton()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
-    private let viewModel = SponsorViewModel()
+    private let viewModel: SponsorViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: HomeCoordinator?
+    init(viewModel: SponsorViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func setBinding() {
         let input = SponsorViewModel.Input()

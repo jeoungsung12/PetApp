@@ -20,6 +20,7 @@ final class MapViewController: BaseViewController {
     private let locationButton = UIButton()
     private let refreshButton = UIButton()
     
+    weak var coordinator: HomeCoordinator?
     init(viewModel: MapViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)

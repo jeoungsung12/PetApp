@@ -17,6 +17,9 @@ final class DetailViewController: BaseViewController {
     
     private var disposeBag = DisposeBag()
     private var viewModel: DetailViewModel
+    
+    weak var homeCoord: HomeCoordinator?
+    weak var mypageCoord: MyPageCoordinator?
     init(viewModel: DetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -103,6 +106,7 @@ final class DetailViewController: BaseViewController {
 
 extension DetailViewController: ShareDelegate {
     
+    //TODO: viewModel
     func activityShare(_ entity: HomeEntity) {
         let deepLink = "https://apps.apple.com/kr/app/%EC%99%80%EB%9E%84%EB%9D%BC-warala/id6744003128"
         let shareText = """

@@ -14,8 +14,19 @@ final class PlayerViewController: BaseViewController {
     private lazy var tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
     private lazy var naviHeight = navigationController?.navigationBar.frame.height ?? 0
     private let tableView = UITableView()
-    private let viewModel = PlayerViewModel()
+    private let viewModel: PlayerViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: PlayerCoordinator?
+    init(viewModel: PlayerViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,10 +63,7 @@ final class PlayerViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.coordinator?.showError(error: error)
             }
             .disposed(by: disposeBag)
         

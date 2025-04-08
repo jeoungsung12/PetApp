@@ -8,24 +8,20 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
+    
     weak var coordinator: AppCoordinator?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
     }
-}
-
-extension TabBarController {
     
     private func configure() {
-        let firstVC = UINavigationController(rootViewController: HomeViewController())
-        let secondVC = UINavigationController(rootViewController: RecordViewController())
-        let thirdVC = UINavigationController(rootViewController: ChatViewController())
-        let forthVC = UINavigationController(rootViewController: PlayerViewController())
-        let fifthVC = UINavigationController(rootViewController: MyPageViewController())
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .customWhite
+        self.tabBar.standardAppearance = appearance
         
-        self.setViewControllers([firstVC, secondVC, thirdVC, forthVC, fifthVC], animated: true)
         guard let items = self.tabBar.items else { return }
         items[0].image = .footPrintImage
         items[1].image = .listImage
@@ -39,14 +35,12 @@ extension TabBarController {
         items[3].title = "영상"
         items[4].title = "프로필"
         
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .customWhite
-        self.tabBar.standardAppearance = appearance
-        
         self.selectedIndex = 0
         self.tabBar.tintColor = .point
         self.tabBar.unselectedItemTintColor = .customLightGray
     }
     
+    deinit {
+        print("TabBarController 해제됨")
+    }
 }

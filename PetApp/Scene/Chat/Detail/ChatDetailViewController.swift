@@ -20,6 +20,7 @@ final class ChatDetailViewController: BaseViewController {
     private let viewModel: ChatDetailViewModel
     private var disposeBag = DisposeBag()
     
+    weak var coordinator: ChatCoordinator?
     init(viewModel: ChatDetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
