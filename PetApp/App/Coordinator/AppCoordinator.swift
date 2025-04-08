@@ -6,10 +6,10 @@
 //
 
 import UIKit
-
 final class AppCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
+    var parentCoordinator: Coordinator? = nil
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController

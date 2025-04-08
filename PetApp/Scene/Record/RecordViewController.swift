@@ -113,6 +113,10 @@ final class RecordViewController: BaseViewController {
             make.horizontalEdges.equalToSuperview()
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }
 
 extension RecordViewController: RemoveDelegate {

@@ -154,6 +154,10 @@ final class ChatViewController: BaseViewController {
             make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }
 
 extension ChatViewController {

@@ -42,6 +42,14 @@ final class SheetProfileViewController: BaseViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if isMovingFromParent {
+            coordinator?.finish()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }

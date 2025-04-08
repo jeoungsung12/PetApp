@@ -6,17 +6,17 @@
 //
 import UIKit
 
-protocol ChatCoordinatorDelegate: AnyObject {
-    func chatCoordinatorDidFinish(_ coordinator: ChatCoordinator)
-}
-
 final class ChatCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
+    var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
-    weak var delegate: ChatCoordinatorDelegate?
     
-    init(navigationController: UINavigationController) {
+    init(
+        navigationController: UINavigationController,
+        parentCoordinator: Coordinator? = nil
+    ) {
         self.navigationController = navigationController
+        self.parentCoordinator = parentCoordinator
     }
     
     func start() {
@@ -46,6 +46,11 @@ final class ChatCoordinator: Coordinator {
         errorVC.coordinator = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
+    }
+    
+    func finish() {
+        parentCoordinator?.childDidFinish(self)
+        print(#function, self)
     }
     
     deinit {
