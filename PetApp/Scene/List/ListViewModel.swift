@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class ListViewModel: BaseViewModel {
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var page: Int = 1
     
@@ -21,6 +21,12 @@ final class ListViewModel: BaseViewModel {
     struct Output {
         let homeResult: BehaviorRelay<[HomeEntity]>
         let errorResult: Driver<DataDreamError>
+    }
+    
+    init(
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
     }
 }
 

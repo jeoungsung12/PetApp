@@ -10,8 +10,21 @@ import MapKit
 import RxSwift
 import RxCocoa
 
-final class LocationRepository: NSObject {
-    static let shared = LocationRepository()
+protocol LocationRepositoryType: AnyObject {
+    var currentLocation: BehaviorRelay<CLLocationCoordinate2D?> { get }
+    var authorizationStatus: BehaviorRelay<CLAuthorizationStatus> { get }
+    var currentAddress: BehaviorRelay<String?> { get }
+    var currentCity: BehaviorRelay<String?> { get }
+    
+    func requestLocationAuthorization()
+    func startUpdatingLocation(forceUpdate: Bool)
+    func stopUpdatingLocation()
+    func getUserLocationRegion(delta: Double) -> MKCoordinateRegion?
+    func reverseGeocode(coordinate: CLLocationCoordinate2D, completion: ((String?, String?) -> Void)?)
+}
+
+final class LocationRepository: NSObject, LocationRepositoryType {
+    static let shared: LocationRepositoryType = LocationRepository()
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
     private var disposeBag = DisposeBag()

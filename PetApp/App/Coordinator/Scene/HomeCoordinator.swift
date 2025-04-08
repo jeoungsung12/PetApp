@@ -20,52 +20,64 @@ final class HomeCoordinator: Coordinator {
     }
     
     func start() {
-        let homeVM = HomeViewModel()
-        let homeVC = HomeViewController(viewModel: homeVM)
-        homeVC.coordinator = self
-        navigationController.pushViewController(homeVC, animated: false)
+        if let homeVM = DIContainer.shared.resolveFactory(type: HomeViewModel.self) {
+            let homeVC = HomeViewController(viewModel: homeVM)
+            homeVC.coordinator = self
+            navigationController.pushViewController(homeVC, animated: false)
+        }
     }
     
     func showDetail(with entity: HomeEntity) {
-        let detailVM = DetailViewModel(model: entity)
-        let detailVC = DetailViewController(viewModel: detailVM)
-        detailVC.homeCoord = self
-        navigationController.pushViewController(detailVC, animated: true)
+        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
+            let detailVC = DetailViewController(viewModel: detailVM)
+            detailVC.homeCoord = self
+            navigationController.pushViewController(detailVC, animated: true)
+        }
     }
     
     func showList() {
-        let listVM = ListViewModel()
-        let listVC = ListViewController(viewModel: listVM)
-        listVC.homeCoord = self
-        navigationController.pushViewController(listVC, animated: true)
+        if let listVM = DIContainer.shared.resolveFactory(type: ListViewModel.self) {
+            let listVC = ListViewController(viewModel: listVM)
+            listVC.homeCoord = self
+            navigationController.pushViewController(listVC, animated: true)
+        }
     }
     
     func showPhoto() {
-        let photoVM = PhotoViewModel()
-        let photoVC = PhotoViewController(viewModel: photoVM)
-        photoVC.coordinator = self
-        navigationController.pushViewController(photoVC, animated: true)
+        if let photoVM = DIContainer.shared.resolveFactory(type: PhotoViewModel.self) {
+            let photoVC = PhotoViewController(viewModel: photoVM)
+            photoVC.coordinator = self
+            navigationController.pushViewController(photoVC, animated: true)
+        }
     }
     
     func showMap(mapType: MapType) {
-        let mapVM = MapViewModel(mapType: mapType)
-        let mapVC = MapViewController(viewModel: mapVM)
-        mapVC.coordinator = self
-        navigationController.pushViewController(mapVC, animated: true)
+        if let mapVM = DIContainer.shared.resolveFactory(type: MapViewModel.self) {
+            let mapVM = MapViewModel(
+                repository: DIContainer.shared.resolve(type: NetworkRepositoryType.self)!,
+                locationManager: DIContainer.shared.resolve(type: LocationRepositoryType.self)!,
+                mapType: mapType
+            )
+            let mapVC = MapViewController(viewModel: mapVM)
+            mapVC.coordinator = self
+            navigationController.pushViewController(mapVC, animated: true)
+        }
     }
     
     func showLike() {
-        let likeVM = LikeViewModel()
-        let likeVC = LikeViewController(viewModel: likeVM)
-        likeVC.homeCoord = self
-        navigationController.pushViewController(likeVC, animated: true)
+        if let likeVM = DIContainer.shared.resolveFactory(type: LikeViewModel.self) {
+            let likeVC = LikeViewController(viewModel: likeVM)
+            likeVC.homeCoord = self
+            navigationController.pushViewController(likeVC, animated: true)
+        }
     }
     
     func showSponsor() {
-        let sponsorVM = SponsorViewModel()
-        let sponsorVC = SponsorViewController(viewModel: sponsorVM)
-        sponsorVC.coordinator = self
-        navigationController.pushViewController(sponsorVC, animated: true)
+        if let sponsorVM = DIContainer.shared.resolveFactory(type: SponsorViewModel.self) {
+            let sponsorVC = SponsorViewController(viewModel: sponsorVM)
+            sponsorVC.coordinator = self
+            navigationController.pushViewController(sponsorVC, animated: true)
+        }
     }
     
     func finish() {

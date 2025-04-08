@@ -20,55 +20,61 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func start() {
-        let myPageVM = MyPageViewModel()
-        let myPageVC = MyPageViewController(viewModel: myPageVM)
-        myPageVC.coordinator = self
-        navigationController.pushViewController(myPageVC, animated: false)
+        if let myPageVM = DIContainer.shared.resolveFactory(type: MyPageViewModel.self) {
+            let myPageVC = MyPageViewController(viewModel: myPageVM)
+            myPageVC.coordinator = self
+            navigationController.pushViewController(myPageVC, animated: false)
+        }
     }
     
     func showDetail(with entity: HomeEntity) {
-        let detailVM = DetailViewModel(model: entity)
-        let detailVC = DetailViewController(viewModel: detailVM)
-        detailVC.mypageCoord = self
-        navigationController.pushViewController(detailVC, animated: true)
+        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
+            let detailVC = DetailViewController(viewModel: detailVM)
+            detailVC.mypageCoord = self
+            navigationController.pushViewController(detailVC, animated: true)
+        }
     }
     
     func showLike() {
-        let likeVM = LikeViewModel()
-        let likeVC = LikeViewController(viewModel: likeVM)
-        likeVC.mypageCoord = self
-        navigationController.pushViewController(likeVC, animated: true)
+        if let likeVM = DIContainer.shared.resolveFactory(type: LikeViewModel.self) {
+            let likeVC = LikeViewController(viewModel: likeVM)
+            likeVC.mypageCoord = self
+            navigationController.pushViewController(likeVC, animated: true)
+        }
     }
     
     func showRecord() {
-        let recordVM = RecordViewModel()
-        let recordVC = RecordViewController(viewModel: recordVM)
-        recordVC.mypageCoordinator = self
-        navigationController.pushViewController(recordVC, animated: true)
+        if let recordVM = DIContainer.shared.resolveFactory(type: RecordViewModel.self) {
+            let recordVC = RecordViewController(viewModel: recordVM)
+            recordVC.mypageCoordinator = self
+            navigationController.pushViewController(recordVC, animated: true)
+        }
     }
     
     func showProfileEdit() {
-        let sheetProfileVM = ProfileViewModel()
-        let sheetProfileVC = SheetProfileViewController(viewModel: sheetProfileVM)
-        sheetProfileVC.coordinator = self
-        
-        navigationController.pushViewController(sheetProfileVC, animated: true)
+        if let sheetProfileVM = DIContainer.shared.resolveFactory(type: ProfileViewModel.self) {
+            let sheetProfileVC = SheetProfileViewController(viewModel: sheetProfileVM)
+            sheetProfileVC.coordinator = self
+            navigationController.pushViewController(sheetProfileVC, animated: true)
+        }
     }
     
     func showProfileImageSelection(currentImage: String?, delegate: ProfileImageDelegate) {
-        let profileImageVM = ProfileImageViewModel()
-        let profileImageVC = ProfileImageViewController(viewModel: profileImageVM)
-        profileImageVC.mypageCoord = self
-        profileImageVC.profileImage = currentImage
-        profileImageVC.profileDelegate = delegate
-        navigationController.pushViewController(profileImageVC, animated: true)
+        if let profileImageVM = DIContainer.shared.resolveFactory(type: ProfileImageViewModel.self) {
+            let profileImageVC = ProfileImageViewController(viewModel: profileImageVM)
+            profileImageVC.mypageCoord = self
+            profileImageVC.profileImage = currentImage
+            profileImageVC.profileDelegate = delegate
+            navigationController.pushViewController(profileImageVC, animated: true)
+        }
     }
     
     func showFAQ() {
-        let faqVM = FAQViewModel()
-        let faqVC = FAQViewController(viewModel: faqVM)
-        faqVC.coordinator = self
-        navigationController.pushViewController(faqVC, animated: true)
+        if let faqVM = DIContainer.shared.resolveFactory(type: FAQViewModel.self) {
+            let faqVC = FAQViewController(viewModel: faqVM)
+            faqVC.coordinator = self
+            navigationController.pushViewController(faqVC, animated: true)
+        }
     }
     
     func openFeedbackURL(urlString: String) {
@@ -102,10 +108,6 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func popSheetProfile() {
-        let sheetProfileVM = ProfileViewModel()
-        let sheetProfileVC = SheetProfileViewController(viewModel: sheetProfileVM)
-        sheetProfileVC.coordinator = self
-        
         navigationController.popViewController(animated: true)
     }
     

@@ -20,24 +20,27 @@ final class ChatCoordinator: Coordinator {
     }
     
     func start() {
-        let chatVM = ChatViewModel()
-        let chatVC = ChatViewController(viewModel: chatVM)
-        chatVC.coordinator = self
-        navigationController.pushViewController(chatVC, animated: false)
+        if let chatVM = DIContainer.shared.resolveFactory(type: ChatViewModel.self) {
+            let chatVC = ChatViewController(viewModel: chatVM)
+            chatVC.coordinator = self
+            navigationController.pushViewController(chatVC, animated: false)
+        }
     }
     
     func showChatDetail(with entity: HomeEntity) {
-        let viewModel = ChatDetailViewModel(entity: entity)
-        let chatDetailVC = ChatDetailViewController(viewModel: viewModel)
-        chatDetailVC.coordinator = self
-        navigationController.pushViewController(chatDetailVC, animated: true)
+        if let viewModel = DIContainer.shared.resolveFactory(type: ChatDetailViewModel.self, entity: entity) {
+            let chatDetailVC = ChatDetailViewController(viewModel: viewModel)
+            chatDetailVC.coordinator = self
+            navigationController.pushViewController(chatDetailVC, animated: true)
+        }
     }
     
     func showList() {
-        let listVM = ListViewModel()
-        let listVC = ListViewController(viewModel: listVM)
-        listVC.chatCoord = self
-        navigationController.pushViewController(listVC, animated: true)
+        if let listVM = DIContainer.shared.resolveFactory(type: ListViewModel.self) {
+            let listVC = ListViewController(viewModel: listVM)
+            listVC.chatCoord = self
+            navigationController.pushViewController(listVC, animated: true)
+        }
     }
     
     func showError(error: Error) {

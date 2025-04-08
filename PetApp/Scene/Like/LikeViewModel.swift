@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class LikeViewModel: BaseViewModel {
-    private var realmRepo: RealmRepositoryType = RealmRepository.shared
+    private var realmRepo: RealmRepositoryType
     private var disposeBag = DisposeBag()
     
     struct Input {
@@ -19,6 +19,12 @@ final class LikeViewModel: BaseViewModel {
     
     struct Output {
         let likeResult: Driver<[HomeEntity]>
+    }
+    
+    init(
+        realmRepo: RealmRepositoryType? = nil
+    ) {
+        self.realmRepo = realmRepo ?? DIContainer.shared.resolve(type: RealmRepositoryType.self)!
     }
 }
 

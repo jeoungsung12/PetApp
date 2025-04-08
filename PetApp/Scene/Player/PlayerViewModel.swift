@@ -16,7 +16,7 @@ final class PlayerViewModel: BaseViewModel {
         let end: Int
     }
     
-    private let repository: NetworkRepositoryType = NetworkRepository()
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var playerRequest: PlayerRequest?
     
@@ -27,6 +27,12 @@ final class PlayerViewModel: BaseViewModel {
     struct Output {
         let errorResult: Driver<OpenSquareError>
         let videoResult: BehaviorRelay<[PlayerEntity]>
+    }
+    
+    init(
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
     }
     
 }

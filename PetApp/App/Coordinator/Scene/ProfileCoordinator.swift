@@ -20,20 +20,21 @@ final class ProfileCoordinator: Coordinator {
     }
     
     func start() {
-        let profileVM = ProfileViewModel()
-        let profileVC = ProfileViewController(viewModel: profileVM)
-        profileVC.coordinator = self
-        navigationController.pushViewController(profileVC, animated: false)
+        if let profileVM = DIContainer.shared.resolveFactory(type: ProfileViewModel.self) {
+            let profileVC = ProfileViewController(viewModel: profileVM)
+            profileVC.coordinator = self
+            navigationController.pushViewController(profileVC, animated: false)
+        }
     }
     
     func showProfileImageSelection(currentImage: String?, delegate: ProfileImageDelegate) {
-        let profileVM = ProfileImageViewModel()
-        let profileImageVC = ProfileImageViewController(viewModel: profileVM)
-        profileImageVC.profileCoord = self
-        profileImageVC.profileImage = currentImage
-        profileImageVC.profileDelegate = delegate
-        
-        navigationController.pushViewController(profileImageVC, animated: true)
+        if let profileVM = DIContainer.shared.resolveFactory(type: ProfileImageViewModel.self) {
+            let profileImageVC = ProfileImageViewController(viewModel: profileVM)
+            profileImageVC.profileCoord = self
+            profileImageVC.profileImage = currentImage
+            profileImageVC.profileDelegate = delegate
+            navigationController.pushViewController(profileImageVC, animated: true)
+        }
     }
     
     func navigateToTabBar() {

@@ -38,7 +38,7 @@ extension HomeSection: SectionModelType {
 }
 
 final class HomeViewModel: BaseViewModel {
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     
     struct Input {
@@ -48,6 +48,12 @@ final class HomeViewModel: BaseViewModel {
     struct Output {
         let homeResult: Driver<[HomeSection]>
         let errorResult: Driver<DataDreamError>
+    }
+    
+    init(
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepository.self)!
     }
     
 }

@@ -17,7 +17,7 @@ enum ChatType {
 }
 
 final class ChatDetailViewModel: BaseViewModel {
-    private let repository: NetworkRepositoryType = NetworkRepository()
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private let entity: HomeEntity
     
@@ -30,7 +30,11 @@ final class ChatDetailViewModel: BaseViewModel {
         let errorResult: Driver<ChatError>
     }
     
-    init(entity: HomeEntity) {
+    init(
+        repository: NetworkRepositoryType? = nil,
+        entity: HomeEntity
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
         self.entity = entity
     }
     

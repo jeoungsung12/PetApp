@@ -28,7 +28,7 @@ enum MyPageCategoryType: String, CaseIterable {
 
 
 final class MyPageViewModel: BaseViewModel {
-    private let realm: RealmRepositoryType = RealmRepository.shared
+    private let realm: RealmRepositoryType
     private(set) var profileData = ProfileData.allCases
     private var disposeBag = DisposeBag()
     
@@ -50,8 +50,10 @@ final class MyPageViewModel: BaseViewModel {
         let categoryBtnResult: Driver<MyPageCategoryType>
     }
     
-    init() {
-        print(#function, self)
+    init(
+        realm: RealmRepositoryType? = nil
+    ) {
+        self.realm = realm ?? DIContainer.shared.resolve(type: RealmRepositoryType.self)!
     }
     
     deinit {
