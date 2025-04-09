@@ -57,7 +57,13 @@ final class ListViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                owner.chatCoord?.showError(error: error)
+                owner.homeCoord?.showError(error: error)
+            }
+            .disposed(by: disposeBag)
+        
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
             }
             .disposed(by: disposeBag)
         

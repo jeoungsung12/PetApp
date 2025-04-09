@@ -30,6 +30,7 @@ final class PlayerCoordinator: Coordinator {
     func showError(error: Error) {
         let errorVM = ErrorViewModel(notiType: .player)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
+        errorVM.delegate = self
         errorVC.coordinator = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
@@ -43,4 +44,19 @@ final class PlayerCoordinator: Coordinator {
     deinit {
         print(#function, self)
     }
+}
+
+extension PlayerCoordinator: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        switch type {
+        case .player:
+            if let playerViewModel = DIContainer.shared.resolveFactory(type: PlayerViewModel.self) {
+                playerViewModel.errorTrigger.onNext(())
+            }
+        default:
+            break
+        }
+    }
+    
 }
