@@ -16,6 +16,9 @@ final class HomeViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
     weak var coordinator: HomeCoordinator?
+    private let input = HomeViewModel.Input(
+        loadTrigger: PublishRelay<Void>()
+    )
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -37,10 +40,8 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setBinding() {
-        let input = HomeViewModel.Input(
-            loadTrigger: Observable.just(())
-        )
         let output = viewModel.transform(input)
+        input.loadTrigger.accept(())
         LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { dataSource, collectionView, indexPath, item in
@@ -156,6 +157,7 @@ final class HomeViewController: BaseViewController {
         self.setNavigation(logo: true)
         view.backgroundColor = .customWhite
         configureCollectionView()
+        coordinator?.delegate = self
     }
     
     deinit {
@@ -163,7 +165,7 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
+extension HomeViewController: MoreBtnDelegate, CategoryDelegate, ErrorDelegate {
     
     func moreBtnTapped(_ type: HomeSectionType) {
         switch type {
@@ -185,6 +187,10 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
         case .sponsor:
             self.coordinator?.showSponsor()
         }
+    }
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        input.loadTrigger.accept(())
     }
     
     private func configureCollectionView() {

@@ -22,6 +22,7 @@ final class ErrorViewController: BaseViewController {
     private var disposeBag = DisposeBag()
     private var errorType: Error
     weak var coordinator: Coordinator?
+    weak var delegate: ErrorDelegate?
     init(viewModel: ErrorViewModel, errorType: Error) {
         self.viewModel = viewModel
         self.errorType = errorType
@@ -49,6 +50,7 @@ final class ErrorViewController: BaseViewController {
                 case .network:
                     owner.view.makeToast(ErrorSenderType.network.rawValue, duration: 1, position: .center)
                 default:
+                    owner.delegate?.reloadNetwork(type: type)
                     owner.dismiss(animated: true)
                 }
             }
