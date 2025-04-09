@@ -90,7 +90,7 @@ final class ChatViewModel: BaseViewModel {
     }
     
     private func fetchData() async throws -> [HomeSection] {
-        let result = try await repository.getAnimal(1)
+        let result = try await repository.getAnimal(1, regionCode: nil)
         
         return [
             HomeSection(title: "지금 도움이 필요한\n친구들과 대화해 보세요 💬", items: result.map {

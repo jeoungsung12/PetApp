@@ -73,7 +73,7 @@ extension PhotoViewModel {
     
     private func fetchData(_ value: [HomeEntity], _ page: Int) async throws -> [HomeEntity] {
         do {
-            let result = try await repository.getAnimal(page)
+            let result = try await repository.getAnimal(page, regionCode: nil)
             return value + result
         } catch {
             throw error

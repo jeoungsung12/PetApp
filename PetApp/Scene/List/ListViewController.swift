@@ -12,7 +12,12 @@ import RxCocoa
 
 final class ListViewController: BaseViewController {
     private let tableView = UITableView()
+    private let locationButton = LocationButton()
     private let viewModel: ListViewModel
+    private let input = ListViewModel.Input(
+        loadTrigger: PublishRelay<ListViewModel.ListRequest>()
+    )
+    private lazy var output = viewModel.transform(input)
     private var disposeBag = DisposeBag()
     
     weak var homeCoord: HomeCoordinator?
@@ -33,11 +38,6 @@ final class ListViewController: BaseViewController {
     }
     
     override func setBinding() {
-        let input = ListViewModel.Input(
-            loadTrigger: PublishRelay()
-        )
-        let output = viewModel.transform(input)
-        input.loadTrigger.accept(viewModel.page)
         LoadingIndicator.showLoading()
         
         let result = output.homeResult.asDriver()
@@ -67,6 +67,18 @@ final class ListViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        locationButton.rx.tap
+            .bind(with: self) {
+                owner, _ in
+                owner.homeCoord?.showLocation(
+                    location: .init(
+                        city: owner.locationButton.subTitleLabel.text ?? "전국",
+                        location: owner.locationButton.viewModel.coord2D
+                    )
+                )
+            }
+            .disposed(by: disposeBag)
+        
         tableView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
                 owner.homeCoord?.showDetail(with: entity)
@@ -74,12 +86,15 @@ final class ListViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         tableView.rx.prefetchRows
-            .bind(with: self) { owner, IndexPaths in
+            .bind(with: self) {
+                owner, IndexPaths in
                 if let lastIndex = IndexPaths.last.map({ $0.row }),
-                   (output.homeResult.value.count - 2) < lastIndex
+                   (owner.output.homeResult.value.count - 2) < lastIndex
                 {
                     LoadingIndicator.showLoading()
-                    input.loadTrigger.accept(owner.viewModel.page + 1)
+                    owner.input.loadTrigger.accept(
+                        .init(page: owner.viewModel.page + 1, location: owner.viewModel.location)
+                    )
                 }
             }
             .disposed(by: disposeBag)
@@ -89,11 +104,16 @@ final class ListViewController: BaseViewController {
                 
             }
             .disposed(by: disposeBag)
+        
+        input.loadTrigger.accept(.init(page: viewModel.page, location: locationButton.viewModel.coord2D))
     }
     
     override func configureView() {
         self.setNavigation()
         self.view.backgroundColor = .white
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationButton)
+        homeCoord?.errorDelegate = self
+        homeCoord?.locationDelegate = self
         
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
@@ -111,4 +131,18 @@ final class ListViewController: BaseViewController {
             make.bottom.horizontalEdges.equalToSuperview()
         }
     }
+}
+
+extension ListViewController: ErrorDelegate, LocationDelegate {
+    
+    func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
+        locationButton.configure(locationEntity.city)
+        output.homeResult.accept([])
+        input.loadTrigger.accept(.init(page: 1, location: locationEntity.location))
+    }
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        input.loadTrigger.accept((.init(page: viewModel.page, location: viewModel.location)))
+    }
+    
 }

@@ -12,6 +12,7 @@ import RxCocoa
 import RxDataSources
 final class HomeViewController: BaseViewController {
     private let viewModel: HomeViewModel
+    private let locationButton = LocationButton()
     private let disposeBag = DisposeBag()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
@@ -123,6 +124,18 @@ final class HomeViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        locationButton.rx.tap
+            .bind(with: self) {
+                owner, _ in
+                owner.coordinator?.showLocation(
+                    location: .init(
+                        city: owner.locationButton.subTitleLabel.text ?? "전국",
+                        location: owner.locationButton.viewModel.coord2D
+                    )
+                )
+            }
+            .disposed(by: disposeBag)
+        
         let result = output.homeResult
         
         result
@@ -155,9 +168,11 @@ final class HomeViewController: BaseViewController {
     
     override func configureView() {
         self.setNavigation(logo: true)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationButton)
         view.backgroundColor = .customWhite
         configureCollectionView()
-        coordinator?.delegate = self
+        coordinator?.errorDelegate = self
+        coordinator?.locationDelegate = self
     }
     
     deinit {
@@ -165,7 +180,11 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController: MoreBtnDelegate, CategoryDelegate, ErrorDelegate {
+extension HomeViewController: MoreBtnDelegate, CategoryDelegate, ErrorDelegate, LocationDelegate {
+    
+    func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
+        locationButton.subTitleLabel.text = locationEntity.city
+    }
     
     func moreBtnTapped(_ type: HomeSectionType) {
         switch type {
