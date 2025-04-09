@@ -80,6 +80,12 @@ final class ChatViewController: BaseViewController {
             return headerView
         }
         
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
+            }
+            .disposed(by: disposeBag)
+        
         let result = output.homeResult
         
         result
@@ -100,10 +106,7 @@ final class ChatViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.coordinator?.showError(error: error)
             }
             .disposed(by: disposeBag)
         

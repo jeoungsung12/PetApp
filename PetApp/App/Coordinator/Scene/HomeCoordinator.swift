@@ -80,6 +80,15 @@ final class HomeCoordinator: Coordinator {
         }
     }
     
+    func showError(error: Error) {
+        let errorVM = ErrorViewModel(notiType: .chat)
+        let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
+        errorVM.delegate = self
+        errorVC.coordinator = self
+        errorVC.modalPresentationStyle = .overCurrentContext
+        navigationController.present(errorVC, animated: true)
+    }
+    
     func finish() {
         parentCoordinator?.childDidFinish(self)
         print(#function, self)
@@ -88,4 +97,19 @@ final class HomeCoordinator: Coordinator {
     deinit {
         print(#function, self)
     }
+}
+
+extension HomeCoordinator: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        switch type {
+        case .home:
+            if let homeViewModel = DIContainer.shared.resolveFactory(type: HomeViewModel.self) {
+                homeViewModel.errorTrigger.onNext(())
+            }
+        default:
+            break
+        }
+    }
+    
 }

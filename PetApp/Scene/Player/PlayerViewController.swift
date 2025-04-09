@@ -46,6 +46,12 @@ final class PlayerViewController: BaseViewController {
         input.loadTrigger.accept(.init(start: 1, end: 10))
         LoadingIndicator.showLoading()
         
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
+            }
+            .disposed(by: disposeBag)
+        
         let result = output.videoResult.asDriver(onErrorJustReturn: [])
         
         result

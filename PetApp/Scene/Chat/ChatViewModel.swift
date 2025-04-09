@@ -21,6 +21,7 @@ final class ChatViewModel: BaseViewModel {
     private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private var likedEntities: [HomeEntity] = []
+    let errorTrigger = PublishSubject<Void>()
     
     init(
         realmRepo: RealmRepositoryType? = nil,
@@ -45,7 +46,7 @@ final class ChatViewModel: BaseViewModel {
         let homeResult = BehaviorRelay<[HomeSection]>(value: [])
         let errorResult = PublishRelay<DataDreamError>()
         
-        input.loadTrigger
+        Observable.merge(input.loadTrigger, errorTrigger)
             .withUnretained(self)
             .flatMapLatest { owner, _ -> Single<[HomeSection]> in
                 return Single<[HomeSection]>.create { single in

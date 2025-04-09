@@ -40,6 +40,7 @@ extension HomeSection: SectionModelType {
 final class HomeViewModel: BaseViewModel {
     private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
+    let errorTrigger = PublishSubject<Void>()
     
     struct Input {
         let loadTrigger: Observable<Void>
@@ -64,7 +65,7 @@ extension HomeViewModel {
         let homeResult = BehaviorRelay<[HomeSection]>(value: [])
         let errorResult = PublishRelay<DataDreamError>()
         
-        input.loadTrigger
+        Observable.merge(input.loadTrigger, errorTrigger)
             .withUnretained(self)
             .flatMapLatest { owner, _ -> Single<[HomeSection]> in
                 return Single<[HomeSection]>.create { single in

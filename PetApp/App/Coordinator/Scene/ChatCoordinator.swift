@@ -47,6 +47,7 @@ final class ChatCoordinator: Coordinator {
         let errorVM = ErrorViewModel(notiType: .chat)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
         errorVC.coordinator = self
+        errorVM.delegate = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
     }
@@ -59,4 +60,19 @@ final class ChatCoordinator: Coordinator {
     deinit {
         print(#function, self)
     }
+}
+
+extension ChatCoordinator: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        switch type {
+        case .chat:
+            if let chatViewModel = DIContainer.shared.resolveFactory(type: ChatViewModel.self) {
+                chatViewModel.errorTrigger.onNext(())
+            }
+        default:
+            break
+        }
+    }
+    
 }
