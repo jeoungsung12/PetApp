@@ -17,7 +17,7 @@ final class ChatViewController: BaseViewController {
     
     private let viewModel: ChatViewModel
     private lazy var input = ChatViewModel.Input(
-        loadTrigger: Observable.just(()),
+        loadTrigger: PublishRelay(),
         reloadRealm: PublishRelay()
     )
     private var disposeBag = DisposeBag()
@@ -46,6 +46,7 @@ final class ChatViewController: BaseViewController {
     
     override func setBinding() {
         let output = viewModel.transform(input)
+        input.loadTrigger.accept(())
         LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { [weak self] dataSource, collectionView, indexPath, item in
@@ -128,7 +129,7 @@ final class ChatViewController: BaseViewController {
     override func configureView() {
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
-        
+        coordinator?.delegate = self
         chatImageView.contentMode = .scaleAspectFit
         
         collectionView.backgroundColor = .customWhite
@@ -163,7 +164,11 @@ final class ChatViewController: BaseViewController {
     }
 }
 
-extension ChatViewController {
+extension ChatViewController: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        input.loadTrigger.accept(())
+    }
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in

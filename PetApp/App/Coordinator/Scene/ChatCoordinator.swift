@@ -11,6 +11,7 @@ final class ChatCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
+    weak var delegate: ErrorDelegate?
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -47,7 +48,7 @@ final class ChatCoordinator: Coordinator {
         let errorVM = ErrorViewModel(notiType: .chat)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
         errorVC.coordinator = self
-        errorVM.delegate = self
+        errorVC.delegate = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
     }
@@ -67,9 +68,7 @@ extension ChatCoordinator: ErrorDelegate {
     func reloadNetwork(type: ErrorSenderType) {
         switch type {
         case .chat:
-            if let chatViewModel = DIContainer.shared.resolveFactory(type: ChatViewModel.self) {
-                chatViewModel.errorTrigger.onNext(())
-            }
+            delegate?.reloadNetwork(type: .chat)
         default:
             break
         }

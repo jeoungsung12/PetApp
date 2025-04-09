@@ -11,6 +11,7 @@ final class HomeCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
+    weak var delegate: ErrorDelegate?
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -81,9 +82,9 @@ final class HomeCoordinator: Coordinator {
     }
     
     func showError(error: Error) {
-        let errorVM = ErrorViewModel(notiType: .chat)
+        let errorVM = ErrorViewModel(notiType: .home)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-        errorVM.delegate = self
+        errorVC.delegate = self
         errorVC.coordinator = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
@@ -104,9 +105,7 @@ extension HomeCoordinator: ErrorDelegate {
     func reloadNetwork(type: ErrorSenderType) {
         switch type {
         case .home:
-            if let homeViewModel = DIContainer.shared.resolveFactory(type: HomeViewModel.self) {
-                homeViewModel.errorTrigger.onNext(())
-            }
+            delegate?.reloadNetwork(type: .home)
         default:
             break
         }

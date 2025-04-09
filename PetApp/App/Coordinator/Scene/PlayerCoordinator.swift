@@ -11,6 +11,7 @@ final class PlayerCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
+    weak var delegate: ErrorDelegate?
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -30,7 +31,7 @@ final class PlayerCoordinator: Coordinator {
     func showError(error: Error) {
         let errorVM = ErrorViewModel(notiType: .player)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-        errorVM.delegate = self
+        errorVC.delegate = self
         errorVC.coordinator = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
@@ -51,9 +52,7 @@ extension PlayerCoordinator: ErrorDelegate {
     func reloadNetwork(type: ErrorSenderType) {
         switch type {
         case .player:
-            if let playerViewModel = DIContainer.shared.resolveFactory(type: PlayerViewModel.self) {
-                playerViewModel.errorTrigger.onNext(())
-            }
+            delegate?.reloadNetwork(type: .player)
         default:
             break
         }

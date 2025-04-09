@@ -19,8 +19,6 @@ final class PlayerViewModel: BaseViewModel {
     private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var playerRequest: PlayerRequest?
-    let errorTrigger = PublishSubject<Void>()
-    private let lastRequestSubject = BehaviorSubject<PlayerRequest?>(value: nil)
     
     struct Input {
         let loadTrigger: PublishRelay<PlayerRequest>
@@ -46,40 +44,32 @@ extension PlayerViewModel {
         let errorResult = PublishRelay<OpenSquareError>()
         
         input.loadTrigger
-            .bind(to: lastRequestSubject)
-            .disposed(by: disposeBag)
-        
-        Observable.merge(
-            input.loadTrigger.map { _ in return true },
-            errorTrigger.map { _ in return false }
-        )
-        .withLatestFrom(lastRequestSubject)
-        .compactMap { $0 }
-        .withUnretained(self)
-        .flatMapLatest { owner, request -> Single<[PlayerEntity]> in
-            return Single<[PlayerEntity]>.create { single in
-                Task {
-                    do {
-                        owner.playerRequest = request
-                        let result = try await owner.repository.getVideo(
-                            start: request.start,
-                            end: request.end
-                        )
-                        single(.success(owner.AppendOriginValue(videoResult, result)))
-                    } catch {
-                        if let openSquareError = error as? OpenSquareError {
-                            errorResult.accept(openSquareError)
-                        } else {
-                            errorResult.accept(OpenSquareError.serverError)
+            .compactMap { $0 }
+            .withUnretained(self)
+            .flatMapLatest { owner, request -> Single<[PlayerEntity]> in
+                return Single<[PlayerEntity]>.create { single in
+                    Task {
+                        do {
+                            owner.playerRequest = request
+                            let result = try await owner.repository.getVideo(
+                                start: request.start,
+                                end: request.end
+                            )
+                            single(.success(owner.AppendOriginValue(videoResult, result)))
+                        } catch {
+                            if let openSquareError = error as? OpenSquareError {
+                                errorResult.accept(openSquareError)
+                            } else {
+                                errorResult.accept(OpenSquareError.serverError)
+                            }
+                            single(.success(videoResult.value))
                         }
-                        single(.success(videoResult.value))
                     }
+                    return Disposables.create()
                 }
-                return Disposables.create()
             }
-        }
-        .bind(to: videoResult)
-        .disposed(by: disposeBag)
+            .bind(to: videoResult)
+            .disposed(by: disposeBag)
         
         return Output(
             errorResult: errorResult.asDriver(onErrorJustReturn: OpenSquareError.serverError),
