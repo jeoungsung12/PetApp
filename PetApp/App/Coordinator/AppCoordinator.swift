@@ -33,7 +33,9 @@ final class AppCoordinator: Coordinator {
     }
     
     func showMainTabBar() {
-        let tabBarController = TabBarController()
+        let tabBarController = TabBarController(
+            locationManager: DIContainer.shared.resolve(type: LocationRepositoryType.self)!
+        )
         tabBarController.coordinator = self
         
         setupTabBarCoordinators(tabBarController: tabBarController)

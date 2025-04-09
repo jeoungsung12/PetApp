@@ -95,7 +95,7 @@ extension HomeViewModel {
     
     private func fetchData() async throws -> [HomeSection] {
         do {
-            let firstResult = try await repository.getAnimal(1)
+            let firstResult = try await repository.getAnimal(1, regionCode: nil)
             let secondResult = firstResult.dropFirst(10).prefix(10)
             
             return [

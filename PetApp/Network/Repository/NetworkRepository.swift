@@ -9,7 +9,7 @@ import Foundation
 import MapKit
 
 protocol NetworkRepositoryType: AnyObject {
-    func getAnimal(_ page: Int) async throws -> [HomeEntity]
+    func getAnimal(_ page: Int, regionCode: CLLocationCoordinate2D?) async throws -> [HomeEntity]
     func getMap(_ type: MapType) async throws -> [MapEntity]
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
     func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity
@@ -20,9 +20,9 @@ final class NetworkRepository: NetworkRepositoryType {
     private let network: NetworkManagerType = NetworkManager.shared
     private let locationRepo = LocationRepository.shared
     
-    func getAnimal(_ page: Int) async throws -> [HomeEntity] {
+    func getAnimal(_ page: Int, regionCode: CLLocationCoordinate2D? = nil) async throws -> [HomeEntity] {
         do {
-            let location = locationRepo.currentLocation.value
+            let location = regionCode
             let regionCode: String?
             
             if let location = location {
@@ -33,8 +33,7 @@ final class NetworkRepository: NetworkRepositoryType {
             } else {
                 regionCode = nil
             }
-            //TODO: 지역코드 변환
-            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, regionCode: nil))
+            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, regionCode: regionCode))
             return result.toEntity()
         } catch {
             if let networkError = error as? NetworkError,

@@ -11,7 +11,8 @@ final class HomeCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
-    weak var delegate: ErrorDelegate?
+    weak var errorDelegate: ErrorDelegate?
+    weak var locationDelegate: LocationDelegate?
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -53,7 +54,7 @@ final class HomeCoordinator: Coordinator {
     }
     
     func showMap(mapType: MapType) {
-        if let mapVM = DIContainer.shared.resolveFactory(type: MapViewModel.self) {
+        if let _ = DIContainer.shared.resolveFactory(type: MapViewModel.self) {
             let mapVM = MapViewModel(
                 repository: DIContainer.shared.resolve(type: NetworkRepositoryType.self)!,
                 locationManager: DIContainer.shared.resolve(type: LocationRepositoryType.self)!,
@@ -90,6 +91,14 @@ final class HomeCoordinator: Coordinator {
         navigationController.present(errorVC, animated: true)
     }
     
+    func showLocation(location: LocationViewModel.LocationEntity) {
+        let locationVC = LocationPopupViewController(userLocation: location)
+        locationVC.modalPresentationStyle = .overCurrentContext
+        locationVC.modalTransitionStyle = .crossDissolve
+        locationVC.delegate = self
+        navigationController.present(locationVC, animated: true)
+    }
+    
     func finish() {
         parentCoordinator?.childDidFinish(self)
         print(#function, self)
@@ -100,12 +109,16 @@ final class HomeCoordinator: Coordinator {
     }
 }
 
-extension HomeCoordinator: ErrorDelegate {
+extension HomeCoordinator: ErrorDelegate, LocationDelegate {
+    
+    func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
+        locationDelegate?.reloadLoaction(locationEntity)
+    }
     
     func reloadNetwork(type: ErrorSenderType) {
         switch type {
         case .home:
-            delegate?.reloadNetwork(type: .home)
+            errorDelegate?.reloadNetwork(type: .home)
         default:
             break
         }

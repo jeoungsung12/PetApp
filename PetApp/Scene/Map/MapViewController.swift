@@ -169,6 +169,28 @@ final class MapViewController: BaseViewController {
     
     private func moveToUserLocation() {
         locationRepository.startUpdatingLocation(forceUpdate: true)
+        
+        if let currentLocation = locationRepository.currentLocation.value {
+            let region = MKCoordinateRegion(
+                center: currentLocation,
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )
+            mapView.setRegion(region, animated: true)
+        } else {
+            locationRepository.currentLocation
+                .skip(1)
+                .take(1)
+                .observe(on: MainScheduler.instance)
+                .bind(with: self, onNext: { owner, coord in
+                    guard let coord = coord else { return }
+                    let region = MKCoordinateRegion(
+                        center: coord,
+                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                    )
+                    owner.mapView.setRegion(region, animated: true)
+                })
+                .disposed(by: disposeBag)
+        }
     }
 }
 
