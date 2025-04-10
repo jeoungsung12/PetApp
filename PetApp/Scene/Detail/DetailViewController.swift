@@ -18,6 +18,7 @@ final class DetailViewController: BaseViewController {
     private var disposeBag = DisposeBag()
     private var viewModel: DetailViewModel
     
+    weak var chatCoord: ChatCoordinator?
     weak var homeCoord: HomeCoordinator?
     weak var mypageCoord: MyPageCoordinator?
     init(viewModel: DetailViewModel) {

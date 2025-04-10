@@ -25,6 +25,7 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
     override func prepareForReuse() {
         super.prepareForReuse()
         thumbImageview.image = nil
+        thumbImageview.contentMode = .scaleAspectFill
         [descriptionLabel, shelterLabel, hashTagLabel].forEach {
             $0.text = nil
         }
@@ -34,7 +35,10 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
         thumbImageview.clipsToBounds = true
         thumbImageview.contentMode = .scaleAspectFill
         thumbImageview.layer.cornerRadius = 10
-        thumbImageview.backgroundColor = .customLightGray
+        thumbImageview.tintColor = .customLightGray
+        thumbImageview.backgroundColor = .systemGray5
+        thumbImageview.layer.borderWidth = 0.3
+        thumbImageview.layer.borderColor = UIColor.customLightGray.cgColor
         
         shelterLabel.textColor = .customLightGray
         shelterLabel.font = .mediumRegular
@@ -127,7 +131,16 @@ final class HomeMiddleCell: BaseCollectionViewCell, ReusableIdentifier {
                 with: url,
                 storageOption: .hybrid,
                 processingOption: .downsample(CGSize(width: 150, height: 150))
-            )
+            ) { [weak self] result in
+                switch result {
+                case .success(let image):
+                    print("이미지 로드 성공 \(image)")
+                case .failure(let error):
+                    print("이미지 로드 에러 \(error), \(url)")
+                    self?.thumbImageview.image = .noImage
+                    self?.thumbImageview.contentMode = .scaleAspectFit
+                }
+            }
 //            thumbImageview.kf.setImage(with: url)
         }
     }

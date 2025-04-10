@@ -89,6 +89,10 @@ extension DIContainer {
             RealmRepository.shared
         }
         
+        container.registerFactory(type: ProfileImageViewModel.self) { _ in
+            ProfileImageViewModel()
+        }
+        
         container.registerFactory(type: SponsorViewModel.self) { _ in
             SponsorViewModel()
         }

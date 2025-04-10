@@ -51,9 +51,9 @@ final class LikeViewController: BaseViewController {
         tableView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
                 if let homeCoord = owner.homeCoord {
-                    owner.homeCoord?.showDetail(with: entity)
+                    homeCoord.showDetail(with: entity)
                 } else if let mypageCoord = owner.mypageCoord {
-                    owner.mypageCoord?.showDetail(with: entity)
+                    mypageCoord.showDetail(with: entity)
                 }
             }
             .disposed(by: disposeBag)

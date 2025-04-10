@@ -23,6 +23,10 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
     override func configureView() {
         backdropImageView.clipsToBounds = true
         backdropImageView.contentMode = .scaleAspectFill
+        backdropImageView.tintColor = .customLightGray
+        backdropImageView.backgroundColor = .systemGray5
+        backdropImageView.layer.borderWidth = 0.3
+        backdropImageView.layer.borderColor = UIColor.customLightGray.cgColor
         
         titleLabel.font = .systemFont(ofSize: 40, weight: .heavy)
         subTitleLabel.font = .systemFont(ofSize: 30, weight: .heavy)
@@ -69,7 +73,17 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
                 with: url,
                 storageOption: .hybrid,
                 processingOption: .downsample(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 1.1))
-            )
+            ) { [weak self] result in
+                switch result {
+                case .success(let image):
+                    print("이미지 로드 성공 \(image)")
+                    print(url)
+                case .failure(let error):
+                    print("이미지 로드 에러 \(error), \(url)")
+                    self?.backdropImageView.image = .noImage
+                    self?.backdropImageView.contentMode = .scaleAspectFit
+                }
+            }
 //            backdropImageView.kf.setImage(with: url)
         }
     }

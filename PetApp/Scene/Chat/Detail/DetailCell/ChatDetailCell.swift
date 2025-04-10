@@ -20,6 +20,7 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
     override func prepareForReuse() {
         super.prepareForReuse()
         thumbImageView.image = nil
+        thumbImageView.contentMode = .scaleAspectFill
         [titleLabel, messageLabel].forEach {
             $0.text = nil
         }
@@ -31,7 +32,10 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
         thumbImageView.clipsToBounds = true
         thumbImageView.contentMode = .scaleAspectFill
         thumbImageView.layer.cornerRadius = 25
-        thumbImageView.backgroundColor = .customLightGray
+        thumbImageView.tintColor = .customLightGray
+        thumbImageView.backgroundColor = .systemGray5
+        thumbImageView.layer.borderWidth = 0.3
+        thumbImageView.layer.borderColor = UIColor.customLightGray.cgColor
         
         titleLabel.textColor = .customLightGray
         titleLabel.font = .mediumSemibold
@@ -108,7 +112,16 @@ final class ChatDetailCell: BaseTableViewCell, ReusableIdentifier {
                 with: url,
                 storageOption: .hybrid,
                 processingOption: .downsample(CGSize(width: 50, height: 50))
-            )
+            ) { [weak self] result in
+                switch result {
+                case .success(let image):
+                    print("이미지 로드 성공 \(image)")
+                case .failure(let error):
+                    print("이미지 로드 에러 \(error), \(url)")
+                    self?.thumbImageView.image = .noImage
+                    self?.thumbImageView.contentMode = .scaleAspectFit
+                }
+            }
 //            thumbImageView.kf.setImage(with: url)
         }
         

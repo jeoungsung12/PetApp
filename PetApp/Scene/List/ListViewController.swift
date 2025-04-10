@@ -57,7 +57,11 @@ final class ListViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                owner.homeCoord?.showError(error: error)
+                if let homeCoord = owner.homeCoord {
+                    homeCoord.showError(error: error)
+                } else if let chatCoord = owner.chatCoord {
+                    chatCoord.showError(error: error)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -71,13 +75,21 @@ final class ListViewController: BaseViewController {
             .bind(with: self) {
                 owner, _ in
                 let entity = owner.locationButton.viewModel.currentLocationEntity.value
-                owner.homeCoord?.showLocation(location: entity)
+                if let homeCoord = owner.homeCoord {
+                    homeCoord.showLocation(location: entity)
+                } else if let chatCoord = owner.chatCoord {
+                    chatCoord.showLocation(location: entity)
+                }
             }
             .disposed(by: disposeBag)
         
         tableView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
-                owner.homeCoord?.showDetail(with: entity)
+                if let homeCoord = owner.homeCoord {
+                    homeCoord.showDetail(with: entity)
+                } else if let chatCoord = owner.chatCoord {
+                    chatCoord.showDetail(with: entity)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -117,6 +129,8 @@ final class ListViewController: BaseViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationButton)
         homeCoord?.errorDelegate = self
         homeCoord?.locationDelegate = self
+        chatCoord?.errorDelegate = self
+        chatCoord?.locationDelegate = self
         
         tableView.backgroundColor = .white
         tableView.separatorStyle = .none
@@ -139,7 +153,6 @@ final class ListViewController: BaseViewController {
 extension ListViewController: ErrorDelegate, LocationDelegate {
     
     func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
-        print("위치 변경: \(locationEntity.city), 좌표: \(String(describing: locationEntity.location))")
         locationButton.configure(locationEntity)
         output.homeResult.accept([])
         viewModel.resetPage()

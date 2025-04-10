@@ -11,7 +11,8 @@ final class ChatCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
-    weak var delegate: ErrorDelegate?
+    weak var errorDelegate: ErrorDelegate?
+    weak var locationDelegate: LocationDelegate?
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -44,6 +45,14 @@ final class ChatCoordinator: Coordinator {
         }
     }
     
+    func showDetail(with entity: HomeEntity) {
+        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
+            let detailVC = DetailViewController(viewModel: detailVM)
+            detailVC.chatCoord = self
+            navigationController.pushViewController(detailVC, animated: true)
+        }
+    }
+    
     func showError(error: Error) {
         let errorVM = ErrorViewModel(notiType: .chat)
         let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
@@ -51,6 +60,14 @@ final class ChatCoordinator: Coordinator {
         errorVC.delegate = self
         errorVC.modalPresentationStyle = .overCurrentContext
         navigationController.present(errorVC, animated: true)
+    }
+    
+    func showLocation(location: LocationViewModel.LocationEntity) {
+        let locationVC = LocationPopupViewController(userLocation: location)
+        locationVC.modalPresentationStyle = .overCurrentContext
+        locationVC.modalTransitionStyle = .crossDissolve
+        locationVC.delegate = self
+        navigationController.present(locationVC, animated: true)
     }
     
     func finish() {
@@ -63,12 +80,16 @@ final class ChatCoordinator: Coordinator {
     }
 }
 
-extension ChatCoordinator: ErrorDelegate {
+extension ChatCoordinator: ErrorDelegate, LocationDelegate {
+    
+    func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
+        locationDelegate?.reloadLoaction(locationEntity)
+    }
     
     func reloadNetwork(type: ErrorSenderType) {
         switch type {
         case .chat:
-            delegate?.reloadNetwork(type: .chat)
+            errorDelegate?.reloadNetwork(type: .chat)
         default:
             break
         }

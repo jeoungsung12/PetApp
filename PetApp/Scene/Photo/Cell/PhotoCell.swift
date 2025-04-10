@@ -14,10 +14,20 @@ final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
     private let imageView = UIImageView()
     private let descriptionLabel = UILabel()
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+        imageView.contentMode = .scaleAspectFill
+    }
+    
     override func configureView() {
         imageView.layer.cornerRadius = 5
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.tintColor = .customLightGray
+        imageView.backgroundColor = .systemGray5
+        imageView.layer.borderWidth = 0.3
+        imageView.layer.borderColor = UIColor.customLightGray.cgColor
         
         descriptionLabel.font = .largeBold
         descriptionLabel.numberOfLines = 2
@@ -50,31 +60,17 @@ final class PhotoCell: BaseCollectionViewCell, ReusableIdentifier {
         }
         descriptionLabel.text = "\(model.animal.name)\n\(model.animal.age)-\(model.animal.weight)"
         imageView.kf.setImage(with: url) { [weak self] result in
-            guard let self = self else { return }
             switch result {
             case .success(let value):
                 let aspectRatio = value.image.size.height / value.image.size.width
                 completion?(aspectRatio)
-                self.layoutIfNeeded()
+                self?.layoutIfNeeded()
             case .failure(let error):
                 print("이미지 로드 실패: \(error)")
+                self?.imageView.image = .noImage
+                self?.imageView.contentMode = .scaleAspectFit
                 completion?(1.0)
             }
         }
-//        imageView.snSetImage(
-//            with: url,
-//            storageOption: .hybrid,
-//            processingOption: .downsample(CGSize(width: 180, height: 180))
-//        ) { result in
-//            switch result {
-//            case .success(let value):
-//                let aspectRatio = value.size.height / value.size.width
-//                completion?(aspectRatio)
-//                self.layoutIfNeeded()
-//            case .failure(let error):
-//                print("이미지 로드 실패: \(error)")
-//                completion?(1.0)
-//            }
-//        }
     }
 }
