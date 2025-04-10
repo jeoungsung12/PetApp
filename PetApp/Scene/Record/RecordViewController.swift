@@ -15,7 +15,7 @@ final class RecordViewController: BaseViewController {
     private let searchBar = UISearchBar()
     private let tableView = UITableView()
     private let writeButton = IconLabelButton()
-    
+    private let isLogo: Bool
     private let viewModel: RecordViewModel
     private lazy var input = RecordViewModel.Input(
         loadTrigger: PublishRelay(),
@@ -25,7 +25,11 @@ final class RecordViewController: BaseViewController {
     
     weak var recordCoordinator: RecordCoordinator?
     weak var mypageCoordinator: MyPageCoordinator?
-    init(viewModel: RecordViewModel) {
+    init(
+        isLogo: Bool,
+        viewModel: RecordViewModel
+    ) {
+        self.isLogo = isLogo
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -73,7 +77,7 @@ final class RecordViewController: BaseViewController {
     }
     
     override func configureView() {
-        self.setNavigation(logo: true)
+        self.setNavigation(logo: isLogo)
         self.view.backgroundColor = .customWhite
         searchBar.searchBarStyle = .minimal
         searchBar.placeholder = "검색어를 입력하세요!"

@@ -45,7 +45,7 @@ final class MyPageCoordinator: Coordinator {
     
     func showRecord() {
         if let recordVM = DIContainer.shared.resolveFactory(type: RecordViewModel.self) {
-            let recordVC = RecordViewController(viewModel: recordVM)
+            let recordVC = RecordViewController(isLogo: false, viewModel: recordVM)
             recordVC.mypageCoordinator = self
             navigationController.pushViewController(recordVC, animated: true)
         }

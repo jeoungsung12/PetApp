@@ -21,7 +21,7 @@ final class RecordCoordinator: Coordinator {
     
     func start() {
         if let recordVM = DIContainer.shared.resolveFactory(type: RecordViewModel.self) {
-            let recordVC = RecordViewController(viewModel: recordVM)
+            let recordVC = RecordViewController(isLogo: true, viewModel: recordVM)
             recordVC.recordCoordinator = self
             navigationController.pushViewController(recordVC, animated: false)
         }
