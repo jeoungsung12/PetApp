@@ -12,11 +12,23 @@ import RxCocoa
 
 final class LikeViewController: BaseViewController {
     private let tableView = UITableView()
-    private let viewModel = LikeViewModel()
+    private let viewModel: LikeViewModel
     private let input = LikeViewModel.Input(
         loadTrigger: PublishRelay()
     )
     private var disposeBag = DisposeBag()
+    
+    weak var homeCoord: HomeCoordinator?
+    weak var mypageCoord: MyPageCoordinator?
+    init(viewModel: LikeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -38,9 +50,11 @@ final class LikeViewController: BaseViewController {
         
         tableView.rx.modelSelected(HomeEntity.self)
             .bind(with: self) { owner, entity in
-                let vm = DetailViewModel(model: entity)
-                let vc = DetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                if let homeCoord = owner.homeCoord {
+                    homeCoord.showDetail(with: entity)
+                } else if let mypageCoord = owner.mypageCoord {
+                    mypageCoord.showDetail(with: entity)
+                }
             }
             .disposed(by: disposeBag)
     }

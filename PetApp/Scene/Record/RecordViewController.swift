@@ -16,12 +16,24 @@ final class RecordViewController: BaseViewController {
     private let tableView = UITableView()
     private let writeButton = IconLabelButton()
     
-    private let viewModel = RecordViewModel()
+    private let viewModel: RecordViewModel
     private lazy var input = RecordViewModel.Input(
         loadTrigger: PublishRelay(),
         searchText: PublishRelay()
     )
     private var disposeBag = DisposeBag()
+    
+    weak var recordCoordinator: RecordCoordinator?
+    weak var mypageCoordinator: MyPageCoordinator?
+    init(viewModel: RecordViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -34,7 +46,7 @@ final class RecordViewController: BaseViewController {
         
         writeButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.navigationController?.pushViewController(WriteViewController(), animated: true)
+                owner.recordCoordinator?.showWrite()
             }
             .disposed(by: disposeBag)
         
@@ -101,6 +113,10 @@ final class RecordViewController: BaseViewController {
             make.horizontalEdges.equalToSuperview()
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }
 
 extension RecordViewController: RemoveDelegate {
@@ -115,12 +131,13 @@ extension RecordViewController: RemoveDelegate {
     }
     
     func remove() {
-        self.customAlert(
-            "게시글 삭제",
-            "확인을 누르시면 영구적으로 게시글이 삭제됩니다. 삭제하시겠습니까?",
-            [.Ok, .Cancel]
-        ) { [weak self] in
-            self?.input.loadTrigger.accept(())
-        }
+        self.recordCoordinator?.showAlert(
+            title: "게시글 삭제",
+            message: "확인을 누르시면 영구적으로 게시글이 삭제됩니다. 삭제하시겠습니까?",
+            actions: [.Ok, .Cancel],
+            completion: { [weak self] in
+                self?.input.loadTrigger.accept(())
+            }
+        )
     }
 }

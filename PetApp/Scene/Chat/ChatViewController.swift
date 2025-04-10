@@ -15,12 +15,23 @@ final class ChatViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
     private let chatImageView = UIImageView()
     
-    private let viewModel = ChatViewModel()
+    private let viewModel: ChatViewModel
     private lazy var input = ChatViewModel.Input(
-        loadTrigger: Observable.just(()),
+        loadTrigger: PublishRelay(),
         reloadRealm: PublishRelay()
     )
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: ChatCoordinator?
+    init(viewModel: ChatViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +46,7 @@ final class ChatViewController: BaseViewController {
     
     override func setBinding() {
         let output = viewModel.transform(input)
+        input.loadTrigger.accept(())
         LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { [weak self] dataSource, collectionView, indexPath, item in
@@ -69,6 +81,12 @@ final class ChatViewController: BaseViewController {
             return headerView
         }
         
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
+            }
+            .disposed(by: disposeBag)
+        
         let result = output.homeResult
         
         result
@@ -89,10 +107,7 @@ final class ChatViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.coordinator?.showError(error: error)
             }
             .disposed(by: disposeBag)
         
@@ -103,12 +118,9 @@ final class ChatViewController: BaseViewController {
         .observe(on: MainScheduler.instance)
         .bind(with: self) { owner, selected in
             if let data = selected.1.data {
-                let vm = ChatDetailViewModel(entity: data)
-                let vc = ChatDetailViewController(viewModel: vm)
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showChatDetail(with: data)
             } else {
-                let vc = ListViewController()
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showList()
             }
         }
         .disposed(by: disposeBag)
@@ -117,7 +129,7 @@ final class ChatViewController: BaseViewController {
     override func configureView() {
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
-        
+        coordinator?.errorDelegate = self
         chatImageView.contentMode = .scaleAspectFit
         
         collectionView.backgroundColor = .customWhite
@@ -146,9 +158,17 @@ final class ChatViewController: BaseViewController {
             make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
 }
 
-extension ChatViewController {
+extension ChatViewController: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        input.loadTrigger.accept(())
+    }
     
     private func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in

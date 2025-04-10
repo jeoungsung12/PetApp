@@ -16,7 +16,7 @@ final class PlayerViewModel: BaseViewModel {
         let end: Int
     }
     
-    private let repository: NetworkRepositoryType = NetworkRepository()
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var playerRequest: PlayerRequest?
     
@@ -29,6 +29,12 @@ final class PlayerViewModel: BaseViewModel {
         let videoResult: BehaviorRelay<[PlayerEntity]>
     }
     
+    init(
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
+    }
+    
 }
 
 extension PlayerViewModel {
@@ -38,6 +44,7 @@ extension PlayerViewModel {
         let errorResult = PublishRelay<OpenSquareError>()
         
         input.loadTrigger
+            .compactMap { $0 }
             .withUnretained(self)
             .flatMapLatest { owner, request -> Single<[PlayerEntity]> in
                 return Single<[PlayerEntity]>.create { single in
@@ -48,7 +55,7 @@ extension PlayerViewModel {
                                 start: request.start,
                                 end: request.end
                             )
-                            single(.success(owner.AppendOriginValue(videoResult, result)))
+                            single(.success(owner.AppendOriginValue(videoResult, result.shuffled())))
                         } catch {
                             if let openSquareError = error as? OpenSquareError {
                                 errorResult.accept(openSquareError)
@@ -63,8 +70,6 @@ extension PlayerViewModel {
             }
             .bind(to: videoResult)
             .disposed(by: disposeBag)
-        
-        
         
         return Output(
             errorResult: errorResult.asDriver(onErrorJustReturn: OpenSquareError.serverError),

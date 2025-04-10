@@ -14,7 +14,7 @@ import RxSwift
 import RxCocoa
 
 final class WriteViewController: BaseViewController {
-    private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tabGestureAction))
+    private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
     private let saveButton = UIBarButtonItem(title: "저장", style: .plain, target: nil, action: nil)
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -26,8 +26,19 @@ final class WriteViewController: BaseViewController {
     private let descriptionTextView = UITextView()
     private let descriptionLabel = UILabel()
     
-    private let viewModel = WriteViewModel()
+    private let viewModel: WriteViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: RecordCoordinator?
+    init(viewModel: WriteViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private lazy var picker = YPImagePicker(configuration: self.configurePicker())
     private var selectedImages = BehaviorRelay<[UIImage]>(value: [])

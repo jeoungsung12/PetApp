@@ -75,7 +75,10 @@ fileprivate class IconAttributeView: BaseView {
         iconImageView.layer.cornerRadius = 40
         iconImageView.layer.borderWidth = 2
         iconImageView.layer.borderColor = UIColor.point.cgColor
-        iconImageView.tintColor = UIColor.customLightGray
+        iconImageView.tintColor = .customLightGray
+        iconImageView.backgroundColor = .systemGray5
+        iconImageView.layer.borderWidth = 0.3
+        iconImageView.layer.borderColor = UIColor.customLightGray.cgColor
         
         titleLabel.font = .largeBold
         titleLabel.numberOfLines = 2
@@ -109,7 +112,16 @@ fileprivate class IconAttributeView: BaseView {
                 with: url,
                 storageOption: .hybrid,
                 processingOption: .downsample(CGSize(width: 80, height: 80))
-            )
+            ) { [weak self] result in
+                switch result {
+                case .success(let image):
+                    print("이미지 로드 성공 \(image)")
+                case .failure(let error):
+                    print("이미지 로드 에러 \(error), \(url)")
+                    self?.iconImageView.image = .noImage
+                    self?.iconImageView.contentMode = .scaleAspectFit
+                }
+            }
 //            iconImageView.kf.setImage(with: url)
         }
         

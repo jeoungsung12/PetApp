@@ -14,8 +14,22 @@ final class PlayerViewController: BaseViewController {
     private lazy var tabBarHeight = tabBarController?.tabBar.frame.height ?? 0
     private lazy var naviHeight = navigationController?.navigationBar.frame.height ?? 0
     private let tableView = UITableView()
-    private let viewModel = PlayerViewModel()
+    private let viewModel: PlayerViewModel
+    private let input = PlayerViewModel.Input(
+        loadTrigger: PublishRelay()
+    )
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: PlayerCoordinator?
+    init(viewModel: PlayerViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,12 +42,15 @@ final class PlayerViewController: BaseViewController {
     }
     
     override func setBinding() {
-        let input = PlayerViewModel.Input(
-            loadTrigger: PublishRelay()
-        )
         let output = viewModel.transform(input)
         input.loadTrigger.accept(.init(start: 1, end: 10))
         LoadingIndicator.showLoading()
+        
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
+            }
+            .disposed(by: disposeBag)
         
         let result = output.videoResult.asDriver(onErrorJustReturn: [])
         
@@ -52,10 +69,7 @@ final class PlayerViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.coordinator?.showError(error: error)
             }
             .disposed(by: disposeBag)
         
@@ -66,7 +80,7 @@ final class PlayerViewController: BaseViewController {
                    (output.videoResult.value.count - 2) < lastIndex
                 {
                     LoadingIndicator.showLoading()
-                    input.loadTrigger.accept(.init(start: 1 + request.end, end: request.end + 10))
+                    owner.input.loadTrigger.accept(.init(start: 1 + request.end, end: request.end + 10))
                 }
             }
             .disposed(by: disposeBag)
@@ -97,6 +111,7 @@ final class PlayerViewController: BaseViewController {
     override func configureView() {
         self.setNavigation(logo: true, color: .customBlack)
         self.view.backgroundColor = .customBlack
+        coordinator?.delegate = self
         tableView.separatorStyle = .none
         tableView.backgroundColor = .customBlack
         tableView.isPagingEnabled = true
@@ -116,4 +131,17 @@ final class PlayerViewController: BaseViewController {
             make.bottom.equalToSuperview().inset(tabBarHeight)
         }
     }
+    
+    deinit {
+        print(#function, self)
+    }
+}
+
+extension PlayerViewController: ErrorDelegate {
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        guard let request = viewModel.playerRequest else { return }
+        input.loadTrigger.accept((request))
+    }
+    
 }

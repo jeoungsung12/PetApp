@@ -12,8 +12,19 @@ import RxCocoa
 
 final class FAQViewController: BaseViewController {
     private var tableView = UITableView()
-    private let viewModel = FAQViewModel()
+    private let viewModel: FAQViewModel
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: MyPageCoordinator?
+    init(viewModel: FAQViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

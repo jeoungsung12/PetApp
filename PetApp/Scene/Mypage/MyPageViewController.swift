@@ -19,13 +19,24 @@ final class MyPageViewController: BaseViewController {
     private let listBoxsButton = MypageItemButton(type: MyPageCategoryType.writeList)
     private let changeProfileButton = MypageItemButton(type: MyPageCategoryType.profile)
     
-    private let viewModel = MyPageViewModel()
+    private let viewModel: MyPageViewModel
     let inputTrigger = MyPageViewModel.Input(
         profileTrigger: PublishRelay<Void>(),
         listBtnTrigger: PublishRelay<MyPageViewModel.MyPageButtonType>(),
         categoryBtnTrigger: PublishRelay<MyPageCategoryType>()
     )
     private var disposeBag = DisposeBag()
+    
+    weak var coordinator: MyPageCoordinator?
+    init(viewModel: MyPageViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,20 +61,14 @@ final class MyPageViewController: BaseViewController {
             .drive(with: self) { owner, type in
                 switch type {
                 case .oftenQS:
-                    owner.navigationController?.pushViewController(FAQViewController(), animated: true)
+                    owner.coordinator?.showFAQ()
                 case .feedback:
-                    if let url = URL(string: DataDreamRouter.feedBackURL) {
-                        UIApplication.shared.open(url)
-                    }
+                    owner.coordinator?.openFeedbackURL(urlString: DataDreamRouter.feedBackURL)
                 case .withdraw:
-                    owner.customAlert(
-                        "탈퇴하기",
-                        "탈퇴를 하시면 저장된 모든 데이터가 삭제됩니다. 계속하시겠습니까?",
-                        [.Ok, .Cancel]
-                    ) {
+                    owner.coordinator?.showAlert(title: "탈퇴하기", message: "탈퇴를 하시면 저장된 모든 데이터가 삭제됩니다. 계속하시겠습니까?", actions: [.Ok, .Cancel], completion: {
                         owner.viewModel.removeUserInfo()
-                        owner.setRootView(UINavigationController(rootViewController: ProfileViewController()))
-                    }
+                        owner.coordinator?.navigateToLogin()
+                    })
                 }
             }.disposed(by: disposeBag)
         
@@ -71,13 +76,11 @@ final class MyPageViewController: BaseViewController {
             .drive(with: self, onNext: { owner, type in
                 switch type {
                 case .likeBox:
-                    owner.navigationController?.pushViewController(LikeViewController(), animated: true)
+                    owner.coordinator?.showLike()
                 case .writeList:
-                    owner.navigationController?.pushViewController(RecordViewController(), animated: true)
+                    owner.coordinator?.showRecord()
                 case .profile:
-                    let vc = UINavigationController(rootViewController: SheetProfileViewController())
-                    vc.modalPresentationStyle = .fullScreen
-                    owner.present(vc, animated: true)
+                    owner.coordinator?.showProfileEdit()
                 }
             }).disposed(by: disposeBag)
         

@@ -17,17 +17,22 @@ enum ChatSectionType: CaseIterable {
 }
 
 final class ChatViewModel: BaseViewModel {
-    private let realmRepo: RealmRepositoryType = RealmRepository.shared
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let realmRepo: RealmRepositoryType
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private var likedEntities: [HomeEntity] = []
     
-    init() {
+    init(
+        realmRepo: RealmRepositoryType? = nil,
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.realmRepo = realmRepo ?? DIContainer.shared.resolve(type: RealmRepository.self)!
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepository.self)!
         loadRealm()
     }
     
     struct Input {
-        let loadTrigger: Observable<Void>
+        let loadTrigger: PublishRelay<Void>
         let reloadRealm: PublishRelay<Void>
     }
     
@@ -85,7 +90,7 @@ final class ChatViewModel: BaseViewModel {
     }
     
     private func fetchData() async throws -> [HomeSection] {
-        let result = try await repository.getAnimal(1)
+        let result = try await repository.getAnimal(1, regionCode: nil)
         
         return [
             HomeSection(title: "지금 도움이 필요한\n친구들과 대화해 보세요 💬", items: result.map {

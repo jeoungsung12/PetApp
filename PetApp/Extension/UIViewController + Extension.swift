@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 extension UIViewController {
     
@@ -15,13 +17,23 @@ extension UIViewController {
     }
     
     @objc
-    func tabGestureAction() {
+    func dismissKeyboard() {
         self.view.endEditing(true)
     }
     
-    func setRootView(_ rootVC: UIViewController) {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else { return }
-        window.rootViewController = rootVC
+    func showSettingsAlert(title: String, message: String) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL)
+            }
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        present(alert, animated: true)
     }
     
     func customAlert(_ title: String = "",_ message: String = "",_ action: [AlertType] = [.Ok],_ method: @escaping () -> Void) {

@@ -15,11 +15,12 @@ final class ChatDetailViewController: BaseViewController {
     private let containerView = UIView()
     private let tableView = UITableView()
     private let keyboardView = ChatKeyboardView()
-    private lazy var tabGesture = UITapGestureRecognizer(target: self, action: #selector(tabGestureAction))
+    private lazy var tabGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     
     private let viewModel: ChatDetailViewModel
     private var disposeBag = DisposeBag()
     
+    weak var coordinator: ChatCoordinator?
     init(viewModel: ChatDetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)

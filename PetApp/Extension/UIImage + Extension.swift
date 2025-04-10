@@ -16,7 +16,6 @@ enum ImageSubscription: String {
     case map
     case photo = "photo.badge.plus"
     case paperplane
-    
     case magnifyingglass
     case archivebox
     case arrowRight = "chevron.right"
@@ -24,6 +23,7 @@ enum ImageSubscription: String {
     case heart
     case heartFill = "heart.fill"
     case share = "square.and.arrow.up"
+    case noImage = "photo.badge.exclamationmark"
 }
 
 extension UIImage {
@@ -36,9 +36,6 @@ extension UIImage {
     static let mapImage = UIImage(systemName: ImageSubscription.map.rawValue)
     static let photoImage = UIImage(systemName: ImageSubscription.photo.rawValue)
     static let paperplaneImage = UIImage(systemName: ImageSubscription.paperplane.rawValue)
-}
-
-extension UIImage {
     static let magnifyingglassImage = UIImage(systemName: ImageSubscription.magnifyingglass.rawValue)
     static let archiveboxImage = UIImage(systemName: ImageSubscription.archivebox.rawValue)
     static let arrowRight = UIImage(systemName: ImageSubscription.arrowRight.rawValue)
@@ -46,22 +43,5 @@ extension UIImage {
     static let heartImage = UIImage(systemName: ImageSubscription.heart.rawValue)
     static let heartFillImage = UIImage(systemName: ImageSubscription.heartFill.rawValue)
     static let shareImage = UIImage(systemName: ImageSubscription.share.rawValue)
-}
-
-extension UIImage {
-    
-    func downSampling(scale: CGFloat) -> UIImage {
-        let data = self.pngData()! as CFData
-        let imageSource = CGImageSourceCreateWithData(data, nil)!
-        let maxPixel = max(self.size.width, self.size.height) * scale
-        let options = [
-            kCGImageSourceThumbnailMaxPixelSize: maxPixel,
-            kCGImageSourceCreateThumbnailFromImageAlways: true
-            
-        ] as CFDictionary
-        
-        let scaledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options)!
-//        print(scaledImage)
-        return UIImage(cgImage: scaledImage)
-    }
+    static let noImage = UIImage(systemName: ImageSubscription.noImage.rawValue)
 }

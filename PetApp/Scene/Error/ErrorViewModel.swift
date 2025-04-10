@@ -27,7 +27,6 @@ final class ErrorViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     
     var notiType: ErrorSenderType
-    weak var delegate: ErrorDelegate?
     struct Input {
         let reloadTrigger: ControlEvent<Void>
     }
@@ -53,7 +52,6 @@ extension ErrorViewModel {
                 case .network:
                     return owner.checkNetwork()
                 default:
-                    owner.setDelegate()
                     return Observable.just((owner.notiType))
                 }
             }
@@ -63,10 +61,6 @@ extension ErrorViewModel {
         return Output(
             networkReloadTrigger: networkReload.asDriver(onErrorJustReturn: .network)
         )
-    }
-    
-    private func setDelegate() {
-        delegate?.reloadNetwork(type: notiType)
     }
     
     private func checkNetwork() -> Observable<ErrorSenderType> {

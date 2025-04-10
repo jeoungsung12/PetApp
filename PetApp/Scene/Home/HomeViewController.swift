@@ -11,9 +11,24 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 final class HomeViewController: BaseViewController {
-    private let viewModel = HomeViewModel()
+    private let viewModel: HomeViewModel
+    private let locationButton = LocationButton()
     private let disposeBag = DisposeBag()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    
+    weak var coordinator: HomeCoordinator?
+    private let input = HomeViewModel.Input(
+        loadTrigger: PublishRelay<Void>()
+    )
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -26,10 +41,8 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setBinding() {
-        let input = HomeViewModel.Input(
-            loadTrigger: Observable.just(())
-        )
         let output = viewModel.transform(input)
+        input.loadTrigger.accept(())
         LoadingIndicator.showLoading()
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<HomeSection> { dataSource, collectionView, indexPath, item in
@@ -90,22 +103,24 @@ final class HomeViewController: BaseViewController {
                     case .middle,
                             .middlePhoto,
                             .footer:
-                        let vm = DetailViewModel(model: data)
-                        let vc = DetailViewController(viewModel: vm)
-                        owner.navigationController?.pushViewController(vc, animated: true)
+                        owner.coordinator?.showDetail(with: data)
                     default:
                         break
                     }
                 } else {
                     switch HomeSectionType.allCases[selected.0.section] {
                     case .middleBtn:
-                        let mapVM = MapViewModel(mapType: .shelter)
-                        let mapVC = MapViewController(viewModel: mapVM)
-                        owner.navigationController?.pushViewController(mapVC, animated: true)
+                        owner.coordinator?.showMap(mapType: .shelter)
                     default:
                         break
                     }
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        input.loadTrigger
+            .bind(with: self) { owner, _ in
+                LoadingIndicator.showLoading()
             }
             .disposed(by: disposeBag)
         
@@ -123,10 +138,7 @@ final class HomeViewController: BaseViewController {
         
         output.errorResult
             .drive(with: self) { owner, error in
-                let errorVM = ErrorViewModel(notiType: .player)
-                let errorVC = ErrorViewController(viewModel: errorVM, errorType: error)
-                errorVC.modalPresentationStyle = .overCurrentContext
-                owner.present(errorVC, animated: true)
+                owner.coordinator?.showError(error: error)
             }
             .disposed(by: disposeBag)
     }
@@ -144,39 +156,43 @@ final class HomeViewController: BaseViewController {
     
     override func configureView() {
         self.setNavigation(logo: true)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: locationButton)
         view.backgroundColor = .customWhite
         configureCollectionView()
+        coordinator?.errorDelegate = self
+    }
+    
+    deinit {
+        print(#function, self)
     }
 }
 
-extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
+extension HomeViewController: MoreBtnDelegate, CategoryDelegate, ErrorDelegate {
     
     func moreBtnTapped(_ type: HomeSectionType) {
-        //TODO: Coordinator
         switch type {
         case .middlePhoto:
-            self.navigationController?.pushViewController(PhotoViewController(), animated: true)
+            self.coordinator?.showPhoto()
         default:
-            self.navigationController?.pushViewController(ListViewController(), animated: true)
+            self.coordinator?.showList()
         }
     }
     
     func didTapCategory(_ type: CategoryType) {
-        //TODO: Coordinator
         switch type {
         case .shelter:
-            let mapVM = MapViewModel(mapType: .shelter)
-            let mapVC = MapViewController(viewModel: mapVM)
-            self.navigationController?.pushViewController(mapVC, animated: true)
+            self.coordinator?.showMap(mapType: .shelter)
         case .hospital:
-            let mapVM = MapViewModel(mapType: .hospital)
-            let mapVC = MapViewController(viewModel: mapVM)
-            self.navigationController?.pushViewController(mapVC, animated: true)
+            self.coordinator?.showMap(mapType: .hospital)
         case .heart:
-            self.navigationController?.pushViewController(LikeViewController(), animated: true)
+            self.coordinator?.showLike()
         case .sponsor:
-            self.navigationController?.pushViewController(SponsorViewController(), animated: true)
+            self.coordinator?.showSponsor()
         }
+    }
+    
+    func reloadNetwork(type: ErrorSenderType) {
+        input.loadTrigger.accept(())
     }
     
     private func configureCollectionView() {
@@ -232,7 +248,7 @@ extension HomeViewController: MoreBtnDelegate, CategoryDelegate {
             
             let headerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(20)
+                heightDimension: .absolute(50)
             )
             let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: headerSize,

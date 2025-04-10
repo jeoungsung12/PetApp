@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 
 final class ProfileViewController: BaseViewController {
-    private lazy var hideGesture = UITapGestureRecognizer(target: self, action: #selector(self.tabGestureAction))
+    private lazy var hideGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
     private let profileButton = CustomProfileButton(120, true)
     private let nameTextField = UITextField()
     private let spacingView = UIView()
@@ -20,7 +20,7 @@ final class ProfileViewController: BaseViewController {
     private let successButton = UIButton()
     private var profileImage: String?
     
-    private let viewModel = ProfileViewModel()
+    private let viewModel: ProfileViewModel
     private var inputTrigger = ProfileViewModel.Input(
         configureViewTrigger: PublishSubject<Void>(),
         nameTextFieldTrigger: PublishSubject<String?>(),
@@ -30,8 +30,15 @@ final class ProfileViewController: BaseViewController {
     
     private var disposeBag = DisposeBag()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    weak var coordinator: ProfileCoordinator?
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -58,8 +65,8 @@ final class ProfileViewController: BaseViewController {
         output.successButtonResult
             .drive(with: self, onNext: { owner, valid in
                 if let valid = valid, valid {
-                    let rootVC = TabBarController()
-                    owner.setRootView(rootVC)
+                    owner.navigationController?.isNavigationBarHidden = true
+                    owner.coordinator?.navigateToTabBar()
                 }
             }).disposed(by: disposeBag)
         
@@ -89,10 +96,7 @@ final class ProfileViewController: BaseViewController {
         
         profileButton.rx.tap
             .bind(with: self) { owner, _ in
-                let vc = ProfileImageViewController()
-                vc.profileImage = owner.profileImage
-                vc.profileDelegate = owner
-                owner.navigationController?.pushViewController(vc, animated: true)
+                owner.coordinator?.showProfileImageSelection(currentImage: owner.profileImage, delegate: owner)
             }
             .disposed(by: disposeBag)
         

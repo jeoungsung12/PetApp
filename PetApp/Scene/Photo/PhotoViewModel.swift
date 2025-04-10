@@ -10,9 +10,11 @@ import RxSwift
 import RxCocoa
 
 final class PhotoViewModel: BaseViewModel {
-    private let repository: NetworkRepositoryType = NetworkRepository.shared
+    private let locationRepo: LocationRepositoryType
+    private let repository: NetworkRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var page: Int = 1
+    private var locationCode: Int?
     
     struct Input {
         let loadTrigger: PublishRelay<Int>
@@ -21,6 +23,14 @@ final class PhotoViewModel: BaseViewModel {
     struct Output {
         let homeResult: BehaviorRelay<[HomeEntity]>
         let errorResult: Driver<DataDreamError>
+    }
+    
+    init(
+        locationRepo: LocationRepositoryType? = nil,
+        repository: NetworkRepositoryType? = nil
+    ) {
+        self.locationRepo = locationRepo ?? DIContainer.shared.resolve(type: LocationRepositoryType.self)!
+        self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
     }
 }
 
@@ -63,7 +73,7 @@ extension PhotoViewModel {
     
     private func fetchData(_ value: [HomeEntity], _ page: Int) async throws -> [HomeEntity] {
         do {
-            let result = try await repository.getAnimal(page)
+            let result = try await repository.getAnimal(page, regionCode: nil)
             return value + result
         } catch {
             throw error
