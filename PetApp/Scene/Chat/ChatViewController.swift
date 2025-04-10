@@ -129,7 +129,7 @@ final class ChatViewController: BaseViewController {
     override func configureView() {
         setNavigation(logo: true)
         view.backgroundColor = .customWhite
-        coordinator?.delegate = self
+        coordinator?.errorDelegate = self
         chatImageView.contentMode = .scaleAspectFit
         
         collectionView.backgroundColor = .customWhite

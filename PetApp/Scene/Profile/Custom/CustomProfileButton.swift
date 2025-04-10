@@ -18,6 +18,7 @@ final class CustomProfileButton: UIButton {
         super.init(frame: .zero)
         isItemSelected = isSelected
         configureView(size)
+        self.isUserInteractionEnabled = true
     }
     
     required init?(coder: NSCoder) {

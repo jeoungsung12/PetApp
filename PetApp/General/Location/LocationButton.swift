@@ -8,6 +8,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import CoreLocation
 
 final class LocationButton: BaseButton {
     private let iconImageView = UIImageView()
@@ -30,8 +31,7 @@ final class LocationButton: BaseButton {
             loadTrigger: loadTrigger
         )
         let output = viewModel.transform(input)
-        loadTrigger.accept(())
-        loadingIndicator.startAnimating()
+        checkLocationPermission()
         
         loadTrigger.asDriver(onErrorJustReturn: ())
             .drive(with: self) { owner, _ in
@@ -50,6 +50,46 @@ final class LocationButton: BaseButton {
                 }
             }
             .disposed(by: disposeBag)
+        
+        viewModel.locationManager.authorizationStatus
+            .bind(with: self, onNext: { owner, status in
+                owner.handleAuthorizationStatus(status)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func checkLocationPermission() {
+        let status = CLLocationManager.authorizationStatus()
+        handleAuthorizationStatus(status)
+    }
+    
+    private func handleAuthorizationStatus(_ status: CLAuthorizationStatus) {
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
+            loadTrigger.accept(())
+        case .denied, .restricted:
+            loadingIndicator.stopAnimating()
+            let entity = LocationViewModel.LocationEntity(city: "전국", location: nil)
+            subTitleLabel.text = "전국"
+            viewModel.updateLocation(entity)
+            
+            if !hasEmittedLocation {
+                hasEmittedLocation = true
+                locationReadySubject.onNext(entity)
+            }
+        case .notDetermined:
+            loadingIndicator.startAnimating()
+        default:
+            loadingIndicator.stopAnimating()
+            let entity = LocationViewModel.LocationEntity(city: "전국", location: nil)
+            subTitleLabel.text = "전국"
+            viewModel.updateLocation(entity)
+            
+            if !hasEmittedLocation {
+                hasEmittedLocation = true
+                locationReadySubject.onNext(entity)
+            }
+        }
     }
     
     override func configureView() {

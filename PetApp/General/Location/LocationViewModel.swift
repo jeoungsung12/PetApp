@@ -10,7 +10,7 @@ import RxCocoa
 import CoreLocation
 
 final class LocationViewModel: BaseViewModel {
-    private var locationManager: LocationRepositoryType
+    private(set) var locationManager: LocationRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var coord2D: CLLocationCoordinate2D? = nil
     private(set) var currentLocationEntity = BehaviorRelay<LocationEntity>(value: LocationEntity(city: "전국", location: nil))
@@ -70,6 +70,14 @@ extension LocationViewModel {
         
         input.loadTrigger
             .bind(with: self, onNext: { owner, _ in
+                let authStatus = CLLocationManager.authorizationStatus()
+                if authStatus == .denied || authStatus == .restricted {
+                    let entity = LocationEntity(city: "전국", location: nil)
+                    owner.currentLocationEntity.accept(entity)
+                    locationResult.accept(entity)
+                    return
+                }
+                
                 if let currentLocation = owner.locationManager.currentLocation.value {
                     owner.getUserLocation { city in
                         let entity = LocationEntity(city: city, location: currentLocation)
