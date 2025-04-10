@@ -13,6 +13,7 @@ final class LocationViewModel: BaseViewModel {
     private var locationManager: LocationRepositoryType
     private var disposeBag = DisposeBag()
     private(set) var coord2D: CLLocationCoordinate2D? = nil
+    private(set) var currentLocationEntity = BehaviorRelay<LocationEntity>(value: LocationEntity(city: "전국", location: nil))
     
     struct LocationEntity {
         var city: String
@@ -33,6 +34,11 @@ final class LocationViewModel: BaseViewModel {
         self.locationManager = locationManager ?? DIContainer.shared.resolve(type: LocationRepositoryType.self)!
         self.locationManager.requestLocationAuthorization()
     }
+    
+    func updateLocation(_ entity: LocationEntity) {
+        self.coord2D = entity.location
+        currentLocationEntity.accept(entity)
+    }
 }
 
 extension LocationViewModel {
@@ -44,8 +50,8 @@ extension LocationViewModel {
                 return status == .authorizedWhenInUse || status == .authorizedAlways
             }
             .take(1)
-            .subscribe(onNext: { [weak self] _ in
-                self?.locationManager.startUpdatingLocation(forceUpdate: true)
+            .bind(with: self, onNext: { owner, status in
+                owner.locationManager.startUpdatingLocation(forceUpdate: true)
             })
             .disposed(by: disposeBag)
         
@@ -54,8 +60,10 @@ extension LocationViewModel {
             .take(1)
             .bind(with: self, onNext: { owner, coordinate in
                 owner.getUserLocation { city in
+                    let entity = LocationEntity(city: city, location: coordinate)
                     owner.coord2D = coordinate
-                    locationResult.accept(.init(city: city, location: coordinate))
+                    owner.currentLocationEntity.accept(entity)
+                    locationResult.accept(entity)
                 }
             })
             .disposed(by: disposeBag)
@@ -64,18 +72,22 @@ extension LocationViewModel {
             .bind(with: self, onNext: { owner, _ in
                 if let currentLocation = owner.locationManager.currentLocation.value {
                     owner.getUserLocation { city in
+                        let entity = LocationEntity(city: city, location: currentLocation)
                         owner.coord2D = currentLocation
-                        locationResult.accept(.init(city: city, location: currentLocation))
+                        owner.currentLocationEntity.accept(entity)
+                        locationResult.accept(entity)
                     }
                 } else {
-                    locationResult.accept(.init(city: "전국", location: nil))
+                    let entity = LocationEntity(city: "전국", location: nil)
+                    owner.currentLocationEntity.accept(entity)
+                    locationResult.accept(entity)
                 }
             })
             .disposed(by: disposeBag)
         
         return Output(
             locationResult: locationResult.asDriver(
-                onErrorJustReturn: .init(city: "전국", location: nil)
+                onErrorJustReturn: LocationEntity(city: "전국", location: nil)
             )
         )
     }

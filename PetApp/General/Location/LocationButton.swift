@@ -4,7 +4,6 @@
 //
 //  Created by 정성윤 on 4/7/25.
 //
-
 import UIKit
 import SnapKit
 import RxSwift
@@ -17,6 +16,9 @@ final class LocationButton: BaseButton {
     
     private(set) var viewModel = LocationViewModel()
     private var disposeBag = DisposeBag()
+    private let loadTrigger = PublishRelay<Void>()
+    private var locationReadySubject = PublishSubject<LocationViewModel.LocationEntity>()
+    private var hasEmittedLocation = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,22 +27,27 @@ final class LocationButton: BaseButton {
     
     private func setBinding() {
         let input = LocationViewModel.Input(
-            loadTrigger: PublishRelay<Void>()
+            loadTrigger: loadTrigger
         )
         let output = viewModel.transform(input)
-        input.loadTrigger.accept(())
+        loadTrigger.accept(())
         loadingIndicator.startAnimating()
         
-        input.loadTrigger.asDriver(onErrorJustReturn: ())
+        loadTrigger.asDriver(onErrorJustReturn: ())
             .drive(with: self) { owner, _ in
                 owner.loadingIndicator.startAnimating()
             }
             .disposed(by: disposeBag)
         
         output.locationResult
-            .drive(with: self) { owner, request in
-                owner.subTitleLabel.text = request.city
+            .drive(with: self) { owner, entity in
+                owner.subTitleLabel.text = entity.city
                 owner.loadingIndicator.stopAnimating()
+                
+                if !owner.hasEmittedLocation {
+                    owner.hasEmittedLocation = true
+                    owner.locationReadySubject.onNext(entity)
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -50,7 +57,6 @@ final class LocationButton: BaseButton {
         iconImageView.contentMode = .scaleAspectFit
         
         subTitleLabel.font = .mediumBold
-        subTitleLabel.textAlignment = .right
         subTitleLabel.textAlignment = .center
         
         subTitleLabel.textColor = .customLightGray
@@ -61,7 +67,11 @@ final class LocationButton: BaseButton {
     }
     
     override func configureHierarchy() {
-        [subTitleLabel, iconImageView, loadingIndicator].forEach {
+        [
+            subTitleLabel,
+            iconImageView,
+            loadingIndicator
+        ].forEach {
             self.addSubview($0)
         }
     }
@@ -86,8 +96,22 @@ final class LocationButton: BaseButton {
         }
     }
     
-    func configure(_ location: String) {
-        subTitleLabel.text = location
+    func configure(_ locationEntity: LocationViewModel.LocationEntity) {
+        subTitleLabel.text = locationEntity.city
+        viewModel.updateLocation(locationEntity)
     }
     
+    func waitForLocationReady(completion: @escaping (LocationViewModel.LocationEntity) -> Void) {
+        if hasEmittedLocation {
+            completion(viewModel.currentLocationEntity.value)
+            return
+        }
+        
+        locationReadySubject
+            .take(1)
+            .bind(with: self, onNext: { owner, entity in
+                completion(entity)
+            })
+            .disposed(by: disposeBag)
+    }
 }

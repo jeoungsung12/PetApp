@@ -70,12 +70,8 @@ final class ListViewController: BaseViewController {
         locationButton.rx.tap
             .bind(with: self) {
                 owner, _ in
-                owner.homeCoord?.showLocation(
-                    location: .init(
-                        city: owner.locationButton.subTitleLabel.text ?? "전국",
-                        location: owner.locationButton.viewModel.coord2D
-                    )
-                )
+                let entity = owner.locationButton.viewModel.currentLocationEntity.value
+                owner.homeCoord?.showLocation(location: entity)
             }
             .disposed(by: disposeBag)
         
@@ -105,7 +101,14 @@ final class ListViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        input.loadTrigger.accept(.init(page: viewModel.page, location: locationButton.viewModel.coord2D))
+        locationButton.waitForLocationReady { [weak self] entity in
+            guard let self = self else { return }
+            self.input.loadTrigger.accept(.init(page: self.viewModel.page, location: entity.location))
+        }
+        
+        if viewModel.homeResult.value.isEmpty {
+            input.loadTrigger.accept(.init(page: viewModel.page, location: nil))
+        }
     }
     
     override func configureView() {
@@ -136,13 +139,14 @@ final class ListViewController: BaseViewController {
 extension ListViewController: ErrorDelegate, LocationDelegate {
     
     func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity) {
-        locationButton.configure(locationEntity.city)
+        print("위치 변경: \(locationEntity.city), 좌표: \(String(describing: locationEntity.location))")
+        locationButton.configure(locationEntity)
         output.homeResult.accept([])
+        viewModel.resetPage()
         input.loadTrigger.accept(.init(page: 1, location: locationEntity.location))
     }
     
     func reloadNetwork(type: ErrorSenderType) {
         input.loadTrigger.accept((.init(page: viewModel.page, location: viewModel.location)))
     }
-    
 }

@@ -4,7 +4,6 @@
 //
 //  Created by 정성윤 on 3/27/25.
 //
-
 import Foundation
 import CoreLocation
 import RxSwift
@@ -15,6 +14,7 @@ final class ListViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     private(set) var location: CLLocationCoordinate2D? = nil
     private(set) var page: Int = 1
+    let homeResult = BehaviorRelay<[HomeEntity]>(value: [])
     
     struct ListRequest {
         var page: Int
@@ -35,12 +35,15 @@ final class ListViewModel: BaseViewModel {
     ) {
         self.repository = repository ?? DIContainer.shared.resolve(type: NetworkRepositoryType.self)!
     }
+    
+    func resetPage() {
+        page = 1
+    }
 }
 
 extension ListViewModel {
     
     func transform(_ input: Input) -> Output {
-        let homeResult = BehaviorRelay<[HomeEntity]>(value: [])
         let errorResult = PublishRelay<DataDreamError>()
         
         input.loadTrigger
@@ -51,13 +54,15 @@ extension ListViewModel {
                 return Single<[HomeEntity]>.create { single in
                     Task {
                         do {
-                            owner.page += 1
+                            if request.page > 1 {
+                                owner.page = request.page
+                            }
                             owner.location = request.location
-                            let value = homeResult.value
+                            let existingData = request.page > 1 ? owner.homeResult.value : []
                             let result = try await owner.fetchData(
-                                value,
+                                existingData,
                                 request.page,
-                                location: owner.location
+                                location: request.location
                             )
                             single(.success(result))
                         } catch {
@@ -66,7 +71,7 @@ extension ListViewModel {
                             } else {
                                 errorResult.accept(DataDreamError.serverError)
                             }
-                            single(.success(homeResult.value))
+                            single(.success(owner.homeResult.value))
                         }
                     }
                     return Disposables.create()
@@ -89,5 +94,4 @@ extension ListViewModel {
             throw error
         }
     }
-    
 }

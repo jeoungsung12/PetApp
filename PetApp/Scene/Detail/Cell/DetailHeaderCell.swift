@@ -26,6 +26,7 @@ final class DetailHeaderCell: BaseTableViewCell, ReusableIdentifier {
         
         titleLabel.font = .systemFont(ofSize: 40, weight: .heavy)
         subTitleLabel.font = .systemFont(ofSize: 30, weight: .heavy)
+        subTitleLabel.numberOfLines = 2
         
         [titleLabel, subTitleLabel].forEach {
             $0.textAlignment = .left

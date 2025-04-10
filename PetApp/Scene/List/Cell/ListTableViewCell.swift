@@ -155,7 +155,7 @@ final class ListTableViewCell: BaseTableViewCell, ReusableIdentifier {
                 case .success(let image):
                     print("이미지 로드 성공 \(image)")
                 case .failure(let error):
-                    print("이미지 로드 에러 \(error)")
+                    print("이미지 로드 에러 \(error), \(url)")
                 }
             }
 //            thumbImageview.kf.setImage(with: url)

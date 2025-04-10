@@ -9,21 +9,28 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import CoreLocation
 
 protocol LocationDelegate: AnyObject {
     func reloadLoaction(_ locationEntity: LocationViewModel.LocationEntity)
 }
 
 final class LocationPopupViewController: BaseViewController {
+    private lazy var dismissGesture = UITapGestureRecognizer(target: self, action: #selector(dismissPopupView))
     private let containerView = UIStackView()
     private let allRegionButton = UIButton()
     private let userRegionButton = UIButton()
     private let userLocation: LocationViewModel.LocationEntity
     private var disposeBag = DisposeBag()
+    private let locationManager: LocationRepositoryType
     
     weak var delegate: LocationDelegate?
-    init(userLocation: LocationViewModel.LocationEntity) {
+    init(
+        userLocation: LocationViewModel.LocationEntity,
+        locationManager: LocationRepositoryType? = nil
+    ) {
         self.userLocation = userLocation
+        self.locationManager = locationManager ?? DIContainer.shared.resolve(type: LocationRepositoryType.self)!
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,14 +42,37 @@ final class LocationPopupViewController: BaseViewController {
     override func setBinding() {
         allRegionButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.delegate?.reloadLoaction(owner.userLocation)
+                let nationwideEntity = LocationViewModel.LocationEntity(city: "전국", location: nil)
+                owner.delegate?.reloadLoaction(nationwideEntity)
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
         
         userRegionButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.delegate?.reloadLoaction(owner.userLocation)
+                let authStatus = CLLocationManager.authorizationStatus()
+                
+                if authStatus == .authorizedWhenInUse || authStatus == .authorizedAlways {
+                    if owner.hasValidUserLocation() {
+                        owner.delegate?.reloadLoaction(owner.userLocation)
+                    } else {
+                        owner.locationManager.startUpdatingLocation(forceUpdate: true)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            if let location = owner.locationManager.currentLocation.value {
+                                owner.locationManager.reverseGeocode(coordinate: location) { address, city in
+                                    let entity = LocationViewModel.LocationEntity(
+                                        city: city ?? "현재 위치",
+                                        location: location
+                                    )
+                                    owner.delegate?.reloadLoaction(entity)
+                                }
+                            }
+                            owner.dismiss(animated: true)
+                        }
+                    }
+                } else {
+                    owner.showSettingsAlert(title: "위치 권한 필요", message: "위치 서비스를 사용하려면 설정에서 권한을 허용해주세요.")
+                }
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
@@ -57,9 +87,16 @@ final class LocationPopupViewController: BaseViewController {
         containerView.spacing = 12
         containerView.alignment = .center
         containerView.distribution = .fillEqually
+        let authStatus = CLLocationManager.authorizationStatus()
+        let hasLocationPermission = authStatus == .authorizedWhenInUse || authStatus == .authorizedAlways
         
         allRegionButton.setTitle("전국", for: .normal)
-        userRegionButton.setTitle(userLocation.city, for: .normal)
+        
+        if hasLocationPermission {
+            userRegionButton.setTitle(hasValidUserLocation() ? "\(userLocation.city)(현위치)" : "현재 위치 가져오기", for: .normal)
+        } else {
+            userRegionButton.setTitle("위치 권한 설정", for: .normal)
+        }
         
         [allRegionButton, userRegionButton].forEach {
             $0.setTitleColor(.customBlack, for: .normal)
@@ -68,10 +105,10 @@ final class LocationPopupViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        containerView.addArrangedSubview(allRegionButton)
-        if userLocation.city != "전국" {
-            containerView.addArrangedSubview(userRegionButton)
+        [allRegionButton, userRegionButton].forEach {
+            self.containerView.addArrangedSubview($0)
         }
+        self.view.addGestureRecognizer(dismissGesture)
         self.view.addSubview(containerView)
     }
     
@@ -84,4 +121,12 @@ final class LocationPopupViewController: BaseViewController {
         }
     }
     
+    private func hasValidUserLocation() -> Bool {
+        return userLocation.location != nil && userLocation.city != "전국"
+    }
+    
+    @objc
+    private func dismissPopupView() {
+        self.dismiss(animated: true)
+    }
 }
