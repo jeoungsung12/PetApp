@@ -55,7 +55,7 @@ extension PlayerViewModel {
                                 start: request.start,
                                 end: request.end
                             )
-                            single(.success(owner.AppendOriginValue(videoResult, result)))
+                            single(.success(owner.AppendOriginValue(videoResult, result.shuffled())))
                         } catch {
                             if let openSquareError = error as? OpenSquareError {
                                 errorResult.accept(openSquareError)
