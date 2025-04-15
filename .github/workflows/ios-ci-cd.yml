@@ -28,10 +28,16 @@ jobs:
       - name: Select latest Xcode
         run: sudo xcode-select -s /Applications/Xcode_15.4.app
 
+      - name: Update Matchfile
+        run: |
+          sed -i '' 's|git_url.*|git_url("${{ secrets.MATCH_GIT_URL }}")|' fastlane/Matchfile
+          sed -i '' 's|app_identifier.*|app_identifier(["WEDLE.Warala"])|' fastlane/Matchfile
+
       - name: Setup Provisioning Profile
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -40,12 +46,13 @@ jobs:
           FASTLANE_PRIVATE_KEY: ${{ secrets.FASTLANE_PRIVATE_KEY }}
         run: |
           echo "$FASTLANE_PRIVATE_KEY" > fastlane/private_key.p8
-          bundle exec fastlane match appstore
+          bundle exec fastlane match appstore --readonly
 
       - name: Build and upload to TestFlight
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           GH_PAT: ${{ secrets.GH_PAT }}

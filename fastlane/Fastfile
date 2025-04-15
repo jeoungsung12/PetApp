@@ -32,7 +32,7 @@ platform :ios do
     
     match(
       type: "appstore",
-      app_identifier: "com.jeoungsung12.PetApp", # 실제 앱 번들 ID로 확인 필요
+      app_identifier: "WEDLE.Warala",
       readonly: true,
       api_key: api_key
     )
