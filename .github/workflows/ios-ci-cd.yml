@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: |
           gem install bundler
-          gem install fastlane-spaceship
-          gem install jwt
-          gem install base32
           bundle install
       
       - name: Select latest Xcode
@@ -50,7 +47,6 @@ jobs:
           SPACESHIP_SKIP_2FA_UPGRADE: 1
           FASTLANE_DISABLE_COLORS: 1
           FASTLANE_DISABLE_ANIMATION: 1
-          SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
         run: |
           bundle exec fastlane match appstore --force
       

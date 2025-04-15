@@ -1,17 +1,6 @@
 # This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
 
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
+opt_out_usage
 
 default_platform(:ios)
 
@@ -23,7 +12,6 @@ platform :ios do
   
   desc "Sync certificates and profiles"
   lane :sync_signing do 
-    # API 키 접근 대신 Apple ID와 비밀번호 사용
     match(
       type: "appstore",
       app_identifier: "WEDLE.Warala",
@@ -34,8 +22,17 @@ platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
     sync_signing
+    
+    # 버전 자동 증가
+    increment_version_number(
+      xcodeproj: "PetApp.xcodeproj",
+      bump_type: "patch"
+    )
+    
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
+    
     build_app(scheme: "PetApp")
+    
     upload_to_testflight(
       username: ENV["APPLE_ID"],
       skip_waiting_for_build_processing: true
