@@ -12,7 +12,12 @@ import RxCocoa
 final class WriteViewModel: BaseViewModel {
     private let repo: RealmRepositoryType = RealmRepository.shared
     private var disposeBag = DisposeBag()
-    
+    private(set) var descriptionText = """
+                                내용을 입력해 주세요
+                                
+                                친구들과 함께 했던 얘기를 자유롭게 얘기해보세요!
+                                #봉사활동 #기록 #함께라서 행복 #얼른 가족만나길
+                                """
     struct Input {
         let saveTrigger: PublishRelay<RecordRealmEntity>
     }

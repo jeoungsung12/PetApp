@@ -63,7 +63,7 @@ final class MyPageViewController: BaseViewController {
                 case .oftenQS:
                     owner.coordinator?.showFAQ()
                 case .feedback:
-                    owner.coordinator?.openFeedbackURL(urlString: DataDreamRouter.feedBackURL)
+                    owner.coordinator?.openFeedbackURL(urlString: AnimalRouter.feedBackURL)
                 case .withdraw:
                     owner.coordinator?.showAlert(title: "탈퇴하기", message: "탈퇴를 하시면 저장된 모든 데이터가 삭제됩니다. 계속하시겠습니까?", actions: [.Ok, .Cancel], completion: {
                         owner.viewModel.removeUserInfo()

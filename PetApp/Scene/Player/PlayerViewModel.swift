@@ -25,7 +25,7 @@ final class PlayerViewModel: BaseViewModel {
     }
     
     struct Output {
-        let errorResult: Driver<OpenSquareError>
+        let errorResult: Driver<AnimalError>
         let videoResult: BehaviorRelay<[PlayerEntity]>
     }
     
@@ -41,7 +41,7 @@ extension PlayerViewModel {
     
     func transform(_ input: Input) -> Output {
         let videoResult = BehaviorRelay<[PlayerEntity]>(value: [])
-        let errorResult = PublishRelay<OpenSquareError>()
+        let errorResult = PublishRelay<AnimalError>()
         
         input.loadTrigger
             .compactMap { $0 }
@@ -57,10 +57,10 @@ extension PlayerViewModel {
                             )
                             single(.success(owner.AppendOriginValue(videoResult, result.shuffled())))
                         } catch {
-                            if let openSquareError = error as? OpenSquareError {
+                            if let openSquareError = error as? AnimalError {
                                 errorResult.accept(openSquareError)
                             } else {
-                                errorResult.accept(OpenSquareError.serverError)
+                                errorResult.accept(AnimalError.serverError)
                             }
                             single(.success(videoResult.value))
                         }
@@ -72,7 +72,7 @@ extension PlayerViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            errorResult: errorResult.asDriver(onErrorJustReturn: OpenSquareError.serverError),
+            errorResult: errorResult.asDriver(onErrorJustReturn: AnimalError.serverError),
             videoResult: videoResult
         )
     }

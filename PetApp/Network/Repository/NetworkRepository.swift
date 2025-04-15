@@ -33,19 +33,16 @@ final class NetworkRepository: NetworkRepositoryType {
             } else {
                 regionCode = nil
             }
-            let result: HomeResponseDTO = try await network.fetchData(DataDreamRouter.getAnimal(page: page, regionCode: regionCode))
+            let result: HomeResponseDTO = try await network.fetchData(AnimalRouter.getAnimal(page: page, regionCode: regionCode))
             return result.toEntity()
         } catch {
             if let networkError = error as? NetworkError,
                let afError = networkError.error.asAFError,
-               let statusCode = afError.responseCode,
-               let responseData = networkError.responseData,
-               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-               let errorMessage = message["message"] as? String {
-                let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
+               let statusCode = afError.responseCode {
+                let customError = AnimalError.mapToError(statusCode: statusCode)
                 throw customError
             } else {
-                throw DataDreamError.serverError
+                throw AnimalError.serverError
             }
         }
     }
@@ -54,7 +51,7 @@ final class NetworkRepository: NetworkRepositoryType {
         do {
             switch type {
             case .shelter:
-                let result: ShelterResponseDTO = try await network.fetchData(DataDreamRouter.getShelter)
+                let result: ShelterResponseDTO = try await network.fetchData(AnimalRouter.getShelter)
                 return result.toEntity()
             case .hospital:
                 let request = MKLocalSearch.Request()
@@ -79,30 +76,27 @@ final class NetworkRepository: NetworkRepositoryType {
         } catch {
             if let networkError = error as? NetworkError,
                let afError = networkError.error.asAFError,
-               let statusCode = afError.responseCode,
-               let responseData = networkError.responseData,
-               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-               let errorMessage = message["message"] as? String {
-                let customError = DataDreamError.mapToDataDreamError(statusCode: statusCode, message: errorMessage)
+               let statusCode = afError.responseCode {
+                let customError = AnimalError.mapToError(statusCode: statusCode)
                 throw customError
             } else {
-                throw DataDreamError.serverError
+                throw AnimalError.serverError
             }
         }
     }
     
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity] {
         do {
-            let result: PlayerResponseDTO = try await network.fetchData(OpenSquareRouter.getVideo(startPage: start, endPage: end))
+            let result: PlayerResponseDTO = try await network.fetchData(AnimalRouter.getVideo(startPage: start, endPage: end))
             return result.toEntity()
         } catch {
             if let networkError = error as? NetworkError,
                let afError = networkError.error.asAFError,
                let statusCode = afError.responseCode {
-                let customError = OpenSquareError.mapToOpenSquareError(statusCode: "Error-\(statusCode)")
+                let customError = AnimalError.mapToError(statusCode: statusCode)
                 throw customError
             } else {
-                throw OpenSquareError.serverError
+                throw AnimalError.serverError
             }
         }
     }
@@ -114,11 +108,8 @@ final class NetworkRepository: NetworkRepositoryType {
         } catch {
             if let networkError = error as? NetworkError,
                let afError = networkError.error.asAFError,
-               let statusCode = afError.responseCode,
-               let responseData = networkError.responseData,
-               let message = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-               let errorMessage = message["message"] as? String {
-                let customError = ChatError.mapToChatError(statusCode: statusCode, message: errorMessage)
+               let statusCode = afError.responseCode {
+                let customError = ChatError.mapToChatError(statusCode: statusCode)
                 throw customError
             } else {
                 throw ChatError.invalidAuthentication

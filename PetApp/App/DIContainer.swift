@@ -105,6 +105,10 @@ extension DIContainer {
             WriteViewModel()
         }
         
+        container.registerFactory(type: FAQViewModel.self) { _ in
+            FAQViewModel()
+        }
+        
         container.registerFactory(type: RecordTableViewModel.self) { _ in
             RecordTableViewModel()
         }

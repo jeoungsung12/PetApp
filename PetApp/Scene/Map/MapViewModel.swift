@@ -27,7 +27,7 @@ final class MapViewModel: BaseViewModel {
     
     struct Output {
         let mapResult: Driver<[MapEntity]>
-        let errorResult: Driver<DataDreamError>
+        let errorResult: Driver<AnimalError>
     }
     
     init(
@@ -42,7 +42,7 @@ final class MapViewModel: BaseViewModel {
     
     func transform(_ input: Input) -> Output {
         let mapResult = BehaviorRelay<[MapEntity]>(value: [])
-        let errorResult = PublishRelay<DataDreamError>()
+        let errorResult = PublishRelay<AnimalError>()
         
         input.loadTrigger
             .withUnretained(self)
@@ -61,10 +61,10 @@ final class MapViewModel: BaseViewModel {
                             }
                             single(.success(result))
                         } catch {
-                            if let dataDreamError = error as? DataDreamError {
+                            if let dataDreamError = error as? AnimalError {
                                 errorResult.accept(dataDreamError)
                             } else {
-                                errorResult.accept(DataDreamError.serverError)
+                                errorResult.accept(AnimalError.serverError)
                             }
                             single(.success(mapResult.value))
                         }
@@ -77,7 +77,7 @@ final class MapViewModel: BaseViewModel {
         
         return Output(
             mapResult: mapResult.asDriver(),
-            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
+            errorResult: errorResult.asDriver(onErrorJustReturn: AnimalError.serverError)
         )
     }
 }

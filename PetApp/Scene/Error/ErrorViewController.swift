@@ -67,16 +67,13 @@ final class ErrorViewController: BaseViewController {
         descriptionLabel.textColor = .customLightGray
         descriptionLabel.font = .systemFont(ofSize: 17, weight: .regular)
         descriptionLabel.numberOfLines = 0
-        if let type = errorType as? DataDreamError {
-            descriptionLabel.text = "\(type.errorDescription)"
-        } else if let type = errorType as? OpenSquareError {
-            descriptionLabel.text = "\(type.errorDescription)"
-        }else if let type = errorType as? ChatError {
-            descriptionLabel.text = "\(type.errorDescription)"
+        if let type = errorType as? AnimalError {
+            descriptionLabel.text = "\(type.errorDescription ?? "")"
+        } else if let type = errorType as? ChatError {
+            descriptionLabel.text = "\(type.errorDescription ?? "")"
         } else {
             descriptionLabel.text = "네트워크 연결이 일시적으로 원활하지 않습니다. 데이터 또는 Wi-Fi 연결 상태를 확인해주세요."
         }
-        descriptionLabel.text = "네트워크 연결이 일시적으로 원활하지 않습니다. 데이터 또는 Wi-Fi 연결 상태를 확인해주세요."
         
         [titleLabel, descriptionLabel].forEach {
             $0.textAlignment = .center

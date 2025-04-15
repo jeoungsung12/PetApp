@@ -99,10 +99,7 @@ final class WriteViewController: BaseViewController {
         descriptionTextView.rx.didEndEditing
             .bind(with: self, onNext: { owner, _ in
                 if owner.descriptionTextView.text.isEmpty {
-                    owner.descriptionTextView.text = """
-                            친구들과 함께 했던 얘기를 자유롭게 얘기해보세요!
-                            #봉사활동 #기록 #함께라서 행복 #얼른 가족만나길
-                        """
+                    owner.descriptionTextView.text = owner.viewModel.descriptionText
                     owner.descriptionTextView.textColor = .customLightGray
                 }
             })
@@ -112,7 +109,7 @@ final class WriteViewController: BaseViewController {
             .bind(with: self) { owner, _ in
                 guard let location = owner.locationTextField.text , !location.isEmpty,
                       let title = owner.titleTextField.text, !title.isEmpty,
-                      let description = owner.descriptionTextView.text, !description.isEmpty,
+                      let description = owner.descriptionTextView.text, description != owner.viewModel.descriptionText,
                       !owner.selectedImages.value.isEmpty else {
                     owner.view.makeToast("모든 항목을 기록해 주세요!", duration: 1, position: .center)
                     return
@@ -200,13 +197,10 @@ final class WriteViewController: BaseViewController {
         descriptionTextView.isScrollEnabled = false
         descriptionTextView.textContainer.maximumNumberOfLines = 0
         descriptionTextView.textContainer.lineBreakMode = .byWordWrapping
-        descriptionTextView.text = """
-                                친구들과 함께 했던 얘기를 자유롭게 얘기해보세요!
-                                #봉사활동 #기록 #함께라서 행복 #얼른 가족만나길
-                                """
+        descriptionTextView.text = viewModel.descriptionText
         
         descriptionLabel.numberOfLines = 0
-        descriptionLabel.textColor = .customLightGray
+        descriptionLabel.textColor = .systemGray4
         descriptionLabel.font = .mediumRegular
         descriptionLabel.textAlignment = .center
         descriptionLabel.text =

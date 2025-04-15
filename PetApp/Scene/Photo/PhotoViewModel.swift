@@ -22,7 +22,7 @@ final class PhotoViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: BehaviorRelay<[HomeEntity]>
-        let errorResult: Driver<DataDreamError>
+        let errorResult: Driver<AnimalError>
     }
     
     init(
@@ -38,7 +38,7 @@ extension PhotoViewModel {
     
     func transform(_ input: Input) -> Output {
         let homeResult = BehaviorRelay<[HomeEntity]>(value: [])
-        let errorResult = PublishRelay<DataDreamError>()
+        let errorResult = PublishRelay<AnimalError>()
         
         input.loadTrigger
             .withUnretained(self)
@@ -51,10 +51,10 @@ extension PhotoViewModel {
                             let result = try await owner.fetchData(value, page)
                             single(.success(result))
                         } catch {
-                            if let dataDreamError = error as? DataDreamError {
+                            if let dataDreamError = error as? AnimalError {
                                 errorResult.accept(dataDreamError)
                             } else {
-                                errorResult.accept(DataDreamError.serverError)
+                                errorResult.accept(AnimalError.serverError)
                             }
                             single(.success(homeResult.value))
                         }
@@ -67,7 +67,7 @@ extension PhotoViewModel {
         
         return Output(
             homeResult: homeResult,
-            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
+            errorResult: errorResult.asDriver(onErrorJustReturn: AnimalError.serverError)
         )
     }
     

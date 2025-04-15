@@ -47,7 +47,7 @@ final class HomeViewModel: BaseViewModel {
     
     struct Output {
         let homeResult: Driver<[HomeSection]>
-        let errorResult: Driver<DataDreamError>
+        let errorResult: Driver<AnimalError>
     }
     
     init(
@@ -62,7 +62,7 @@ extension HomeViewModel {
     
     func transform(_ input: Input) -> Output {
         let homeResult = BehaviorRelay<[HomeSection]>(value: [])
-        let errorResult = PublishRelay<DataDreamError>()
+        let errorResult = PublishRelay<AnimalError>()
         
         input.loadTrigger
             .withUnretained(self)
@@ -73,10 +73,10 @@ extension HomeViewModel {
                             let result = try await owner.fetchData()
                             single(.success(result))
                         } catch {
-                            if let dataDreamError = error as? DataDreamError {
+                            if let dataDreamError = error as? AnimalError {
                                 errorResult.accept(dataDreamError)
                             } else {
-                                errorResult.accept(DataDreamError.serverError)
+                                errorResult.accept(AnimalError.serverError)
                             }
                             single(.success(homeResult.value))
                         }
@@ -89,7 +89,7 @@ extension HomeViewModel {
         
         return Output(
             homeResult: homeResult.asDriver(onErrorJustReturn: []),
-            errorResult: errorResult.asDriver(onErrorJustReturn: DataDreamError.serverError)
+            errorResult: errorResult.asDriver(onErrorJustReturn: AnimalError.serverError)
         )
     }
     

@@ -7,13 +7,13 @@
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
 ## Router
-DataDreamRouter.swift
-OpenSquareRouter.swift
-ChatRouter.swift
-SponsorAPI.swift
+#DataDreamRouter.swift
+#OpenSquareRouter.swift
+#ChatRouter.swift
+#SponsorAPI.swift
 
 ## APIKey
-APIKey.swift
+#APIKey.swift
 
 # macOS 시스템 파일 무시
 .DS_Store
