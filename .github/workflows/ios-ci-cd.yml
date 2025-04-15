@@ -30,35 +30,34 @@ jobs:
 
       - name: Update Matchfile
         run: |
-          sed -i '' 's|git_url.*|git_url("${{ secrets.MATCH_GIT_URL }}")|' fastlane/Matchfile
-          sed -i '' 's|app_identifier.*|app_identifier(["WEDLE.Warala"])|' fastlane/Matchfile
+          cat > fastlane/Matchfile << EOL
+          git_url("${{ secrets.MATCH_GIT_URL }}")
+          storage_mode("git")
+          type("development")
+          app_identifier(["WEDLE.Warala"])
+          username("${{ secrets.APPLE_ID }}")
+          EOL
 
       - name: Setup Provisioning Profile
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
           FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           GH_PAT: ${{ secrets.GH_PAT }}
-          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
-          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
-          FASTLANE_PRIVATE_KEY: ${{ secrets.FASTLANE_PRIVATE_KEY }}
         run: |
-          echo "$FASTLANE_PRIVATE_KEY" > fastlane/private_key.p8
           bundle exec fastlane match appstore --readonly
 
       - name: Build and upload to TestFlight
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
           FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           GH_PAT: ${{ secrets.GH_PAT }}
-          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
-          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
-          FASTLANE_PRIVATE_KEY: ${{ secrets.FASTLANE_PRIVATE_KEY }}
         run: |
-          echo "$FASTLANE_PRIVATE_KEY" > fastlane/private_key.p8
           bundle exec fastlane beta

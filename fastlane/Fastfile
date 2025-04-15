@@ -23,18 +23,12 @@ platform :ios do
   
   desc "Sync certificates and profiles"
   lane :sync_signing do 
-    api_key = app_store_connect_api_key(
-      key_id: ENV["FASTLANE_KEY_ID"],
-      issuer_id: ENV["FASTLANE_ISSUER_ID"],
-      key_filepath: "fastlane/private_key.p8",
-      duration: 1200
-    )
-    
+    # API 키 접근 대신 Apple ID와 비밀번호 사용
     match(
       type: "appstore",
       app_identifier: "WEDLE.Warala",
       readonly: true,
-      api_key: api_key
+      username: ENV["APPLE_ID"]
     )
   end
 
@@ -44,12 +38,7 @@ platform :ios do
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
     build_app(scheme: "PetApp")
     upload_to_testflight(
-      api_key: app_store_connect_api_key(
-        key_id: ENV["FASTLANE_KEY_ID"],
-        issuer_id: ENV["FASTLANE_ISSUER_ID"],
-        key_filepath: "fastlane/private_key.p8",
-        duration: 1200
-      ),
+      username: ENV["APPLE_ID"],
       skip_waiting_for_build_processing: true
     )
   end
