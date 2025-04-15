@@ -174,7 +174,7 @@
 				E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				E4C05C402DA283530018F9D4 /* XCRemoteSwiftPackageReference "SNKit" */,
 			);
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 54;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
