@@ -41,24 +41,19 @@ jobs:
       
       - name: Setup Provisioning Profile
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
           FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          GH_PAT: ${{ secrets.GH_PAT }}
+          SPACESHIP_SKIP_2FA_UPGRADE: 1
+          FASTLANE_DISABLE_COLORS: 1
+          FASTLANE_DISABLE_ANIMATION: 1
         run: |
           bundle exec fastlane match appstore --force
       
       - name: Build and upload to TestFlight
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
           FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           bundle exec fastlane beta
