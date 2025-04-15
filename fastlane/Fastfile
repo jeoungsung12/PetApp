@@ -16,10 +16,41 @@
 default_platform(:ios)
 
 platform :ios do
+  desc "Run tests"
+  lane :test do
+    scan(scheme: "PetApp")
+  end
+  
+  desc "Sync certificates and profiles"
+  lane :sync_signing do 
+    api_key = app_store_connect_api_key(
+      key_id: ENV["FASTLANE_KEY_ID"],
+      issuer_id: ENV["FASTLANE_ISSUER_ID"],
+      key_filepath: "fastlane/private_key.p8",
+      duration: 1200
+    )
+    
+    match(
+      type: "appstore",
+      app_identifier: "com.jeoungsung12.PetApp", # 실제 앱 번들 ID로 확인 필요
+      readonly: true,
+      api_key: api_key
+    )
+  end
+
   desc "Push a new beta build to TestFlight"
   lane :beta do
+    sync_signing
     increment_build_number(xcodeproj: "PetApp.xcodeproj")
     build_app(scheme: "PetApp")
-    upload_to_testflight
+    upload_to_testflight(
+      api_key: app_store_connect_api_key(
+        key_id: ENV["FASTLANE_KEY_ID"],
+        issuer_id: ENV["FASTLANE_ISSUER_ID"],
+        key_filepath: "fastlane/private_key.p8",
+        duration: 1200
+      ),
+      skip_waiting_for_build_processing: true
+    )
   end
 end
