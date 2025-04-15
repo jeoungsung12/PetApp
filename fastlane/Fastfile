@@ -27,7 +27,6 @@ platform :ios do
     match(
       type: "appstore",
       app_identifier: "WEDLE.Warala",
-      readonly: true,
       username: ENV["APPLE_ID"]
     )
   end
