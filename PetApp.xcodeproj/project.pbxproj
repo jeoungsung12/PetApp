@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -40,6 +40,27 @@
 		E49726502D8D273300716594 /* PetApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E49726A92D8D2D6B00716594 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E49726622D8D273A00716594 /* Exceptions for "PetApp" folder in "PetApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E497264F2D8D273300716594 /* PetApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E49726522D8D273300716594 /* PetApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E49726622D8D273A00716594 /* Exceptions for "PetApp" folder in "PetApp" target */,
+			);
+			path = PetApp;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		E497264D2D8D273300716594 /* Frameworks */ = {
@@ -80,11 +101,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E49726522D8D273300716594 /* PetApp */ = {
-			isa = PBXGroup;
-			path = PetApp;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -100,6 +116,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E49726522D8D273300716594 /* PetApp */,
 			);
 			name = PetApp;
 			packageProductDependencies = (
@@ -155,7 +174,7 @@
 				E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				E4C05C402DA283530018F9D4 /* XCRemoteSwiftPackageReference "SNKit" */,
 			);
-			preferredProjectObjectVersion = 54;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
