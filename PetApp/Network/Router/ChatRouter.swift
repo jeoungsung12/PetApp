@@ -95,7 +95,9 @@ extension ChatRouter: Router {
                             - 특징: \(entity.animal.description),\(entity.animal.color),\(entity.animal.gender),\(entity.animal.neut)
                             - 체중: \(entity.animal.weight)kg
                             - 태어난 시기: \(entity.animal.age)
-                            - 구조된 보호소: \(entity.shelter)
+                            - 구조된 보호소: \(entity.shelter.name)
+                            - 보호소 정보: \(entity.shelter.address),\(entity.shelter.number)
+                            - 공고 기간: \(entity.shelter.beginDate)~\(entity.shelter.endDate)
 
                             [규칙]
                             1. 나는 이 동물의 성격을 기반으로 말해.
