@@ -104,8 +104,6 @@ final class ChatViewModel: BaseViewModel {
     }
     
     private func loadRealm() {
-        DispatchQueue.main.async { [weak self] in
-            self?.likedEntities = self?.realmRepo.getAllLikedHomeEntities() ?? []
-        }
+        self.likedEntities = self.realmRepo.getAllLikedHomeEntities()
     }
 }

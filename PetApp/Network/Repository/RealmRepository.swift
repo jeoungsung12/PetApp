@@ -168,8 +168,41 @@ extension RealmRepository {
     }
     
     func getAllLikedHomeEntities() -> [HomeEntity] {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let currentDate = Date()
         let realmEntities = realm.objects(RealmHomeEntity.self)
-        return realmEntities.map { toHomeEntity($0) }
+        
+        let expiredEntities = realmEntities.filter { entity in
+            guard let endDateString = entity.shelter?.endDate,
+                  let endDate = dateFormatter.date(from: endDateString) else {
+                return false
+            }
+            
+            return endDate < currentDate
+        }
+        
+        if !expiredEntities.isEmpty {
+            do {
+                try realm.write {
+                    realm.delete(expiredEntities)
+                }
+            } catch {
+                print("만료된 좋아요 엔티티 삭제 실패: \(error)")
+            }
+        }
+        
+        let validEntities = realmEntities.filter { entity in
+            guard let endDateString = entity.shelter?.endDate,
+                  let endDate = dateFormatter.date(from: endDateString) else {
+                return true
+            }
+            
+            return endDate >= currentDate
+        }
+        
+        return validEntities.map { toHomeEntity($0) }
     }
     
     func isLiked(id: String) -> Bool {

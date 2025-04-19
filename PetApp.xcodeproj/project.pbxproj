@@ -508,7 +508,7 @@
 			repositoryURL = "https://github.com/jeoungsung12/SNKit.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.2;
+				version = 1.0.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
