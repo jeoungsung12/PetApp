@@ -76,6 +76,14 @@
 			);
 			target = E48B1A172DB7CF4B0066C8C8 /* PetAppWidgetExtension */;
 		};
+		E48B1A322DB7DE890066C8C8 /* Exceptions for "PetAppWidget" folder in "PetApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Modifier/ForegroundWrapper.swift,
+				Modifier/PosterView.swift,
+			);
+			target = E497264F2D8D273300716594 /* PetApp */;
+		};
 		E49726622D8D273A00716594 /* Exceptions for "PetApp" folder in "PetApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -89,6 +97,7 @@
 		E48B1A1E2DB7CF4B0066C8C8 /* PetAppWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				E48B1A322DB7DE890066C8C8 /* Exceptions for "PetAppWidget" folder in "PetApp" target */,
 				E48B1A2C2DB7CF4D0066C8C8 /* Exceptions for "PetAppWidget" folder in "PetAppWidgetExtension" target */,
 			);
 			path = PetAppWidget;
