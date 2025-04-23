@@ -13,6 +13,7 @@ protocol NetworkRepositoryType: AnyObject {
     func getMap(_ type: MapType) async throws -> [MapEntity]
     func getVideo(start: Int, end: Int) async throws -> [PlayerEntity]
     func getChatAnswer(entity: HomeEntity, question: String) async throws -> ChatEntity
+    func downloadImage(from urlString: String, completion: @escaping (URL?) -> Void)
 }
 
 final class NetworkRepository: NetworkRepositoryType {
@@ -117,4 +118,58 @@ final class NetworkRepository: NetworkRepositoryType {
         }
     }
     
+    func downloadImage(from urlString: String, completion: @escaping (URL?) -> Void) {
+        guard let url = URL(string: urlString) else {
+            completion(nil)
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let image = UIImage(data: data) else {
+                completion(nil)
+                return
+            }
+            
+            let resizedImage = self.resizeImageForWidget(image, maxSize: 400)
+            guard let resizedData = resizedImage.jpegData(compressionQuality: 0.8) else {
+                completion(nil)
+                return
+            }
+            
+            if let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Warala.SeSAC") {
+                let fileName = UUID().uuidString + ".jpg"
+                let fileURL = containerURL.appendingPathComponent(fileName)
+                
+                do {
+                    try resizedData.write(to: fileURL)
+                    completion(fileURL)
+                } catch {
+                    print("이미지 저장 실패: \(error)")
+                    completion(nil)
+                }
+            } else {
+                completion(nil)
+            }
+        }.resume()
+    }
+    
+    
+    private func resizeImageForWidget(_ image: UIImage, maxSize: CGFloat = 800) -> UIImage {
+        let aspectRatio = image.size.width / image.size.height
+        var newSize: CGSize
+        
+        if aspectRatio > 1 {
+            newSize = CGSize(width: maxSize, height: maxSize / aspectRatio)
+        } else {
+            newSize = CGSize(width: maxSize * aspectRatio, height: maxSize)
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: CGRect(origin: .zero, size: newSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return resizedImage ?? image
+    }
 }

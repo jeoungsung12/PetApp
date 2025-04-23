@@ -46,8 +46,8 @@ struct Provider: TimelineProvider {
         SimpleEntry(
             date: Date(),
             id: "",
-            name: "관심등록하면 여기서 볼 수 있어요",
-            shelter: "지금 바로 앱에서 관심등록 해보세요!",
+            name: "관심등록하면 볼 수 있어요",
+            shelter: "지금 등록해 보세요!",
             image: "",
             endDate: "유기동물을 도와주세요"
         )
@@ -71,8 +71,8 @@ struct Provider: TimelineProvider {
             let entry = SimpleEntry(
                 date: Date(),
                 id: "",
-                name: "관심등록하면 여기서 볼 수 있어요",
-                shelter: "지금 바로 앱에서 관심등록 해보세요!",
+                name: "관심등록하면 볼 수 있어요",
+                shelter: "지금 등록해 보세요!",
                 image: "",
                 endDate: "유기동물을 도와주세요"
             )
@@ -89,8 +89,8 @@ struct Provider: TimelineProvider {
             let entry = SimpleEntry(
                 date: Date(),
                 id: "",
-                name: "관심등록하면 여기서 볼 수 있어요",
-                shelter: "지금 바로 앱에서 관심등록 해보세요!",
+                name: "관심등록하면 볼 수 있어요",
+                shelter: "지금 등록해 보세요!",
                 image: "",
                 endDate: "유기동물을 도와주세요"
             )
@@ -140,7 +140,6 @@ struct Provider: TimelineProvider {
             
             return endDate >= Date()
         }
-        
         return validPets
     }
 }
@@ -158,53 +157,60 @@ struct PetAppWidgetEntryView : View {
     var entry: Provider.Entry
     
     var body: some View {
-        VStack(alignment: .center, spacing: 12) {
-            HStack(alignment: .center, spacing: 12) {
-                if let imageURL = URL(string: entry.image) {
-                    SNImage(
-                        url: imageURL,
-                        processingOption: .downsample(.init(width: 70, height: 70))
-                    )
-                    .asBackground(.gray.opacity(0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                } else {
-                    Image(systemName: "photo")
+        GeometryReader { geometry in
+            ZStack {
+                if let imageURL = URL(string: entry.image), imageURL.isFileURL,
+                   let uiImage = UIImage(contentsOfFile: imageURL.path) {
+                    Image(uiImage: uiImage)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 70, height: 70)
-                        .asBackground(.gray.opacity(0.3))
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                } else {
+                    Color.gray.opacity(0.3)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(entry.name)
-                        .font(.callout)
-                        .bold()
-                        .asForeground(.black)
-                    
-                    Text(entry.shelter)
-                        .font(.caption)
-                        .asForeground(.black)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(entry.name)
+                                .font(.system(size: 13, weight: .heavy))
+                                .shadow(color: .black, radius: 2)
+                            
+                            Text(entry.shelter)
+                                .font(.system(size: 11, weight: .bold))
+                                .shadow(color: .black, radius: 2)
+                        }
+                        Spacer()
+                    }
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 8)
+                    .padding(.horizontal, 8)
+                        
+
+                    Spacer()
+
+                    HStack {
+                        Text(entry.endDate)
+                            .padding(5)
+                            .background(Color.pink.opacity(0.7))
+                            .foregroundColor(.white)
+                            .font(.system(size: 11, weight: .bold))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 12)
                 }
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .frame(width: geometry.size.width, height: geometry.size.height)
             }
-            .padding(.top, 4)
-            .padding(.horizontal, 4)
-            
-            HStack {
-                Spacer()
-                Text(entry.endDate)
-                    .padding(5)
-                    .asBackground(.pink.opacity(0.7))
-                    .asForeground(.white)
-                    .font(.system(size: 13, weight: .bold))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 4)
         }
     }
+
+
 }
 
 struct PetAppWidget: Widget {
@@ -214,10 +220,11 @@ struct PetAppWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             if #available(iOS 17.0, *) {
                 PetAppWidgetEntryView(entry: entry)
-                    .containerBackground(.fill.tertiary, for: .widget)
+                    .containerBackground(.white, for: .widget)
             } else {
                 PetAppWidgetEntryView(entry: entry)
                     .padding()
+                    .background(Color.white)
             }
         }
         .configurationDisplayName("Warala 위젯")

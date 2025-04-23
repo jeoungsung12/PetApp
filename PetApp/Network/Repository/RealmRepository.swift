@@ -26,6 +26,7 @@ protocol RealmRepositoryType {
 
 final class RealmRepository: RealmRepositoryType {
     static let shared: RealmRepositoryType = RealmRepository()
+    private let container: DIContainerType = DIContainer.shared
     private let realm = try! Realm()
     
     private init() {}
@@ -214,18 +215,35 @@ extension RealmRepository {
     func syncLikedPetsToWidget() {
         let likedEntities = getAllLikedHomeEntities()
         
-        let likedPetsData = likedEntities.map { entity -> [String: String] in
-            return [
-                "id": entity.animal.id,
-                "name": entity.animal.name,
-                "shelter": entity.shelter.name,
-                "image": entity.animal.thumbImage,
-                "endDate": entity.shelter.endDate
-            ]
+        var likedPetsData: [[String: String]] = []
+        let group = DispatchGroup()
+        
+        for entity in likedEntities {
+            group.enter()
+            
+            if let networkRepo = container.resolve(type: NetworkRepositoryType.self) {
+                networkRepo.downloadImage(from: entity.animal.fullImage) { localURL in
+                    defer { group.leave() }
+                    
+                    guard let localURL = localURL else { return }
+                    
+                    let petData: [String: String] = [
+                        "id": entity.animal.id,
+                        "name": entity.animal.name,
+                        "shelter": entity.shelter.name,
+                        "image": localURL.absoluteString,
+                        "endDate": entity.shelter.endDate
+                    ]
+                    likedPetsData.append(petData)
+                }
+            }
         }
         
-        UserDefaults.groupShared.set(likedPetsData, forKey: "likedPetsKey")
+        group.notify(queue: .main) {
+            UserDefaults.groupShared.set(likedPetsData, forKey: "likedPetsKey")
+        }
     }
+    
 }
 
 extension RealmRepository {
