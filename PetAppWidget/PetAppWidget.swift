@@ -67,44 +67,45 @@ struct PetAppWidgetEntryView : View {
     var entry: Provider.Entry
     
     var body: some View {
-        VStack(alignment: .center, spacing: 12) {
-            HStack(alignment: .center, spacing: 12) {
-                PosterView(image: entry.image, size: 70)
-                    .frame(height: 70)
-                    .scaledToFill()
-                    .background(.gray.opacity(0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(entry.name)
-                        .font(.callout)
-                        .bold()
-                        .asForeground(.black)
-                    
-                    Text(entry.shelter)
-                        .font(.caption)
-                        .asForeground(.black)
-                    
-//                    Spacer()
-                }
-            }
-            .padding(.top, 4)
-            .padding(.horizontal, 4)
-            
-            Spacer()
-            
-            HStack {
-                Spacer()
-                Text(entry.endDate)
-                    .padding(5)
-                    .background(.pink.opacity(0.7))
-                    .asForeground(.white)
-                    .font(.caption)
-                    .bold()
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            }
-            .padding(.horizontal, 4)
-        }
+        Text("")
+//        VStack(alignment: .center, spacing: 12) {
+//            HStack(alignment: .center, spacing: 12) {
+//                PosterView(image: entry.image, size: 70)
+//                    .frame(height: 70)
+//                    .scaledToFill()
+//                    .background(.gray.opacity(0.3))
+//                    .clipShape(RoundedRectangle(cornerRadius: 10))
+//                
+//                VStack(alignment: .leading, spacing: 4) {
+//                    Text(entry.name)
+//                        .font(.callout)
+//                        .bold()
+//                        .asForeground(.black)
+//                    
+//                    Text(entry.shelter)
+//                        .font(.caption)
+//                        .asForeground(.black)
+//                    
+////                    Spacer()
+//                }
+//            }
+//            .padding(.top, 4)
+//            .padding(.horizontal, 4)
+//            
+//            Spacer()
+//            
+//            HStack {
+//                Spacer()
+//                Text(entry.endDate)
+//                    .padding(5)
+//                    .background(.pink.opacity(0.7))
+//                    .asForeground(.white)
+//                    .font(.caption)
+//                    .bold()
+//                    .clipShape(RoundedRectangle(cornerRadius: 10))
+//            }
+//            .padding(.horizontal, 4)
+//        }
     }
 }
 
@@ -119,7 +120,7 @@ struct PetAppWidget: Widget {
             } else {
                 PetAppWidgetEntryView(entry: entry)
                     .padding()
-                    .background()
+//                    .background()
             }
         }
         .configurationDisplayName("Warala 위젯")
@@ -128,14 +129,14 @@ struct PetAppWidget: Widget {
     }
 }
 
-#Preview(as: .systemSmall) {
-    PetAppWidget()
-} timeline: {
-    SimpleEntry(
-        date: Date(),
-        name: "푸들",
-        shelter: "한국유기동물보호소",
-        image: "",
-        endDate: "공고마감 7일전!"
-    )
-}
+//#Preview(as: .systemSmall) {
+//    PetAppWidget()
+//} timeline: {
+//    SimpleEntry(
+//        date: Date(),
+//        name: "푸들",
+//        shelter: "한국유기동물보호소",
+//        image: "",
+//        endDate: "공고마감 7일전!"
+//    )
+//}

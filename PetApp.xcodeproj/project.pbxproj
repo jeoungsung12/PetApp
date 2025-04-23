@@ -10,6 +10,7 @@
 		E48B1A1B2DB7CF4B0066C8C8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E48B1A1A2DB7CF4B0066C8C8 /* WidgetKit.framework */; };
 		E48B1A1D2DB7CF4B0066C8C8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E48B1A1C2DB7CF4B0066C8C8 /* SwiftUI.framework */; };
 		E48B1A282DB7CF4D0066C8C8 /* PetAppWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E48B1A182DB7CF4B0066C8C8 /* PetAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E48B1AB32DB7E8F20066C8C8 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E48B1AB22DB7E8F20066C8C8 /* FirebaseCrashlytics */; };
 		E48EB5F12D9AA3FE00ACAEA3 /* YPImagePicker in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F02D9AA3FE00ACAEA3 /* YPImagePicker */; };
 		E48EB5F42D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F32D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper */; };
 		E48EB5F72D9AA41700ACAEA3 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = E48EB5F62D9AA41700ACAEA3 /* Toast */; };
@@ -136,6 +137,7 @@
 				E48EB5FA2D9AA42C00ACAEA3 /* SnapKit in Frameworks */,
 				E48EB6052D9AA4D500ACAEA3 /* Kingfisher in Frameworks */,
 				E48EB5FD2D9AA43F00ACAEA3 /* RxCocoa in Frameworks */,
+				E48B1AB32DB7E8F20066C8C8 /* FirebaseCrashlytics in Frameworks */,
 				E48EB5F12D9AA3FE00ACAEA3 /* YPImagePicker in Frameworks */,
 				E48EB5F42D9AA40800ACAEA3 /* YouTubeiOSPlayerHelper in Frameworks */,
 			);
@@ -207,6 +209,7 @@
 				E497264E2D8D273300716594 /* Resources */,
 				E48EB3582D97E9C400ACAEA3 /* Embed Frameworks */,
 				E48B1A2D2DB7CF4D0066C8C8 /* Embed Foundation Extensions */,
+				E4625D492DB8D26100070A4E /* Google Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -229,6 +232,7 @@
 				E48EB6072D9AA50600ACAEA3 /* Alamofire */,
 				E48EB60A2D9AA56C00ACAEA3 /* RxDataSources */,
 				E4C05C412DA283530018F9D4 /* SNKit */,
+				E48B1AB22DB7E8F20066C8C8 /* FirebaseCrashlytics */,
 			);
 			productName = PetApp;
 			productReference = E49726502D8D273300716594 /* PetApp.app */;
@@ -272,6 +276,7 @@
 				E48EB6062D9AA50600ACAEA3 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				E48EB6092D9AA56C00ACAEA3 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				E4C05C402DA283530018F9D4 /* XCRemoteSwiftPackageReference "SNKit" */,
+				E48B1AB12DB7E8F20066C8C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E49726512D8D273300716594 /* Products */;
@@ -301,6 +306,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E4625D492DB8D26100070A4E /* Google Crashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Google Crashlytics";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E48B1A142DB7CF4B0066C8C8 /* Sources */ = {
@@ -341,19 +372,23 @@
 				INFOPLIST_FILE = PetAppWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PetAppWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala.PetAppWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -370,19 +405,23 @@
 				INFOPLIST_FILE = PetAppWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PetAppWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala.PetAppWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -395,6 +434,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Q653PU93R6;
 				EXCLUDED_ARCHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
@@ -620,6 +660,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E48B1AB12DB7E8F20066C8C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
 		E48EB5EF2D9AA3FE00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Yummypets/YPImagePicker.git";
@@ -703,6 +751,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E48B1AB22DB7E8F20066C8C8 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48B1AB12DB7E8F20066C8C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
 		E48EB5F02D9AA3FE00ACAEA3 /* YPImagePicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E48EB5EF2D9AA3FE00ACAEA3 /* XCRemoteSwiftPackageReference "YPImagePicker" */;
