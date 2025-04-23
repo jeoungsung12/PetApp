@@ -7,44 +7,112 @@
 
 import WidgetKit
 import SwiftUI
+import SNKit
+
+extension UserDefaults {
+    static var groupShared: UserDefaults {
+        let appGroupID = "group.Warala.SeSAC"
+        return UserDefaults(suiteName: appGroupID)!
+    }
+}
 
 struct Provider: TimelineProvider {
+    // 날짜 계산 함수 - 공고 마감일까지 남은 일수 계산
+    private func calculateDaysLeft(endDateString: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        
+        guard let endDate = dateFormatter.date(from: endDateString) else {
+            return "정보 없음"
+        }
+        
+        let calendar = Calendar.current
+        let currentDate = Date()
+        let components = calendar.dateComponents([.day], from: currentDate, to: endDate)
+        
+        if let days = components.day {
+            if days <= 0 {
+                return "공고 마감"
+            } else {
+                return "공고마감 \(days)일전!"
+            }
+        }
+        
+        return "정보 없음"
+    }
+    
     //위젯 최초 렌더링
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(
             date: Date(),
-            name: "푸들",
-            shelter: "한국유기동물보호소",
+            id: "",
+            name: "관심등록하면 여기서 볼 수 있어요",
+            shelter: "지금 바로 앱에서 관심등록 해보세요!",
             image: "",
-            endDate: "공고마감 7일전!"
+            endDate: "유기동물을 도와주세요"
         )
     }
     
     //위젯 갤러리 미리보기 화면
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(
-            date: Date(),
-            name: "푸들",
-            shelter: "한국유기동물보호소",
-            image: "",
-            endDate: "공고마감 7일전!"
-        )
-        completion(entry)
+        let likedPets = getLikedPets()
+        
+        if let firstPet = likedPets.first {
+            let entry = SimpleEntry(
+                date: Date(),
+                id: firstPet["id"] ?? "",
+                name: firstPet["name"] ?? "이름 정보 없음",
+                shelter: firstPet["shelter"] ?? "보호소 정보 없음",
+                image: firstPet["image"] ?? "",
+                endDate: calculateDaysLeft(endDateString: firstPet["endDate"] ?? "")
+            )
+            completion(entry)
+        } else {
+            let entry = SimpleEntry(
+                date: Date(),
+                id: "",
+                name: "관심등록하면 여기서 볼 수 있어요",
+                shelter: "지금 바로 앱에서 관심등록 해보세요!",
+                image: "",
+                endDate: "유기동물을 도와주세요"
+            )
+            completion(entry)
+        }
     }
     
     //위젯 상태 변경 시점
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         var entries: [SimpleEntry] = []
+        let likedPets = getLikedPets()
         
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+        if likedPets.isEmpty {
             let entry = SimpleEntry(
                 date: Date(),
-                name: "푸들",
-                shelter: "한국유기동물보호소",
+                id: "",
+                name: "관심등록하면 여기서 볼 수 있어요",
+                shelter: "지금 바로 앱에서 관심등록 해보세요!",
                 image: "",
-                endDate: "공고마감 7일전!"
+                endDate: "유기동물을 도와주세요"
+            )
+            let timeline = Timeline(entries: [entry], policy: .atEnd)
+            completion(timeline)
+            return
+        }
+        
+        let currentDate = Date()
+        for hourOffset in 0 ..< max(1, likedPets.count) {
+            let petIndex = hourOffset % likedPets.count
+            let pet = likedPets[petIndex]
+            
+            let entryDate = Calendar.current.date(byAdding: .minute, value: hourOffset * 10, to: currentDate)!
+            
+            let entry = SimpleEntry(
+                date: entryDate,
+                id: pet["id"] ?? "",
+                name: pet["name"] ?? "이름 정보 없음",
+                shelter: pet["shelter"] ?? "보호소 정보 없음",
+                image: pet["image"] ?? "",
+                endDate: calculateDaysLeft(endDateString: pet["endDate"] ?? "")
             )
             entries.append(entry)
         }
@@ -53,10 +121,33 @@ struct Provider: TimelineProvider {
         completion(timeline)
     }
     
+    private func getLikedPets() -> [[String: String]] {
+        guard let petsData = UserDefaults.groupShared.array(forKey: "likedPetsKey") as? [[String: String]] else {
+            return []
+        }
+        
+        let validPets = petsData.filter { pet in
+            guard let endDateString = pet["endDate"],
+                  !endDateString.isEmpty else {
+                return false
+            }
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyyMMdd"
+            guard let endDate = dateFormatter.date(from: endDateString) else {
+                return false
+            }
+            
+            return endDate >= Date()
+        }
+        
+        return validPets
+    }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
+    let id: String
     let name: String
     let shelter: String
     let image: String
@@ -67,14 +158,23 @@ struct PetAppWidgetEntryView : View {
     var entry: Provider.Entry
     
     var body: some View {
-        Text("")
         VStack(alignment: .center, spacing: 12) {
             HStack(alignment: .center, spacing: 12) {
-                PosterView(image: entry.image, size: 70)
-                    .frame(height: 70)
-                    .scaledToFill()
+                if let imageURL = URL(string: entry.image) {
+                    SNImage(
+                        url: imageURL,
+                        processingOption: .downsample(.init(width: 70, height: 70))
+                    )
                     .asBackground(.gray.opacity(0.3))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 70, height: 70)
+                        .asBackground(.gray.opacity(0.3))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(entry.name)
@@ -85,14 +185,12 @@ struct PetAppWidgetEntryView : View {
                     Text(entry.shelter)
                         .font(.caption)
                         .asForeground(.black)
-                    
-//                    Spacer()
                 }
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.top, 4)
             .padding(.horizontal, 4)
-            
-            Spacer()
             
             HStack {
                 Spacer()
@@ -100,10 +198,11 @@ struct PetAppWidgetEntryView : View {
                     .padding(5)
                     .asBackground(.pink.opacity(0.7))
                     .asForeground(.white)
-                    .font(.caption)
+                    .font(.system(size: 13, weight: .bold))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .padding(.horizontal, 4)
+            .padding(.bottom, 4)
         }
     }
 }
@@ -119,7 +218,6 @@ struct PetAppWidget: Widget {
             } else {
                 PetAppWidgetEntryView(entry: entry)
                     .padding()
-//                    .background()
             }
         }
         .configurationDisplayName("Warala 위젯")
@@ -132,6 +230,7 @@ struct PetAppWidget_Previews: PreviewProvider {
     static var previews: some View {
         PetAppWidgetEntryView(entry: SimpleEntry(
             date: Date(),
+            id: "",
             name: "푸들",
             shelter: "한국유기동물보호소",
             image: "",

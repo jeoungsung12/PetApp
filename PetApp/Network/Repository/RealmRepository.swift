@@ -142,6 +142,7 @@ extension RealmRepository {
         } catch {
             print("관심등록 실패 \(error)")
         }
+        syncLikedPetsToWidget()
     }
     
     func removeAllLikedEntity() {
@@ -153,6 +154,7 @@ extension RealmRepository {
         } catch {
             print("모든 좋아요 엔티티 삭제 실패: \(error)")
         }
+        syncLikedPetsToWidget()
     }
     
     func removeLikedHomeEntity(id: String) {
@@ -165,6 +167,7 @@ extension RealmRepository {
         } catch {
             print("관심 삭제 실패")
         }
+        syncLikedPetsToWidget()
     }
     
     func getAllLikedHomeEntities() -> [HomeEntity] {
@@ -206,6 +209,22 @@ extension RealmRepository {
     
     func isLiked(id: String) -> Bool {
         return realm.object(ofType: RealmHomeEntity.self, forPrimaryKey: id) != nil
+    }
+    
+    func syncLikedPetsToWidget() {
+        let likedEntities = getAllLikedHomeEntities()
+        
+        let likedPetsData = likedEntities.map { entity -> [String: String] in
+            return [
+                "id": entity.animal.id,
+                "name": entity.animal.name,
+                "shelter": entity.shelter.name,
+                "image": entity.animal.thumbImage,
+                "endDate": entity.shelter.endDate
+            ]
+        }
+        
+        UserDefaults.groupShared.set(likedPetsData, forKey: "likedPetsKey")
     }
 }
 

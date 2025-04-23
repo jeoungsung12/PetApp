@@ -63,6 +63,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E428104E2DB8FE6E00467263 /* PetAppWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PetAppWidgetExtension.entitlements; sourceTree = "<group>"; };
 		E48B1A182DB7CF4B0066C8C8 /* PetAppWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PetAppWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E48B1A1A2DB7CF4B0066C8C8 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		E48B1A1C2DB7CF4B0066C8C8 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -83,7 +84,6 @@
 			membershipExceptions = (
 				Modifier/BackgroundWrapper.swift,
 				Modifier/ForegroundWrapper.swift,
-				Modifier/PosterView.swift,
 			);
 			target = E497264F2D8D273300716594 /* PetApp */;
 		};
@@ -161,6 +161,7 @@
 		E49726472D8D273300716594 = {
 			isa = PBXGroup;
 			children = (
+				E428104E2DB8FE6E00467263 /* PetAppWidgetExtension.entitlements */,
 				E49726A92D8D2D6B00716594 /* .gitignore */,
 				E49726522D8D273300716594 /* PetApp */,
 				E48B1A1E2DB7CF4B0066C8C8 /* PetAppWidget */,
@@ -368,6 +369,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PetAppWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -401,6 +403,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PetAppWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
