@@ -1,5 +1,5 @@
 {
-  "originHash" : "1a8c755e8fca441d4bc0f1b576ae9903f5b28a4d08d18a3ff1ae976becbb0b3f",
+  "originHash" : "13d1d5271452468da1fe0cd931ca55341e2c04c96a45445836f3774337f97977",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jeoungsung12/SNKit.git",
       "state" : {
-        "revision" : "d01976cf5505715cb98be92e102280ed51c530c6",
-        "version" : "1.0.4"
+        "revision" : "ce97d612d7db2a3d54b3d12243192b3dfeb6e343",
+        "version" : "1.1.0"
       }
     },
     {

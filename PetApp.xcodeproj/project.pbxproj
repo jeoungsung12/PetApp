@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E4625D4E2DB8E43500070A4E /* SNKit in Frameworks */ = {isa = PBXBuildFile; productRef = E4625D4D2DB8E43500070A4E /* SNKit */; };
 		E48B1A1B2DB7CF4B0066C8C8 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E48B1A1A2DB7CF4B0066C8C8 /* WidgetKit.framework */; };
 		E48B1A1D2DB7CF4B0066C8C8 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E48B1A1C2DB7CF4B0066C8C8 /* SwiftUI.framework */; };
 		E48B1A282DB7CF4D0066C8C8 /* PetAppWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E48B1A182DB7CF4B0066C8C8 /* PetAppWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -80,6 +81,7 @@
 		E48B1A322DB7DE890066C8C8 /* Exceptions for "PetAppWidget" folder in "PetApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Modifier/BackgroundWrapper.swift,
 				Modifier/ForegroundWrapper.swift,
 				Modifier/PosterView.swift,
 			);
@@ -119,6 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4625D4E2DB8E43500070A4E /* SNKit in Frameworks */,
 				E48B1A1D2DB7CF4B0066C8C8 /* SwiftUI.framework in Frameworks */,
 				E48B1A1B2DB7CF4B0066C8C8 /* WidgetKit.framework in Frameworks */,
 			);
@@ -195,6 +198,7 @@
 			);
 			name = PetAppWidgetExtension;
 			packageProductDependencies = (
+				E4625D4D2DB8E43500070A4E /* SNKit */,
 			);
 			productName = PetAppWidgetExtension;
 			productReference = E48B1A182DB7CF4B0066C8C8 /* PetAppWidgetExtension.appex */;
@@ -745,12 +749,17 @@
 			repositoryURL = "https://github.com/jeoungsung12/SNKit.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.4;
+				version = 1.1.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E4625D4D2DB8E43500070A4E /* SNKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E4C05C402DA283530018F9D4 /* XCRemoteSwiftPackageReference "SNKit" */;
+			productName = SNKit;
+		};
 		E48B1AB22DB7E8F20066C8C8 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E48B1AB12DB7E8F20066C8C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

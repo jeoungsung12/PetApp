@@ -169,7 +169,7 @@ extension RealmRepository {
     
     func getAllLikedHomeEntities() -> [HomeEntity] {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyyMMdd"
         
         let currentDate = Date()
         let realmEntities = realm.objects(RealmHomeEntity.self)
@@ -179,7 +179,6 @@ extension RealmRepository {
                   let endDate = dateFormatter.date(from: endDateString) else {
                 return false
             }
-            
             return endDate < currentDate
         }
         

@@ -10,7 +10,7 @@ import SwiftUI
 struct ForegroundWrapper: ViewModifier {
     let color: Color
     func body(content: Content) -> some View {
-        if #available(iOS 16, *) {
+        if #available(iOS 15, *) {
             content
                 .foregroundStyle(color)
         } else {

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SNKit
-import Kingfisher
 
 struct PosterView: View {
     let image: String
@@ -33,15 +32,9 @@ struct PosterView: View {
                 }
             }
         } else {
-//            KFImage(URL(string: image))
-//                .placeholder {
-//                    ProgressView()
-//                        .frame(height: size)
-//                }
-//                .resizable()
-//                .scaledToFill()
-//                .frame(height: size)
-//                .background(Color.gray)
+            if let url = URL(string: image) {
+                SNImage(url: url)
+            }
         }
     }
 }
