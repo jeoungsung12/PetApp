@@ -1,0 +1,43 @@
+name: iOS CI (Develop Branch)
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Cache CocoaPods packages
+        uses: actions/cache@v3
+        with:
+          path: Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      
+      - name: Install CocoaPods Dependencies
+        run: |
+          pod install --repo-update
+      
+      - name: Build and Test
+        env:
+          scheme: PetApp
+          platform: iOS Simulator
+          device: iPhone 14
+        run: |
+          xcodebuild clean test -workspace PetApp.xcworkspace -scheme "$scheme" -destination "platform=$platform,name=$device" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/
