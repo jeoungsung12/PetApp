@@ -1,6 +1,0 @@
-git_url("https://github.com/jeoungsung12/PetAppCertificates.git")
-storage_mode("git")
-type("appstore")
-app_identifier("WEDLE.Warala")
-username("jeoungsung12@naver.com")
-team_id("Q653PU93R6")
