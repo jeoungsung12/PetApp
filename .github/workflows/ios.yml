@@ -9,12 +9,28 @@ on:
 jobs:
   deploy-to-testflight:
     name: Build and Deploy to TestFlight
-    runs-on: macos-latest
+    runs-on: macos-14 # GitHub의 최신 macOS 환경
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
+      # 시스템 정보 확인
+      - name: Check System Info
+        run: |
+          sw_vers
+          xcode-select -p
+          xcodebuild -version
+          ls -la /Applications | grep Xcode
+      
+      # 프로젝트 구조 확인
+      - name: List project structure
+        run: |
+          ls -la
+          find . -name "*.xcodeproj" | sort
+          find . -name "*.xcworkspace" | sort
+      
+      # Swift 패키지 캐싱 - 빌드 시간 단축
       - name: Cache Swift packages
         uses: actions/cache@v3
         with:
@@ -23,13 +39,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
       
-      - name: Set Default Scheme
+      # 프로젝트 및 스킴 자동 감지
+      - name: Find Project and Scheme
         run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
+          project_file=$(find . -name "*.xcodeproj" | head -n 1)
+          
+          if [ -n "$project_file" ]; then
+            project_name=$(basename "$project_file" .xcodeproj)
+            echo "PROJECT_NAME=$project_name" >> $GITHUB_ENV
+            echo "PROJECT_FILE=$project_file" >> $GITHUB_ENV
+            echo "Using project: $project_name ($project_file)"
+            
+            # pbxproj 파일 분석해서 타겟 이름 추출 (기본 스킴으로 사용)
+            target_name=$(grep -A 5 "PBXNativeTarget" "$project_file/project.pbxproj" | grep "name =" | head -n 1 | cut -d '"' -f 2)
+            if [ -n "$target_name" ]; then
+              echo "DEFAULT_SCHEME=$target_name" >> $GITHUB_ENV
+              echo "Using scheme: $target_name"
+            else
+              echo "DEFAULT_SCHEME=$project_name" >> $GITHUB_ENV
+              echo "Using scheme: $project_name (fallback to project name)"
+            fi
+          else
+            echo "No .xcodeproj file found"
+            exit 1
+          fi
       
+      # App Store Connect API 키 설정
       - name: Setup App Store Connect API Key
         env:
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
@@ -39,35 +74,26 @@ jobs:
           mkdir -p ~/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
+      # Apple 계정 인증
       - name: Setup Apple Developer Authentication
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID"
-          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD"
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
+          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD" || true
       
+      # 앱 아카이브 생성
       - name: Build App
         env:
-          scheme: $(cat default)
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
         run: |
-          # Xcode 프로젝트/워크스페이스 자동 감지
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then 
-            filetype_parameter="workspace" 
-            file_to_build="`ls -A | grep -i \\.xcworkspace\$`"
-          else 
-            filetype_parameter="project" 
-            file_to_build="`ls -A | grep -i \\.xcodeproj\$`"
-          fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          
           # 아카이브 생성
           xcodebuild archive \
-            -"$filetype_parameter" "$file_to_build" \
-            -scheme "$scheme" \
+            -project "$PROJECT_FILE" \
+            -scheme "$DEFAULT_SCHEME" \
             -archivePath build/app.xcarchive \
             -destination "generic/platform=iOS" \
             -configuration Release \
@@ -75,6 +101,7 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             CODE_SIGN_STYLE=Automatic
       
+      # 자동 서명용 ExportOptions.plist 생성
       - name: Create Export Options Plist
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -99,6 +126,7 @@ jobs:
           </plist>
           EOL
       
+      # IPA 생성
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
@@ -106,6 +134,7 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build
       
+      # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
