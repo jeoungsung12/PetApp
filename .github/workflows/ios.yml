@@ -1,7 +1,6 @@
 name: Upload to TestFlight
 
 on:
-  # 수동 트리거를 추가하여 GitHub 웹 인터페이스에서 워크플로우를 실행할 수 있습니다
   workflow_dispatch:
     inputs:
       ipa_path:
@@ -22,14 +21,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
+      # IPA 파일 경로 설정
+      - name: Set IPA path
+        id: set-ipa-path
+        run: |
+          # 이벤트 타입에 따라 IPA 경로 설정
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # 수동 실행인 경우 입력된 경로 사용
+            echo "IPA_PATH=${{ github.event.inputs.ipa_path }}" >> $GITHUB_ENV
+          else
+            # 푸시 이벤트인 경우 기본 경로 사용
+            echo "IPA_PATH=builds/app.ipa" >> $GITHUB_ENV
+          fi
+          echo "Using IPA path: ${{ env.IPA_PATH }}"
+      
       # IPA 파일을 저장소에 업로드했는지 확인
       - name: Verify IPA exists
         run: |
-          ipa_path="${{ github.event.inputs.ipa_path }}"
-          if [ -f "$ipa_path" ]; then
-            echo "IPA file found at $ipa_path"
+          if [ -f "${{ env.IPA_PATH }}" ]; then
+            echo "✅ IPA file found at ${{ env.IPA_PATH }}"
           else
-            echo "IPA file not found at $ipa_path"
+            echo "❌ IPA file not found at ${{ env.IPA_PATH }}"
             echo "Please upload your IPA file to the repository in the specified path"
             echo "Or provide a correct path when triggering this workflow"
             exit 1
@@ -49,7 +61,7 @@ jobs:
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: ${{ github.event.inputs.ipa_path }}
+          app-path: ${{ env.IPA_PATH }}
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
