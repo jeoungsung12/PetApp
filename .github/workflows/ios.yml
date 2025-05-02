@@ -2,7 +2,9 @@ name: iOS CD (Release Branch)
 
 on:
   push:
-    branches: [ release ]
+    branches: [ "release" ]
+  pull_request:
+    branches: [ "release" ]
 
 jobs:
   deploy-to-testflight:
@@ -11,19 +13,22 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
-      - name: Cache CocoaPods packages
+      - name: Cache Swift packages
         uses: actions/cache@v3
         with:
-          path: Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-spm-
       
-      - name: Install CocoaPods Dependencies
+      - name: Set Default Scheme
         run: |
-          pod install --repo-update
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $default | cat >default
+          echo Using default scheme: $default
       
       - name: Setup App Store Connect API Key
         env:
@@ -45,21 +50,35 @@ jobs:
       
       - name: Build App
         env:
+          scheme: $(cat default)
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          BUNDLE_IDENTIFIER: "WEDLE.Warala"
-          APPLE_ID: ${{ secrets.APPLE_ID }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
         run: |
-          # 자동 서명 활성화를 위한 프로젝트 설정 업데이트
-          /usr/libexec/PlistBuddy -c "Set :ProvisioningStyle Automatic" PetApp.xcodeproj/project.pbxproj
+          # Xcode 프로젝트/워크스페이스 자동 감지
+          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then 
+            filetype_parameter="workspace" 
+            file_to_build="`ls -A | grep -i \\.xcworkspace\$`"
+          else 
+            filetype_parameter="project" 
+            file_to_build="`ls -A | grep -i \\.xcodeproj\$`"
+          fi
+          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
           
-          # Xcode Managed Profile을 사용하여 빌드
-          xcodebuild -workspace PetApp.xcworkspace -scheme PetApp -configuration Release \
-          -archivePath build/PetApp.xcarchive archive \
-          DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
-          CODE_SIGN_IDENTITY="Apple Distribution" \
-          CODE_SIGN_STYLE=Automatic
+          # 아카이브 생성
+          xcodebuild archive \
+            -"$filetype_parameter" "$file_to_build" \
+            -scheme "$scheme" \
+            -archivePath build/app.xcarchive \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            CODE_SIGN_STYLE=Automatic
       
       - name: Create Export Options Plist
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -69,7 +88,7 @@ jobs:
               <key>method</key>
               <string>app-store</string>
               <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
+              <string>${APPLE_TEAM_ID}</string>
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
@@ -82,12 +101,15 @@ jobs:
       
       - name: Create IPA
         run: |
-          xcodebuild -exportArchive -archivePath build/PetApp.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build
+          xcodebuild -exportArchive \
+            -archivePath build/app.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build
       
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: build/PetApp.ipa
+          app-path: build/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
