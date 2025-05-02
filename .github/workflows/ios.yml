@@ -9,9 +9,9 @@ on:
         required: true
         default: 'builds/app.ipa'
   
-  # release 브랜치 푸시 시에도 실행 (필요하면 주석 제거)
-  # push:
-  #   branches: [ "release" ]
+  # release 브랜치 푸시 시에도 실행
+  push:
+     branches: [ "release" ]
 
 jobs:
   upload-to-testflight:
