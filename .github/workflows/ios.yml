@@ -1,66 +1,37 @@
-name: iOS CD (Release Branch)
+name: Upload to TestFlight
 
 on:
-  push:
-    branches: [ "release" ]
-  pull_request:
-    branches: [ "release" ]
+  # 수동 트리거를 추가하여 GitHub 웹 인터페이스에서 워크플로우를 실행할 수 있습니다
+  workflow_dispatch:
+    inputs:
+      ipa_path:
+        description: '업로드할 IPA 파일 경로'
+        required: true
+        default: 'builds/app.ipa'
+  
+  # release 브랜치 푸시 시에도 실행 (필요하면 주석 제거)
+  # push:
+  #   branches: [ "release" ]
 
 jobs:
-  deploy-to-testflight:
-    name: Build and Deploy to TestFlight
-    runs-on: macos-14 # GitHub의 최신 macOS 환경
+  upload-to-testflight:
+    name: Upload to TestFlight
+    runs-on: macos-latest
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
-      # 시스템 정보 확인
-      - name: Check System Info
+      # IPA 파일을 저장소에 업로드했는지 확인
+      - name: Verify IPA exists
         run: |
-          sw_vers
-          xcode-select -p
-          xcodebuild -version
-          ls -la /Applications | grep Xcode
-      
-      # 프로젝트 구조 확인
-      - name: List project structure
-        run: |
-          ls -la
-          find . -name "*.xcodeproj" | sort
-          find . -name "*.xcworkspace" | sort
-      
-      # Swift 패키지 캐싱 - 빌드 시간 단축
-      - name: Cache Swift packages
-        uses: actions/cache@v3
-        with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-      
-      # 프로젝트 및 스킴 자동 감지
-      - name: Find Project and Scheme
-        run: |
-          project_file=$(find . -name "*.xcodeproj" | head -n 1)
-          
-          if [ -n "$project_file" ]; then
-            project_name=$(basename "$project_file" .xcodeproj)
-            echo "PROJECT_NAME=$project_name" >> $GITHUB_ENV
-            echo "PROJECT_FILE=$project_file" >> $GITHUB_ENV
-            echo "Using project: $project_name ($project_file)"
-            
-            # pbxproj 파일 분석해서 타겟 이름 추출 (기본 스킴으로 사용)
-            target_name=$(grep -A 5 "PBXNativeTarget" "$project_file/project.pbxproj" | grep "name =" | head -n 1 | cut -d '"' -f 2)
-            if [ -n "$target_name" ]; then
-              echo "DEFAULT_SCHEME=$target_name" >> $GITHUB_ENV
-              echo "Using scheme: $target_name"
-            else
-              echo "DEFAULT_SCHEME=$project_name" >> $GITHUB_ENV
-              echo "Using scheme: $project_name (fallback to project name)"
-            fi
+          ipa_path="${{ github.event.inputs.ipa_path }}"
+          if [ -f "$ipa_path" ]; then
+            echo "IPA file found at $ipa_path"
           else
-            echo "No .xcodeproj file found"
+            echo "IPA file not found at $ipa_path"
+            echo "Please upload your IPA file to the repository in the specified path"
+            echo "Or provide a correct path when triggering this workflow"
             exit 1
           fi
       
@@ -74,71 +45,11 @@ jobs:
           mkdir -p ~/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # Apple 계정 인증
-      - name: Setup Apple Developer Authentication
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
-          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD" || true
-      
-      # 앱 아카이브 생성
-      - name: Build App
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
-        run: |
-          # 아카이브 생성
-          xcodebuild archive \
-            -project "$PROJECT_FILE" \
-            -scheme "$DEFAULT_SCHEME" \
-            -archivePath build/app.xcarchive \
-            -destination "generic/platform=iOS" \
-            -configuration Release \
-            DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            CODE_SIGN_STYLE=Automatic
-      
-      # 자동 서명용 ExportOptions.plist 생성
-      - name: Create Export Options Plist
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
-        run: |
-          cat > ExportOptions.plist << EOL
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>teamID</key>
-              <string>${APPLE_TEAM_ID}</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-          </dict>
-          </plist>
-          EOL
-      
-      # IPA 생성
-      - name: Create IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath build/app.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build
-      
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: build/*.ipa
+          app-path: ${{ github.event.inputs.ipa_path }}
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
