@@ -4,6 +4,7 @@
 //
 //  Created by 정성윤 on 4/8/25.
 //
+
 import UIKit
 
 final class HomeCoordinator: Coordinator {
@@ -11,8 +12,12 @@ final class HomeCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
+    weak var detailCoordinator: DetailCoordinating?
+    weak var mapCoordinator: LocationCoordinating?
+    
     weak var errorDelegate: ErrorDelegate?
     weak var locationDelegate: LocationDelegate?
+    
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -30,11 +35,7 @@ final class HomeCoordinator: Coordinator {
     }
     
     func showDetail(with entity: HomeEntity) {
-        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
-            let detailVC = DetailViewController(viewModel: detailVM)
-            detailVC.homeCoord = self
-            navigationController.pushViewController(detailVC, animated: true)
-        }
+        detailCoordinator?.showDetail(with: entity, from: self)
     }
     
     func showList() {
@@ -54,16 +55,7 @@ final class HomeCoordinator: Coordinator {
     }
     
     func showMap(mapType: MapType) {
-        if let _ = DIContainer.shared.resolveFactory(type: MapViewModel.self) {
-            let mapVM = MapViewModel(
-                repository: DIContainer.shared.resolve(type: NetworkRepositoryType.self)!,
-                locationManager: DIContainer.shared.resolve(type: LocationRepositoryType.self)!,
-                mapType: mapType
-            )
-            let mapVC = MapViewController(viewModel: mapVM)
-            mapVC.coordinator = self
-            navigationController.pushViewController(mapVC, animated: true)
-        }
+        mapCoordinator?.showMap(mapType: mapType, from: self)
     }
     
     func showLike() {
@@ -92,11 +84,7 @@ final class HomeCoordinator: Coordinator {
     }
     
     func showLocation(location: LocationViewModel.LocationEntity) {
-        let locationVC = LocationPopupViewController(userLocation: location)
-        locationVC.modalPresentationStyle = .overCurrentContext
-        locationVC.modalTransitionStyle = .crossDissolve
-        locationVC.delegate = self
-        navigationController.present(locationVC, animated: true)
+        mapCoordinator?.showLocation(location: location, from: self)
     }
     
     func finish() {
@@ -123,5 +111,4 @@ extension HomeCoordinator: ErrorDelegate, LocationDelegate {
             break
         }
     }
-    
 }

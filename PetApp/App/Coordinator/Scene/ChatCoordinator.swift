@@ -4,6 +4,7 @@
 //
 //  Created by 정성윤 on 4/8/25.
 //
+
 import UIKit
 
 final class ChatCoordinator: Coordinator {
@@ -11,8 +12,11 @@ final class ChatCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
     
+    weak var detailCoordinator: DetailCoordinating?
+    
     weak var errorDelegate: ErrorDelegate?
     weak var locationDelegate: LocationDelegate?
+    
     init(
         navigationController: UINavigationController,
         parentCoordinator: Coordinator? = nil
@@ -37,19 +41,15 @@ final class ChatCoordinator: Coordinator {
         }
     }
     
+    func showDetail(with entity: HomeEntity) {
+        detailCoordinator?.showDetail(with: entity, from: self)
+    }
+    
     func showList() {
         if let listVM = DIContainer.shared.resolveFactory(type: ListViewModel.self) {
             let listVC = ListViewController(viewModel: listVM)
             listVC.chatCoord = self
             navigationController.pushViewController(listVC, animated: true)
-        }
-    }
-    
-    func showDetail(with entity: HomeEntity) {
-        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
-            let detailVC = DetailViewController(viewModel: detailVM)
-            detailVC.chatCoord = self
-            navigationController.pushViewController(detailVC, animated: true)
         }
     }
     
@@ -94,5 +94,4 @@ extension ChatCoordinator: ErrorDelegate, LocationDelegate {
             break
         }
     }
-    
 }

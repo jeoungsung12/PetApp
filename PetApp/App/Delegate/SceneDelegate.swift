@@ -4,6 +4,10 @@
 //
 //  Created by 정성윤 on 3/21/25.
 //
+//
+//  SceneDelegate.swift
+//  PetApp
+//
 
 import UIKit
 
@@ -77,7 +81,4 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneDidEnterBackground(_ scene: UIScene) {
     }
-    
-    
 }
-

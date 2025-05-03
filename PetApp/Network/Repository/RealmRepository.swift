@@ -213,12 +213,44 @@ extension RealmRepository {
     }
     
     func syncLikedPetsToWidget() {
-        let likedEntities = getAllLikedHomeEntities()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        let currentDate = Date()
         
-        var likedPetsData: [[String: String]] = []
+        let validEntities = getAllLikedHomeEntities().filter { entity in
+            let endDateString = entity.shelter.endDate
+            guard let endDate = dateFormatter.date(from: endDateString) else {
+                return true
+            }
+            return endDate >= currentDate
+        }
+        
+        
+        let existingData = UserDefaults.groupShared.array(forKey: "likedPetsKey") as? [[String: String]] ?? []
+        let existingIDs = Set(existingData.compactMap { $0["id"] })
+        
+        let currentIDs = Set(validEntities.map { $0.animal.id })
+        let newIDs = currentIDs.subtracting(existingIDs)
+        let removedIDs = existingIDs.subtracting(currentIDs)
+        let unchangedIDs = existingIDs.intersection(currentIDs)
+        
+        var likedPetsData: [[String: String]] = existingData.filter { dict in
+            guard let id = dict["id"] else { return false }
+            return unchangedIDs.contains(id)
+        }
+        
+        let newEntities = validEntities.filter { newIDs.contains($0.animal.id) }
+        
+        if newEntities.isEmpty {
+            if !removedIDs.isEmpty {
+                UserDefaults.groupShared.set(likedPetsData, forKey: "likedPetsKey")
+            }
+            return
+        }
+        
         let group = DispatchGroup()
         
-        for entity in likedEntities {
+        for entity in newEntities {
             group.enter()
             
             if let networkRepo = container.resolve(type: NetworkRepositoryType.self) {

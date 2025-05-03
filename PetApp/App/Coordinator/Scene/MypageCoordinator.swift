@@ -4,12 +4,15 @@
 //
 //  Created by 정성윤 on 4/8/25.
 //
+
 import UIKit
 
 final class MyPageCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var parentCoordinator: Coordinator?
     var navigationController: UINavigationController
+    
+    weak var detailCoordinator: DetailCoordinating?
     
     init(
         navigationController: UINavigationController,
@@ -28,11 +31,7 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func showDetail(with entity: HomeEntity) {
-        if let detailVM = DIContainer.shared.resolveFactory(type: DetailViewModel.self, entity: entity) {
-            let detailVC = DetailViewController(viewModel: detailVM)
-            detailVC.mypageCoord = self
-            navigationController.pushViewController(detailVC, animated: true)
-        }
+        detailCoordinator?.showDetail(with: entity, from: self)
     }
     
     func showLike() {
@@ -99,11 +98,8 @@ final class MyPageCoordinator: Coordinator {
     }
     
     func navigateToLogin() {
-        guard let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate,
-              let appCoordinator = sceneDelegate.appCoordinator else { return }
-        
-        appCoordinator.childCoordinators.removeAll()
-        appCoordinator.showLogin()
+        guard let mainCoordinator = parentCoordinator as? MainCoordinator else { return }
+        mainCoordinator.navigateToLogin()
         finish()
     }
     

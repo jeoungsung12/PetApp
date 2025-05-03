@@ -67,6 +67,13 @@ final class DIContainer: DIContainerType {
 
 extension DIContainer {
     static func setupDependencies() {
+        setupNetworkDependencies()
+        setupLocationDependencies()
+        setupRepositoryDependencies()
+        setupViewModelDependencies()
+    }
+    
+    static func setupNetworkDependencies() {
         let container = DIContainer.shared
         
         container.registerSingleton(type: NetworkManagerType.self) {
@@ -77,17 +84,29 @@ extension DIContainer {
             NetworkMonitorManager()
         }
         
-        container.registerSingleton(type: LocationRepositoryType.self) {
-            LocationRepository.shared
-        }
-        
         container.registerSingleton(type: NetworkRepositoryType.self) {
             NetworkRepository.shared
         }
+    }
+    
+    static func setupLocationDependencies() {
+        let container = DIContainer.shared
+        
+        container.registerSingleton(type: LocationRepositoryType.self) {
+            LocationRepository.shared
+        }
+    }
+    
+    static func setupRepositoryDependencies() {
+        let container = DIContainer.shared
         
         container.registerSingleton(type: RealmRepositoryType.self) {
             RealmRepository.shared
         }
+    }
+    
+    static func setupViewModelDependencies() {
+        let container = DIContainer.shared
         
         container.registerFactory(type: ProfileImageViewModel.self) { _ in
             ProfileImageViewModel()

@@ -9,7 +9,7 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     private let locationManager: LocationRepositoryType
-    weak var coordinator: AppCoordinator?
+    weak var coordinator: Coordinator?
     
     init(
         locationManager: LocationRepositoryType

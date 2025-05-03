@@ -28,3 +28,14 @@ extension Coordinator {
         parentCoordinator?.childDidFinish(self)
     }
 }
+
+
+protocol DetailCoordinating: AnyObject {
+    func showDetail(with entity: HomeEntity, from sourceCoordinator: Coordinator)
+    func closeDetail()
+}
+
+protocol LocationCoordinating: AnyObject {
+    func showLocation(location: LocationViewModel.LocationEntity, from sourceCoordinator: Coordinator)
+    func showMap(mapType: MapType, from sourceCoordinator: Coordinator)
+}

@@ -11,6 +11,12 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
+enum SourceCoordinatorType {
+    case home
+    case chat
+    case mypage
+}
+
 final class DetailViewController: BaseViewController {
     private let loadingIndicator = UIActivityIndicatorView()
     private let tableView = UITableView()
@@ -18,9 +24,9 @@ final class DetailViewController: BaseViewController {
     private var disposeBag = DisposeBag()
     private var viewModel: DetailViewModel
     
-    weak var chatCoord: ChatCoordinator?
-    weak var homeCoord: HomeCoordinator?
-    weak var mypageCoord: MyPageCoordinator?
+    weak var coordinator: DetailCoordinator?
+    var sourceCoordinator: SourceCoordinatorType?
+    
     init(viewModel: DetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -32,9 +38,7 @@ final class DetailViewController: BaseViewController {
     }
     
     override func setBinding() {
-        let input = DetailViewModel.Input(
-            
-        )
+        let input = DetailViewModel.Input()
         let output = viewModel.transform(input)
         loadingIndicator.startAnimating()
         
@@ -107,7 +111,6 @@ final class DetailViewController: BaseViewController {
 
 extension DetailViewController: ShareDelegate {
     
-    //TODO: viewModel
     func activityShare(_ entity: HomeEntity) {
         let deepLink = "https://apps.apple.com/kr/app/%EC%99%80%EB%9E%84%EB%9D%BC-warala/id6744003128"
         let shareText = """
@@ -126,7 +129,6 @@ extension DetailViewController: ShareDelegate {
             return
         }
         
-        //TODO: 이미지 통신
         URLSession.shared.dataTask(with: imageUrl) { data, response, error in
             DispatchQueue.main.async {
                 if let data = data, let image = UIImage(data: data) {
@@ -147,6 +149,4 @@ extension DetailViewController: ShareDelegate {
         tableView.register(DetailMiddleCell.self, forCellReuseIdentifier: DetailMiddleCell.id)
         tableView.register(DetailFooterCell.self, forCellReuseIdentifier: DetailFooterCell.id)
     }
-    
-    
 }
