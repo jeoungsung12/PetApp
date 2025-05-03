@@ -1,20 +1,19 @@
-name: iOS CI (Develop Branch)
+name: iOS CD (Release Branch)
 
 on:
   push:
-    branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+    branches: [ "release" ]
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  deploy-to-testflight:
+    name: Build and Deploy to TestFlight
     runs-on: macos-latest
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
+      # Swift 패키지 캐싱
       - name: Cache Swift packages
         uses: actions/cache@v3
         with:
@@ -23,67 +22,117 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
       
-      - name: Set Default Scheme
+      # Xcode 버전 확인
+      - name: Check Xcode version
         run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
+          xcodebuild -version
       
-      - name: Build
-        env:
-          scheme: $(cat default)
-          platform: iOS Simulator
+      # 프로젝트 및 스킴 자동 감지
+      - name: Find Project and Scheme
         run: |
-          # Xcode 프로젝트/워크스페이스 자동 감지
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then 
-            filetype_parameter="workspace" 
-            file_to_build="`ls -A | grep -i \\.xcworkspace\$`"
-          else 
-            filetype_parameter="project" 
-            file_to_build="`ls -A | grep -i \\.xcodeproj\$`"
+          project_file=$(find . -name "*.xcodeproj" | head -n 1)
+          
+          if [ -n "$project_file" ]; then
+            project_name=$(basename "$project_file" .xcodeproj)
+            echo "PROJECT_NAME=$project_name" >> $GITHUB_ENV
+            echo "PROJECT_FILE=$project_file" >> $GITHUB_ENV
+            echo "Using project: $project_name ($project_file)"
+            
+            # 스킴 리스트 가져오기 시도
+            schemes=$(xcodebuild -project "$project_file" -list | grep -A 10 "Schemes:" | grep -v "Schemes:" | grep -v '^$' | sed 's/^[ \t]*//')
+            if [ -n "$schemes" ]; then
+              default_scheme=$(echo "$schemes" | head -n 1)
+              echo "DEFAULT_SCHEME=$default_scheme" >> $GITHUB_ENV
+              echo "Using scheme: $default_scheme"
+            else
+              echo "DEFAULT_SCHEME=$project_name" >> $GITHUB_ENV
+              echo "Using scheme: $project_name (fallback to project name)"
+            fi
+          else
+            echo "No .xcodeproj file found"
+            exit 1
           fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          
-          # 사용 가능한 시뮬레이터 찾기
-          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
-          
-          # 빌드
-          xcodebuild build-for-testing \
-            -"$filetype_parameter" "$file_to_build" \
-            -scheme "$scheme" \
-            -destination "platform=$platform,name=$device" \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
       
-      - name: Test
+      # App Store Connect API 키 설정
+      - name: Setup App Store Connect API Key
         env:
-          scheme: $(cat default)
-          platform: iOS Simulator
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
-          # Xcode 프로젝트/워크스페이스 자동 감지
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then 
-            filetype_parameter="workspace" 
-            file_to_build="`ls -A | grep -i \\.xcworkspace\$`"
-          else 
-            filetype_parameter="project" 
-            file_to_build="`ls -A | grep -i \\.xcodeproj\$`"
-          fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          
-          # 사용 가능한 시뮬레이터 찾기
-          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
-          
-          # 테스트
-          xcodebuild test-without-building \
-            -"$filetype_parameter" "$file_to_build" \
-            -scheme "$scheme" \
-            -destination "platform=$platform,name=$device"
+          mkdir -p ~/private_keys
+          echo -n "$APP_STORE_CONNECT_API_KEY" > ~/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v3
-        if: failure()
+      # Apple 계정 인증
+      - name: Setup Apple Developer Authentication
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
+          xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD" || true
+      
+      # 앱 빌드 및 아카이브
+      - name: Build App
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
+        run: |
+          # 빌드 번호 증가 (선택 사항)
+          # build_number=$(xcrun agvtool what-version -terse)
+          # new_build_number=$((build_number + 1))
+          # xcrun agvtool new-version -all $new_build_number
+          
+          # 아카이브 생성
+          xcodebuild archive \
+            -project "$PROJECT_FILE" \
+            -scheme "$DEFAULT_SCHEME" \
+            -archivePath build/app.xcarchive \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            CODE_SIGN_STYLE=Automatic
+      
+      # 자동 서명용 ExportOptions.plist 생성
+      - name: Create Export Options Plist
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
+        run: |
+          cat > ExportOptions.plist << EOL
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>${APPLE_TEAM_ID}</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+          </dict>
+          </plist>
+          EOL
+      
+      # IPA 생성
+      - name: Create IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/app.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build
+      
+      # TestFlight에 업로드
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
         with:
-          name: test-results
-          path: test-results/
+          app-path: build/*.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
