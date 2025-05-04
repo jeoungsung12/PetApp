@@ -26,27 +26,8 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # 앱 빌드 및 아카이브 (완전 자동 서명)
-      - name: Build and Archive App
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          xcodebuild archive \
-            -project PetApp.xcodeproj \
-            -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
-            -destination "generic/platform=iOS" \
-            -configuration Release \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            CODE_SIGN_IDENTITY="Apple Development" \
-            CODE_SIGN_STYLE=Automatic
-      
       # ExportOptions.plist 생성 (자동 서명용)
       - name: Create Export Options Plist
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -55,8 +36,6 @@ jobs:
           <dict>
               <key>method</key>
               <string>app-store</string>
-              <key>teamID</key>
-              <string>${APPLE_TEAM_ID}</string>
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
@@ -66,6 +45,18 @@ jobs:
           </dict>
           </plist>
           EOL
+      
+      # 앱 빌드 및 아카이브 (완전 자동 서명)
+      - name: Build and Archive App
+        run: |
+          xcodebuild archive \
+            -project PetApp.xcodeproj \
+            -scheme "PetApp" \
+            -archivePath build/app.xcarchive \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration
       
       # IPA 생성 (자동 서명 사용)
       - name: Create IPA
