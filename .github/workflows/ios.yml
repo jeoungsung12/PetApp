@@ -26,7 +26,28 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # 앱 빌드 및 아카이브 (완전 자동 서명)
+      # Apple Developer 계정 로그인 및 프로비저닝 프로파일 새로고침
+      - name: Refresh Provisioning Profiles
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun altool --list-providers -u "$APPLE_ID" -p "$APPLE_PASSWORD"
+          
+          # 프로비저닝 프로파일 새로고침 및 동기화
+          xcodebuild -project PetApp.xcodeproj \
+            -scheme "PetApp" \
+            -sdk iphoneos \
+            -configuration Release \
+            clean build \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration
+      
+      # 앱 빌드 및 아카이브
       - name: Build and Archive App
         run: |
           xcodebuild archive \
