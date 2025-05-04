@@ -41,11 +41,11 @@ jobs:
             -allowProvisioningDeviceRegistration \
             -resolvePackageDependencies
       
-      # 디버그: 아카이브 디렉토리 확인
+       # 디버그: 아카이브 디렉토리 확인
       - name: Check Archive Directory
         run: |
-          echo "RUNNER_TEMP: $RUNNER_TEMP"
-          ls -la "$RUNNER_TEMP/build"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE/build"
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
@@ -70,24 +70,24 @@ jobs:
       # IPA 생성
       - name: Create IPA
         run: |
-          mkdir -p "$RUNNER_TEMP/output"
+          mkdir -p "$GITHUB_WORKSPACE/output"
           xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/build/app.xcarchive" \
+            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath "$RUNNER_TEMP/output" \
+            -exportPath "$GITHUB_WORKSPACE/output" \
             -allowProvisioningUpdates
       
       # 디버그: 빌드 디렉토리 확인
       - name: Check Build Directory
         run: |
-          echo "RUNNER_TEMP: $RUNNER_TEMP"
-          ls -la "$RUNNER_TEMP/output"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE/output"
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: ${{ runner.temp }}/output/*.ipa
+          app-path: ${{ github.workspace }}/output/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
