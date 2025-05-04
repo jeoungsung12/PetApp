@@ -28,25 +28,23 @@ jobs:
       
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
             -project PetApp.xcodeproj \
             -scheme "PetApp" \
-            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
+            -archivePath "$PWD/app.xcarchive" \
             -destination "generic/platform=iOS" \
             -configuration Release \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
-      
-      # 디버그: 빌드 디렉토리 확인
-      - name: Check Build Directory
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/build"
-          ls -la "$GITHUB_WORKSPACE"
-          ls -la "$GITHUB_WORKSPACE/build"
+            -allowProvisioningDeviceRegistration \
+            DEVELOPMENT_TEAM="$TEAM_ID"
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -55,6 +53,8 @@ jobs:
           <dict>
               <key>method</key>
               <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
@@ -69,21 +69,21 @@ jobs:
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
+            -archivePath "$PWD/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath "$GITHUB_WORKSPACE/build" \
+            -exportPath "$PWD/build" \
             -allowProvisioningUpdates
       
-      # 디버그: 빌드 디렉토리 최종 확인
-      - name: Final Check Build Directory
+      # 디버깅: 빌드 디렉토리 내용 확인
+      - name: List Build Directory
         run: |
-          ls -la "$GITHUB_WORKSPACE/build"
+          ls -la "$PWD/build"
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: ${{ github.workspace }}/build/*.ipa
+          app-path: build/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
