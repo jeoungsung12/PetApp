@@ -32,14 +32,18 @@ jobs:
           xcodebuild archive \
             -project PetApp.xcodeproj \
             -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
+            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
             -destination "generic/platform=iOS" \
             -configuration Release \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            -resolvePackageDependencies
+            -allowProvisioningDeviceRegistration
+      
+      # 디버그: 빌드 디렉토리 확인
+      - name: Check Build Directory
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/build"
+          ls -la "$GITHUB_WORKSPACE"
+          ls -la "$GITHUB_WORKSPACE/build"
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
@@ -57,8 +61,6 @@ jobs:
               <false/>
               <key>uploadSymbols</key>
               <true/>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
           </dict>
           </plist>
           EOL
@@ -67,16 +69,21 @@ jobs:
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath build/app.xcarchive \
+            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
+            -exportPath "$GITHUB_WORKSPACE/build" \
             -allowProvisioningUpdates
+      
+      # 디버그: 빌드 디렉토리 최종 확인
+      - name: Final Check Build Directory
+        run: |
+          ls -la "$GITHUB_WORKSPACE/build"
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: build/*.ipa
+          app-path: ${{ github.workspace }}/build/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
