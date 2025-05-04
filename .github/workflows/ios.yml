@@ -16,6 +16,15 @@ jobs:
         with:
           xcode-version: '16.2'
       
+      # 디버깅: 현재 작업 환경 상세 확인
+      - name: Detailed Workspace Debug
+        run: |
+          pwd
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la
+          echo "Contents of GITHUB_WORKSPACE:"
+          ls -la "$GITHUB_WORKSPACE"
+      
       # App Store Connect API 키 설정
       - name: Setup App Store Connect API Key
         env:
@@ -29,19 +38,17 @@ jobs:
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
         run: |
+          mkdir -p "$GITHUB_WORKSPACE/build"
           xcodebuild archive \
-            -project PetApp.xcodeproj \
+            -project "$GITHUB_WORKSPACE/PetApp.xcodeproj" \
             -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
+            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
             -destination "generic/platform=iOS" \
             -configuration Release \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            -resolvePackageDependencies
+            -allowProvisioningDeviceRegistration
       
-       # 디버그: 아카이브 디렉토리 확인
+      # 디버그: 아카이브 디렉토리 확인
       - name: Check Archive Directory
         run: |
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
@@ -50,7 +57,7 @@ jobs:
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
         run: |
-          cat > ExportOptions.plist << EOL
+          cat > "$GITHUB_WORKSPACE/ExportOptions.plist" << EOL
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -73,7 +80,7 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/output"
           xcodebuild -exportArchive \
             -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
-            -exportOptionsPlist ExportOptions.plist \
+            -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
             -exportPath "$GITHUB_WORKSPACE/output" \
             -allowProvisioningUpdates
       
