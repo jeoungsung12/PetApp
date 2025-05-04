@@ -7,28 +7,27 @@ on:
 jobs:
   build:
     name: Build and Test default scheme using any available iPhone simulator
-    runs-on: macos-15
+    runs-on: macos-latest  # macos-15 대신 macos-latest 사용
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-      - name: List available destinations
+      - name: Set Default Scheme
         run: |
-          xcodebuild -showdestinations -project *.xcodeproj -scheme PetApp
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $default | cat >default
+          echo Using default scheme: $default
       - name: Build
         env:
-          scheme: PetApp
+          scheme: ${{ 'PetApp' }}
           platform: ${{ 'iOS Simulator' }}
         run: |
-          # 특정 iPhone 시뮬레이터를 사용
-          xcodebuild build-for-testing -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,id=dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder"
+          # 간단한 대체 방식
+          xcodebuild build-for-testing -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,OS=latest"
       - name: Test
         env:
-          scheme: PetApp
+          scheme: ${{ 'PetApp' }}
           platform: ${{ 'iOS Simulator' }}
         run: |
-          # 특정 iPhone 시뮬레이터를 사용
-          xcodebuild test-without-building -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,id=dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder"
+          # 간단한 대체 방식
+          xcodebuild test-without-building -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,OS=latest"
