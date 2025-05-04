@@ -7,17 +7,16 @@ on:
 jobs:
   deploy-to-testflight:
     name: Build and Deploy to TestFlight
-    runs-on: macos-14  # 특정 macOS 버전 지정
+    runs-on: macos-14
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
-      # Xcode 버전 명시적 설정
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.2'  # 프로젝트와 호환되는 Xcode 버전 지정
+          xcode-version: '16.2'
       
       # Swift 패키지 캐싱
       - name: Cache Swift packages
@@ -28,30 +27,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
       
-      # Xcode 버전 확인
-      - name: Check Xcode version
-        run: |
-          xcodebuild -version
-      
-      # 프로젝트 및 스킴 찾기 - 수정된 부분
-      - name: Find Project and Scheme
-        run: |
-          project_file=$(find . -name "*.xcodeproj" | head -n 1)
-          
-          if [ -n "$project_file" ]; then
-            project_name=$(basename "$project_file" .xcodeproj)
-            echo "PROJECT_NAME=$project_name" >> $GITHUB_ENV
-            echo "PROJECT_FILE=$project_file" >> $GITHUB_ENV
-            echo "Using project: $project_name ($project_file)"
-            
-            # 메인 스킴 이름을 프로젝트 이름과 동일하게 설정
-            echo "DEFAULT_SCHEME=$project_name" >> $GITHUB_ENV
-            echo "Using scheme: $project_name"
-          else
-            echo "No .xcodeproj file found"
-            exit 1
-          fi
-      
       # App Store Connect API 키 설정
       - name: Setup App Store Connect API Key
         env:
@@ -59,42 +34,42 @@ jobs:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
-          mkdir -p ~/private_keys
-          echo -n "$APP_STORE_CONNECT_API_KEY" > ~/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # Apple 계정 인증
-      - name: Setup Apple Developer Authentication
+      # Apple Developer 로그인 및 자동 프로비저닝 설정
+      - name: Setup Authentication
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
+          # Apple ID 저장
+          xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --password "$APPLE_ID_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
           xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD" || true
       
-      # 앱 빌드 및 아카이브 - Automatic 코드 서명 설정
-      - name: Build App
+      # 앱 빌드 및 아카이브 (자동 서명 사용)
+      - name: Build and Archive App
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
         run: |
-          # 아카이브 생성 - CODE_SIGN_IDENTITY 변경
           xcodebuild archive \
-            -project "$PROJECT_FILE" \
-            -scheme "$DEFAULT_SCHEME" \
+            -project *.xcodeproj \
+            -scheme "PetApp" \
             -archivePath build/app.xcarchive \
             -destination "generic/platform=iOS" \
             -configuration Release \
             -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration \
             DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
             CODE_SIGN_IDENTITY="Apple Development" \
             CODE_SIGN_STYLE=Automatic
       
-      # 자동 서명용 ExportOptions.plist 생성
+      # ExportOptions.plist 생성 (자동 서명용)
       - name: Create Export Options Plist
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -111,13 +86,11 @@ jobs:
               <false/>
               <key>uploadSymbols</key>
               <true/>
-              <key>provisioningProfiles</key>
-              <dict/>
           </dict>
           </plist>
           EOL
       
-      # IPA 생성
+      # IPA 생성 (자동 서명 사용)
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
