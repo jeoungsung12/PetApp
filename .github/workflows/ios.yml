@@ -26,7 +26,19 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # ExportOptions.plist 생성 (자동 서명용)
+      # 앱 빌드 및 아카이브 (완전 자동 서명)
+      - name: Build and Archive App
+        run: |
+          xcodebuild archive \
+            -project PetApp.xcodeproj \
+            -scheme "PetApp" \
+            -archivePath build/app.xcarchive \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration
+      
+      # ExportOptions.plist 생성
       - name: Create Export Options Plist
         run: |
           cat > ExportOptions.plist << EOL
@@ -46,19 +58,7 @@ jobs:
           </plist>
           EOL
       
-      # 앱 빌드 및 아카이브 (완전 자동 서명)
-      - name: Build and Archive App
-        run: |
-          xcodebuild archive \
-            -project PetApp.xcodeproj \
-            -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
-            -destination "generic/platform=iOS" \
-            -configuration Release \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
-      
-      # IPA 생성 (자동 서명 사용)
+      # IPA 생성
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
