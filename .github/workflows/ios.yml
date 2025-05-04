@@ -67,21 +67,21 @@ jobs:
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
+            -archivePath "build/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath "$GITHUB_WORKSPACE/build" \
+            -exportPath build \
             -allowProvisioningUpdates
       
       # 디버그: 빌드 디렉토리 확인
       - name: Check Build Directory
         run: |
-          ls -la "$GITHUB_WORKSPACE/build"
+          ls -la build
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: ${{ github.workspace }}/build/*.ipa
+          app-path: build/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
