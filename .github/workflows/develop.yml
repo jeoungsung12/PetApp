@@ -1,4 +1,4 @@
-name: iOS develop workflow
+name: iOS CI(develop Branch)
 on:
   push:
     branches: [ "develop" ]
@@ -26,24 +26,12 @@ jobs:
           scheme: ${{ 'default' }}
           platform: ${{ 'iOS Simulator' }}
         run: |
-          # 사용 가능한 시뮬레이터 목록 확인
-          xcrun simctl list devices available
-          # 특정 iPhone 시뮬레이터 선택 - 공백 처리 보완
-          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | awk -F" \\(" '{print $1}' | xargs)
-          echo "Using simulator: $device"
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild build-for-testing -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
+          # 가장 간단한 방법 - 하드코딩된 기본 시뮬레이터 사용
+          xcodebuild build-for-testing -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,name=Any iOS Simulator Device"
       - name: Test
         env:
           scheme: ${{ 'default' }}
           platform: ${{ 'iOS Simulator' }}
         run: |
-          # 시뮬레이터 선택 수정 - Build 단계와 동일하게 유지
-          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | awk -F" \\(" '{print $1}' | xargs)
-          echo "Using simulator: $device"
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild test-without-building -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
+          # 가장 간단한 방법 - 하드코딩된 기본 시뮬레이터 사용
+          xcodebuild test-without-building -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,name=Any iOS Simulator Device"
