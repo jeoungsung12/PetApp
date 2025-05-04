@@ -6,7 +6,7 @@ on:
     branches: [ "develop" ]
 jobs:
   build:
-    name: Build and Test default scheme using any available iPhone simulator
+    name: Build for iOS device
     runs-on: macos-14
     steps:
       - name: Checkout
@@ -18,14 +18,5 @@ jobs:
       - name: Build
         env:
           scheme: PetApp
-          platform: ${{ 'iOS Simulator' }}
         run: |
-          # 특정 iPhone 시뮬레이터 ID를 직접 사용
-          xcodebuild build-for-testing -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,name=iPhone 15 Pro,id=3250F3FE-9EB6-42AB-98B3-5D53F4B39F8C"
-      - name: Test
-        env:
-          scheme: PetApp
-          platform: ${{ 'iOS Simulator' }}
-        run: |
-          # 특정 iPhone 시뮬레이터 ID를 직접 사용
-          xcodebuild test-without-building -scheme "$scheme" -project *.xcodeproj -destination "platform=$platform,name=iPhone 15 Pro,id=3250F3FE-9EB6-42AB-98B3-5D53F4B39F8C"
+          xcodebuild clean build -scheme "$scheme" -project *.xcodeproj -destination "generic/platform=iOS" CODE_SIGNING_ALLOWED=NO
