@@ -28,8 +28,8 @@ jobs:
         run: |
           # 사용 가능한 시뮬레이터 목록 확인
           xcrun simctl list devices available
-          # 시뮬레이터 선택 수정 - 단순 grep 사용
-          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | sed -E 's/(.+) \(([A-Z0-9-]+)\) .+/\1/')
+          # 특정 iPhone 시뮬레이터 선택 - 공백 처리 보완
+          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | awk -F" \\(" '{print $1}' | xargs)
           echo "Using simulator: $device"
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
@@ -41,7 +41,7 @@ jobs:
           platform: ${{ 'iOS Simulator' }}
         run: |
           # 시뮬레이터 선택 수정 - Build 단계와 동일하게 유지
-          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | sed -E 's/(.+) \(([A-Z0-9-]+)\) .+/\1/')
+          device=$(xcrun simctl list devices available | grep -i 'iPhone' | head -1 | awk -F" \\(" '{print $1}' | xargs)
           echo "Using simulator: $device"
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
