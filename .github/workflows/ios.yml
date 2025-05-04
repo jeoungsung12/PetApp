@@ -28,8 +28,6 @@ jobs:
       
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
-        env:
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
             -project PetApp.xcodeproj \
@@ -37,14 +35,14 @@ jobs:
             -archivePath build/app.xcarchive \
             -destination "generic/platform=iOS" \
             -configuration Release \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             -allowProvisioningUpdates \
             -allowProvisioningDeviceRegistration \
-            DEVELOPMENT_TEAM="$TEAM_ID"
+            -resolvePackageDependencies
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
-        env:
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -53,14 +51,14 @@ jobs:
           <dict>
               <key>method</key>
               <string>app-store</string>
-              <key>teamID</key>
-              <string>$TEAM_ID</string>
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
               <false/>
               <key>uploadSymbols</key>
               <true/>
+              <key>teamID</key>
+              <string>${{ secrets.APPLE_TEAM_ID }}</string>
           </dict>
           </plist>
           EOL
