@@ -29,17 +29,17 @@ jobs:
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
         run: |
+          mkdir -p build
           xcodebuild archive \
             -project PetApp.xcodeproj \
             -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
+            -archivePath "$PWD/build/app.xcarchive" \
             -destination "generic/platform=iOS" \
             -configuration Release \
             -skipPackagePluginValidation \
             -skipMacroValidation \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            -resolvePackageDependencies
+            -allowProvisioningDeviceRegistration
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
@@ -67,10 +67,15 @@ jobs:
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath build/app.xcarchive \
+            -archivePath "$PWD/build/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
+            -exportPath "$PWD/build" \
             -allowProvisioningUpdates
+      
+      # 디버깅: 빌드 디렉토리 내용 확인
+      - name: List Build Directory
+        run: |
+          ls -la "$PWD/build"
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
