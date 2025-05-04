@@ -39,7 +39,8 @@ jobs:
             -skipMacroValidation \
             -allowProvisioningUpdates \
             -allowProvisioningDeviceRegistration \
-            -resolvePackageDependencies | tee build.log
+            -resolvePackageDependencies \
+            -verbose
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
