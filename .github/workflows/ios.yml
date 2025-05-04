@@ -29,15 +29,12 @@ jobs:
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
         run: |
-          mkdir -p build
           xcodebuild archive \
             -project PetApp.xcodeproj \
             -scheme "PetApp" \
-            -archivePath "$PWD/build/app.xcarchive" \
+            -archivePath build/app.xcarchive \
             -destination "generic/platform=iOS" \
             -configuration Release \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
             -allowProvisioningUpdates \
             -allowProvisioningDeviceRegistration
       
@@ -57,8 +54,6 @@ jobs:
               <false/>
               <key>uploadSymbols</key>
               <true/>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
           </dict>
           </plist>
           EOL
@@ -67,15 +62,15 @@ jobs:
       - name: Create IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$PWD/build/app.xcarchive" \
+            -archivePath build/app.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath "$PWD/build" \
+            -exportPath build \
             -allowProvisioningUpdates
       
       # 디버깅: 빌드 디렉토리 내용 확인
       - name: List Build Directory
         run: |
-          ls -la "$PWD/build"
+          ls -la build
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
