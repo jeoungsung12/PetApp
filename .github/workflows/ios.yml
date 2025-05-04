@@ -41,6 +41,12 @@ jobs:
             -allowProvisioningDeviceRegistration \
             -resolvePackageDependencies
       
+      # 디버그: 아카이브 디렉토리 확인
+      - name: Check Archive Directory
+        run: |
+          echo "RUNNER_TEMP: $RUNNER_TEMP"
+          ls -la "$RUNNER_TEMP/build"
+      
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
         run: |
@@ -57,8 +63,6 @@ jobs:
               <false/>
               <key>uploadSymbols</key>
               <true/>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
           </dict>
           </plist>
           EOL
@@ -66,22 +70,24 @@ jobs:
       # IPA 생성
       - name: Create IPA
         run: |
+          mkdir -p "$RUNNER_TEMP/output"
           xcodebuild -exportArchive \
-            -archivePath "build/app.xcarchive" \
+            -archivePath "$RUNNER_TEMP/build/app.xcarchive" \
             -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
+            -exportPath "$RUNNER_TEMP/output" \
             -allowProvisioningUpdates
       
       # 디버그: 빌드 디렉토리 확인
       - name: Check Build Directory
         run: |
-          ls -la build
+          echo "RUNNER_TEMP: $RUNNER_TEMP"
+          ls -la "$RUNNER_TEMP/output"
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: build/*.ipa
+          app-path: ${{ runner.temp }}/output/*.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
