@@ -35,8 +35,11 @@ jobs:
             -archivePath build/app.xcarchive \
             -destination "generic/platform=iOS" \
             -configuration Release \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
+            -allowProvisioningDeviceRegistration \
+            -resolvePackageDependencies
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
@@ -54,6 +57,8 @@ jobs:
               <false/>
               <key>uploadSymbols</key>
               <true/>
+              <key>teamID</key>
+              <string>${{ secrets.APPLE_TEAM_ID }}</string>
           </dict>
           </plist>
           EOL
@@ -66,11 +71,6 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build \
             -allowProvisioningUpdates
-      
-      # 디버깅: 빌드 디렉토리 내용 확인
-      - name: List Build Directory
-        run: |
-          ls -la build
       
       # TestFlight에 업로드
       - name: Upload to TestFlight
