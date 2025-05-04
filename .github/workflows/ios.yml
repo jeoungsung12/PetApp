@@ -26,29 +26,10 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
       
-      # Apple Developer 계정 로그인 및 프로비저닝 프로파일 새로고침
-      - name: Refresh Provisioning Profiles
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          xcrun altool --list-providers -u "$APPLE_ID" -p "$APPLE_PASSWORD"
-          
-          # 프로비저닝 프로파일 새로고침 및 동기화
-          xcodebuild -project PetApp.xcodeproj \
-            -scheme "PetApp" \
-            -sdk iphoneos \
-            -configuration Release \
-            clean build \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            CODE_SIGN_STYLE=Automatic \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
-      
       # 앱 빌드 및 아카이브
       - name: Build and Archive App
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
             -project PetApp.xcodeproj \
@@ -57,10 +38,13 @@ jobs:
             -destination "generic/platform=iOS" \
             -configuration Release \
             -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
+            -allowProvisioningDeviceRegistration \
+            DEVELOPMENT_TEAM="$TEAM_ID"
       
       # ExportOptions.plist 생성
       - name: Create Export Options Plist
+        env:
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > ExportOptions.plist << EOL
           <?xml version="1.0" encoding="UTF-8"?>
@@ -69,6 +53,8 @@ jobs:
           <dict>
               <key>method</key>
               <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
