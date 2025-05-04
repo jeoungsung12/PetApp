@@ -16,16 +16,6 @@ jobs:
         with:
           xcode-version: '16.2'
       
-      # Apple ID 로그인 및 자동 프로비저닝 설정
-      - name: Login to Apple Developer Account
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          # Apple ID로 로그인
-          xcrun altool --login -u "$APPLE_ID" -p "$APPLE_ID_PASSWORD"
-      
       # App Store Connect API 키 설정
       - name: Setup App Store Connect API Key
         env:
