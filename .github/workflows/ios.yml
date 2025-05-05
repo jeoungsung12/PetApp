@@ -6,6 +6,7 @@ jobs:
   deploy-to-testflight:
     name: Build and Deploy to TestFlight
     runs-on: macos-14
+    timeout-minutes: 60 # 빌드 타임아웃 증가
     
     steps:
     - name: Checkout Repository
@@ -16,7 +17,27 @@ jobs:
       with:
         xcode-version: '16.2'
     
-    # Apple 개발자 계정 로그인 설정 - 수정된 부분
+    # 시스템 정보 확인
+    - name: Check System Info
+      run: |
+        echo "macOS Version:"
+        sw_vers
+        echo "Xcode Version:"
+        xcodebuild -version
+        echo "Free Disk Space:"
+        df -h
+        echo "Current Directory:"
+        pwd
+    
+    # 프로젝트 파일 구조 확인
+    - name: Check Project Structure
+      run: |
+        echo "Project Files:"
+        ls -la
+        echo "Xcode Project Info:"
+        xcodebuild -project PetApp.xcodeproj -list
+    
+    # Apple 개발자 계정 로그인 설정
     - name: Setup Authentication
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -32,8 +53,7 @@ jobs:
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
         security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
         
-        # Apple 개발자 계정 로그인 설정 - 간소화된 방식
-        # xcrun notarytool만 사용하고 문제가 있던 altool 부분은 제거
+        # Apple 개발자 계정 로그인 설정
         xcrun notarytool store-credentials "AC_PASSWORD" \
           --apple-id "$APPLE_ID" \
           --team-id "$APPLE_TEAM_ID" \
@@ -52,16 +72,53 @@ jobs:
         echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
         echo "App Store Connect API Key setup completed"
     
-    # 앱 빌드 상태 확인을 위한 단계 추가
-    - name: Build and Archive App
+    # 단계적 접근: 우선 CleanBuild 먼저 실행
+    - name: Clean Build
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        APPLE_ID: ${{ secrets.APPLE_ID }}
       run: |
-        # 빌드 시작
-        echo "Starting build and archive process..."
+        echo "Starting clean build process..."
         
-        # 명시적으로 DEVELOPMENT_TEAM 추가
+        xcodebuild clean \
+        -project PetApp.xcodeproj \
+        -scheme "PetApp" \
+        -configuration Release \
+        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+        CODE_SIGN_STYLE="Automatic" \
+        | xcpretty
+        
+        echo "Clean build completed"
+    
+    # 빌드 실행 (아카이브 전)
+    - name: Build Project
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        echo "Starting build process..."
+        
+        xcodebuild build \
+        -project PetApp.xcodeproj \
+        -scheme "PetApp" \
+        -configuration Release \
+        -destination "generic/platform=iOS" \
+        -skipPackagePluginValidation \
+        -skipMacroValidation \
+        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        CODE_SIGN_STYLE="Automatic" \
+        | tee buildlog.txt || { echo "Build failed. See log below:"; cat buildlog.txt; exit 1; }
+        
+        echo "Build completed successfully!"
+    
+    # 아카이브 생성
+    - name: Archive App
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        echo "Starting archive process..."
+        
+        mkdir -p build
+        
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
@@ -72,9 +129,10 @@ jobs:
         -skipMacroValidation \
         -allowProvisioningUpdates \
         -allowProvisioningDeviceRegistration \
-        -resolvePackageDependencies \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        -verbose
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        CODE_SIGN_STYLE="Automatic" \
+        | tee archivelog.txt || { echo "Archive failed. See log below:"; cat archivelog.txt; exit 1; }
         
         # 아카이브 생성 확인
         if [ ! -d "build/app.xcarchive" ]; then
@@ -114,6 +172,12 @@ jobs:
             <true/>
             <key>compileBitcode</key>
             <false/>
+            <key>destination</key>
+            <string>upload</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>iCloudContainerEnvironment</key>
+            <string>Production</string>
         </dict>
         </plist>
         EOL
@@ -125,12 +189,13 @@ jobs:
     - name: Create IPA
       run: |
         mkdir -p "$GITHUB_WORKSPACE/output"
+        
         xcodebuild -exportArchive \
         -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
         -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
         -exportPath "$GITHUB_WORKSPACE/output" \
         -allowProvisioningUpdates \
-        -verbose
+        | tee exportlog.txt || { echo "Export failed. See log below:"; cat exportlog.txt; exit 1; }
         
         # IPA 파일 확인
         echo "Output directory content:"
