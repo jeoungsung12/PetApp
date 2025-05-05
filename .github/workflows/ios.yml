@@ -16,7 +16,7 @@ jobs:
       with:
         xcode-version: '16.2'
     
-    # Apple 개발자 계정 로그인 설정
+    # Apple 개발자 계정 로그인 설정 - 수정된 부분
     - name: Setup Authentication
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -32,14 +32,14 @@ jobs:
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
         security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
         
-        # Apple 개발자 계정 로그인 설정
+        # Apple 개발자 계정 로그인 설정 - 간소화된 방식
+        # xcrun notarytool만 사용하고 문제가 있던 altool 부분은 제거
         xcrun notarytool store-credentials "AC_PASSWORD" \
           --apple-id "$APPLE_ID" \
           --team-id "$APPLE_TEAM_ID" \
           --password "$APPLE_APP_SPECIFIC_PASSWORD"
         
-        # 추가 비밀번호를 키체인에 저장
-        echo "$APPLE_APP_SPECIFIC_PASSWORD" | xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -s
+        echo "Authentication setup completed"
     
     # App Store Connect API 키 설정
     - name: Setup App Store Connect API Key
@@ -50,15 +50,18 @@ jobs:
       run: |
         mkdir -p ~/.appstoreconnect/private_keys
         echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+        echo "App Store Connect API Key setup completed"
     
     # 앱 빌드 상태 확인을 위한 단계 추가
     - name: Build and Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
       run: |
         # 빌드 시작
         echo "Starting build and archive process..."
         
+        # 명시적으로 DEVELOPMENT_TEAM 추가
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
@@ -70,6 +73,7 @@ jobs:
         -allowProvisioningUpdates \
         -allowProvisioningDeviceRegistration \
         -resolvePackageDependencies \
+        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
         -verbose
         
         # 아카이브 생성 확인
@@ -108,6 +112,8 @@ jobs:
             <false/>
             <key>uploadSymbols</key>
             <true/>
+            <key>compileBitcode</key>
+            <false/>
         </dict>
         </plist>
         EOL
@@ -123,7 +129,8 @@ jobs:
         -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
         -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
         -exportPath "$GITHUB_WORKSPACE/output" \
-        -allowProvisioningUpdates
+        -allowProvisioningUpdates \
+        -verbose
         
         # IPA 파일 확인
         echo "Output directory content:"
