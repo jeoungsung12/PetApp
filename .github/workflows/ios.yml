@@ -72,7 +72,7 @@ jobs:
         echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
         echo "App Store Connect API Key setup completed"
     
-    # 단계적 접근: 우선 CleanBuild 먼저 실행
+    # 단계적 접근: 우선 CleanBuild 먼저 실행 - 코드 서명 충돌 해결
     - name: Clean Build
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -84,12 +84,11 @@ jobs:
         -scheme "PetApp" \
         -configuration Release \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        CODE_SIGN_STYLE="Automatic" \
         | xcpretty
         
         echo "Clean build completed"
     
-    # 빌드 실행 (아카이브 전)
+    # 빌드 실행 (아카이브 전) - 코드 서명 충돌 해결
     - name: Build Project
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -104,13 +103,11 @@ jobs:
         -skipPackagePluginValidation \
         -skipMacroValidation \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        CODE_SIGN_IDENTITY="Apple Distribution" \
-        CODE_SIGN_STYLE="Automatic" \
         | tee buildlog.txt || { echo "Build failed. See log below:"; cat buildlog.txt; exit 1; }
         
         echo "Build completed successfully!"
     
-    # 아카이브 생성
+    # 아카이브 생성 - 코드 서명 충돌 해결
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -130,8 +127,6 @@ jobs:
         -allowProvisioningUpdates \
         -allowProvisioningDeviceRegistration \
         DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        CODE_SIGN_IDENTITY="Apple Distribution" \
-        CODE_SIGN_STYLE="Automatic" \
         | tee archivelog.txt || { echo "Archive failed. See log below:"; cat archivelog.txt; exit 1; }
         
         # 아카이브 생성 확인
