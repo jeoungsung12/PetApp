@@ -8,77 +8,139 @@ jobs:
     runs-on: macos-14
     
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.2'
-      
-      # App Store Connect API 키 설정
-      - name: Setup App Store Connect API Key
-        env:
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
-      
-      # 앱 빌드 및 아카이브
-      - name: Build and Archive App
-        run: |
-          xcodebuild archive \
-            -project PetApp.xcodeproj \
-            -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
-            -destination "generic/platform=iOS" \
-            -configuration Release \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            -resolvePackageDependencies \
-            -verbose
-      
-      # ExportOptions.plist 생성
-      - name: Create Export Options Plist
-        run: |
-          cat > ExportOptions.plist << EOL
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
-          </dict>
-          </plist>
-          EOL
-      
-      # IPA 생성
-      - name: Create IPA
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/output"
-          xcodebuild -exportArchive \
-            -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
-            -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
-            -exportPath "$GITHUB_WORKSPACE/output" \
-            -allowProvisioningUpdates
-      
-      # TestFlight에 업로드
-      - name: Upload to TestFlight
-        uses: apple-actions/upload-testflight-build@v1
-        with:
-          app-path: ${{ github.workspace }}/output/*.ipa
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.2'
+    
+    # Apple 개발자 계정 로그인 설정
+    - name: Setup Authentication
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        # Keychain 생성
+        KEYCHAIN_PATH=$RUNNER_TEMP/login.keychain-db
+        KEYCHAIN_PASSWORD=$(openssl rand -base64 12)
+        
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security default-keychain -s $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        
+        # Apple 개발자 계정 로그인 설정
+        xcrun notarytool store-credentials "AC_PASSWORD" \
+          --apple-id "$APPLE_ID" \
+          --team-id "$APPLE_TEAM_ID" \
+          --password "$APPLE_APP_SPECIFIC_PASSWORD"
+        
+        # 추가 비밀번호를 키체인에 저장
+        echo "$APPLE_APP_SPECIFIC_PASSWORD" | xcrun altool --store-password-in-keychain-item "AC_PASSWORD" -u "$APPLE_ID" -s
+    
+    # App Store Connect API 키 설정
+    - name: Setup App Store Connect API Key
+      env:
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      run: |
+        mkdir -p ~/.appstoreconnect/private_keys
+        echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+    
+    # 앱 빌드 상태 확인을 위한 단계 추가
+    - name: Build and Archive App
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        # 빌드 시작
+        echo "Starting build and archive process..."
+        
+        xcodebuild archive \
+        -project PetApp.xcodeproj \
+        -scheme "PetApp" \
+        -archivePath build/app.xcarchive \
+        -destination "generic/platform=iOS" \
+        -configuration Release \
+        -skipPackagePluginValidation \
+        -skipMacroValidation \
+        -allowProvisioningUpdates \
+        -allowProvisioningDeviceRegistration \
+        -resolvePackageDependencies \
+        -verbose
+        
+        # 아카이브 생성 확인
+        if [ ! -d "build/app.xcarchive" ]; then
+          echo "Archive failed to create."
+          echo "Current directory content:"
+          ls -la
+          echo "Build directory content (if exists):"
+          if [ -d "build" ]; then
+            ls -la build
+          fi
+          exit 1
+        fi
+        
+        echo "Archive completed successfully!"
+        echo "Archive content:"
+        ls -la build/app.xcarchive
+    
+    # ExportOptions.plist 생성
+    - name: Create Export Options Plist
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        cat > ExportOptions.plist << EOL
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>uploadBitcode</key>
+            <false/>
+            <key>uploadSymbols</key>
+            <true/>
+        </dict>
+        </plist>
+        EOL
+        
+        echo "ExportOptions.plist content:"
+        cat ExportOptions.plist
+    
+    # IPA 생성
+    - name: Create IPA
+      run: |
+        mkdir -p "$GITHUB_WORKSPACE/output"
+        xcodebuild -exportArchive \
+        -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
+        -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
+        -exportPath "$GITHUB_WORKSPACE/output" \
+        -allowProvisioningUpdates
+        
+        # IPA 파일 확인
+        echo "Output directory content:"
+        ls -la "$GITHUB_WORKSPACE/output"
+        
+        if ! ls "$GITHUB_WORKSPACE/output/"*.ipa 1> /dev/null 2>&1; then
+          echo "IPA file creation failed."
+          exit 1
+        fi
+        
+        echo "IPA created successfully!"
+    
+    # TestFlight에 업로드
+    - name: Upload to TestFlight
+      uses: apple-actions/upload-testflight-build@v1
+      with:
+        app-path: ${{ github.workspace }}/output/*.ipa
+        issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+        api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+        api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
