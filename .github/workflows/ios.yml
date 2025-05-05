@@ -37,29 +37,56 @@ jobs:
         echo "Xcode Project Info:"
         xcodebuild -project PetApp.xcodeproj -list
     
-    # Apple 개발자 계정 로그인 설정
-    - name: Setup Authentication
+    # 인증서 및 프로비저닝 프로파일 설정 (수동 서명)
+    - name: Install the Apple certificate and provisioning profile
       env:
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        MAIN_PROVISIONING_PROFILE_BASE64: ${{ secrets.MAIN_PROVISIONING_PROFILE_BASE64 }}
+        WIDGET_PROVISIONING_PROFILE_BASE64: ${{ secrets.WIDGET_PROVISIONING_PROFILE_BASE64 }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
         # Keychain 생성
-        KEYCHAIN_PATH=$RUNNER_TEMP/login.keychain-db
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         KEYCHAIN_PASSWORD=$(openssl rand -base64 12)
         
+        # 인증서 및 프로비저닝 프로파일 파일 경로
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        MAIN_PROFILE_PATH=$RUNNER_TEMP/main_profile.mobileprovision
+        WIDGET_PROFILE_PATH=$RUNNER_TEMP/widget_profile.mobileprovision
+        
+        # 키체인 생성 및 설정
         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
         security default-keychain -s $KEYCHAIN_PATH
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
         security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
         
-        # Apple 개발자 계정 로그인 설정
-        xcrun notarytool store-credentials "AC_PASSWORD" \
-          --apple-id "$APPLE_ID" \
-          --team-id "$APPLE_TEAM_ID" \
-          --password "$APPLE_APP_SPECIFIC_PASSWORD"
+        # base64 인코딩된 인증서 및 프로비저닝 프로파일 디코딩
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+        echo -n "$MAIN_PROVISIONING_PROFILE_BASE64" | base64 --decode --output $MAIN_PROFILE_PATH
+        echo -n "$WIDGET_PROVISIONING_PROFILE_BASE64" | base64 --decode --output $WIDGET_PROFILE_PATH
         
-        echo "Authentication setup completed"
+        # 인증서 가져오기
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        
+        # 프로비저닝 프로파일 설치
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp $MAIN_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
+        cp $WIDGET_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
+        
+        # 프로비저닝 프로파일 UUID 추출
+        MAIN_PROFILE_UUID=$(security cms -D -i $MAIN_PROFILE_PATH | plutil -extract UUID raw -)
+        WIDGET_PROFILE_UUID=$(security cms -D -i $WIDGET_PROFILE_PATH | plutil -extract UUID raw -)
+        
+        # UUID 출력 (디버깅용)
+        echo "Main Provisioning Profile UUID: $MAIN_PROFILE_UUID"
+        echo "Widget Provisioning Profile UUID: $WIDGET_PROFILE_UUID"
+        
+        # 환경 변수로 저장
+        echo "MAIN_PROFILE_UUID=$MAIN_PROFILE_UUID" >> $GITHUB_ENV
+        echo "WIDGET_PROFILE_UUID=$WIDGET_PROFILE_UUID" >> $GITHUB_ENV
     
     # App Store Connect API 키 설정
     - name: Setup App Store Connect API Key
@@ -72,61 +99,43 @@ jobs:
         echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
         echo "App Store Connect API Key setup completed"
     
-    # 단계적 접근: 우선 CleanBuild 먼저 실행 - 코드 서명 충돌 해결
-    - name: Clean Build
-      env:
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      run: |
-        echo "Starting clean build process..."
-        
-        xcodebuild clean \
-        -project PetApp.xcodeproj \
-        -scheme "PetApp" \
-        -configuration Release \
-        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        | xcpretty
-        
-        echo "Clean build completed"
-    
-    # 빌드 실행 (아카이브 전) - 코드 서명 충돌 해결
-    - name: Build Project
-      env:
-        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      run: |
-        echo "Starting build process..."
-        
-        xcodebuild build \
-        -project PetApp.xcodeproj \
-        -scheme "PetApp" \
-        -configuration Release \
-        -destination "generic/platform=iOS" \
-        -skipPackagePluginValidation \
-        -skipMacroValidation \
-        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-        | tee buildlog.txt || { echo "Build failed. See log below:"; cat buildlog.txt; exit 1; }
-        
-        echo "Build completed successfully!"
-    
-    # 아카이브 생성 - 코드 서명 충돌 해결
+    # 아카이브 생성
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
+        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
         echo "Starting archive process..."
         
         mkdir -p build
         
+        # 수동 서명을 위한 xcconfig 파일 생성
+        cat > build/manual_signing.xcconfig << EOL
+        CODE_SIGN_STYLE = Manual
+        DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}
+        
+        // 메인 앱 타겟 설정
+        PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*][config=Release][bundle=WEDLE.Warala] = ${MAIN_PROFILE_UUID}
+        CODE_SIGN_IDENTITY[sdk=iphoneos*][config=Release] = Apple Distribution
+        
+        // 위젯 타겟 설정
+        PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*][config=Release][bundle=WEDLE.Warala.PetAppWidget] = ${WIDGET_PROFILE_UUID}
+        EOL
+        
+        echo "xcconfig content:"
+        cat build/manual_signing.xcconfig
+        
+        # 아카이브 빌드 수행
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
         -archivePath build/app.xcarchive \
         -destination "generic/platform=iOS" \
         -configuration Release \
+        -xcconfig build/manual_signing.xcconfig \
         -skipPackagePluginValidation \
         -skipMacroValidation \
-        -allowProvisioningUpdates \
-        -allowProvisioningDeviceRegistration \
-        DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
         | tee archivelog.txt || { echo "Archive failed. See log below:"; cat archivelog.txt; exit 1; }
         
         # 아카이브 생성 확인
@@ -145,10 +154,12 @@ jobs:
         echo "Archive content:"
         ls -la build/app.xcarchive
     
-    # ExportOptions.plist 생성
+    # ExportOptions.plist 생성 (수동 서명용)
     - name: Create Export Options Plist
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
+        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
         cat > ExportOptions.plist << EOL
         <?xml version="1.0" encoding="UTF-8"?>
@@ -158,9 +169,16 @@ jobs:
             <key>method</key>
             <string>app-store</string>
             <key>signingStyle</key>
-            <string>automatic</string>
+            <string>manual</string>
             <key>teamID</key>
             <string>${APPLE_TEAM_ID}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+                <key>${MAIN_BUNDLE_ID}</key>
+                <string>${MAIN_PROFILE_UUID}</string>
+                <key>${WIDGET_BUNDLE_ID}</key>
+                <string>${WIDGET_PROFILE_UUID}</string>
+            </dict>
             <key>uploadBitcode</key>
             <false/>
             <key>uploadSymbols</key>
@@ -189,7 +207,6 @@ jobs:
         -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
         -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
         -exportPath "$GITHUB_WORKSPACE/output" \
-        -allowProvisioningUpdates \
         | tee exportlog.txt || { echo "Export failed. See log below:"; cat exportlog.txt; exit 1; }
         
         # IPA 파일 확인
