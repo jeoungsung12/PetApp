@@ -73,12 +73,14 @@ jobs:
         
         # 프로비저닝 프로파일 설치
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-        cp $MAIN_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
-        cp $WIDGET_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
         
-        # 프로비저닝 프로파일 UUID 추출
+        # 이름을 UUID로 저장
         MAIN_PROFILE_UUID=$(security cms -D -i $MAIN_PROFILE_PATH | grep -A1 UUID | grep string | cut -d'>' -f2 | cut -d'<' -f1)
         WIDGET_PROFILE_UUID=$(security cms -D -i $WIDGET_PROFILE_PATH | grep -A1 UUID | grep string | cut -d'>' -f2 | cut -d'<' -f1)
+        
+        # 프로비저닝 프로파일 파일 복사
+        cp $MAIN_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$MAIN_PROFILE_UUID.mobileprovision
+        cp $WIDGET_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$WIDGET_PROFILE_UUID.mobileprovision
         
         # UUID 출력 (디버깅용)
         echo "Main Provisioning Profile UUID: $MAIN_PROFILE_UUID"
@@ -91,33 +93,29 @@ jobs:
     # App Store Connect API 키 설정
     - name: Setup App Store Connect API Key
       env:
-        APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+        APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
       run: |
         mkdir -p ~/.appstoreconnect/private_keys
-        echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+        echo -n "$APPSTORE_API_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
         echo "App Store Connect API Key setup completed"
     
     # 디버깅: 프로비저닝 프로파일 및 인증서 확인
     - name: Debug Provisioning Profiles and Certificates
       run: |
         echo "Installed Provisioning Profiles:"
-        ls ~/Library/MobileDevice/Provisioning\ Profiles
+        ls -la ~/Library/MobileDevice/Provisioning\ Profiles
         
         echo "\nCode Signing Identities:"
         security find-identity -p codesigning
-        
-        echo "\nProfile Details for Main App:"
-        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
-        
-        echo "\nProfile Details for Widget:"
-        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
     
     # 프로젝트 파일 수정 (서명 설정)
     - name: Update project settings
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
+        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
         # 프로젝트 파일 수정 스크립트
         cat > update_project.rb << 'EOL'
@@ -125,6 +123,9 @@ jobs:
         
         project_path = 'PetApp.xcodeproj'
         project = Xcodeproj::Project.open(project_path)
+        
+        main_bundle_id = ENV['MAIN_BUNDLE_ID'] || 'WEDLE.Warala'
+        widget_bundle_id = ENV['WIDGET_BUNDLE_ID'] || 'WEDLE.Warala.PetAppWidget'
         
         # 메인 앱 타겟
         main_target = project.targets.find { |t| t.name == 'PetApp' }
@@ -138,12 +139,14 @@ jobs:
               config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
               config.build_settings['DEVELOPMENT_TEAM'] = ENV['APPLE_TEAM_ID']
               config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
+              config.build_settings['CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION'] = 'YES'
+              config.build_settings['ENABLE_BITCODE'] = 'NO'
               
               if target.name == 'PetApp'
-                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'WEDLE.Warala'
+                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = main_bundle_id
                 config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'Warala_AppStore'
               elsif target.name == 'PetAppWidgetExtension'
-                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'WEDLE.Warala.PetAppWidget'
+                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = widget_bundle_id
                 config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'WaralaWidget_AppStore'
               end
             end
@@ -173,7 +176,6 @@ jobs:
           -skipPackagePluginValidation \
           -skipMacroValidation \
           -allowProvisioningUpdates \
-          OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
           | tee archivelog.txt
         
         # 아카이브 생성 확인
@@ -196,29 +198,38 @@ jobs:
     - name: Create Export Options Plist
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
+        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
+        MAIN_BUNDLE_ID=${MAIN_BUNDLE_ID:-"WEDLE.Warala"}
+        WIDGET_BUNDLE_ID=${WIDGET_BUNDLE_ID:-"WEDLE.Warala.PetAppWidget"}
+        
         cat > ExportOptions.plist << EOL
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
         <dict>
             <key>method</key>
-            <string>app-store</string>
+            <string>app-store-connect</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>teamID</key>
             <string>${APPLE_TEAM_ID}</string>
             <key>provisioningProfiles</key>
             <dict>
-                <key>WEDLE.Warala</key>
+                <key>${MAIN_BUNDLE_ID}</key>
                 <string>${MAIN_PROFILE_UUID}</string>
-                <key>WEDLE.Warala.PetAppWidget</key>
+                <key>${WIDGET_BUNDLE_ID}</key>
                 <string>${WIDGET_PROFILE_UUID}</string>
             </dict>
+            <key>signingCertificate</key>
+            <string>Apple Distribution</string>
             <key>compileBitcode</key>
             <false/>
             <key>uploadBitcode</key>
             <false/>
+            <key>stripSwiftSymbols</key>
+            <true/>
             <key>destination</key>
             <string>upload</string>
         </dict>
@@ -253,9 +264,25 @@ jobs:
     
     # TestFlight에 업로드
     - name: Upload to TestFlight
-      uses: apple-actions/upload-testflight-build@v1
-      with:
-        app-path: ${{ github.workspace }}/output/*.ipa
-        issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-        api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-        api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+        APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      run: |
+        # 출력 디렉토리에서 IPA 파일 찾기
+        IPA_PATH=$(find "$GITHUB_WORKSPACE/output" -name "*.ipa" | head -n 1)
+        
+        if [ -z "$IPA_PATH" ]; then
+          echo "IPA file not found."
+          exit 1
+        fi
+        
+        echo "Found IPA: $IPA_PATH"
+        
+        # API 키를 사용하여 TestFlight에 업로드
+        xcrun altool --upload-app --type ios \
+          --file "$IPA_PATH" \
+          --apiKey "$APPSTORE_API_KEY_ID" \
+          --apiIssuer "$APPSTORE_ISSUER_ID" \
+          --show-progress
