@@ -261,7 +261,7 @@ jobs:
         
     # 업로드된 IPA 파일 아티팩트로 저장 (선택 사항)
     - name: Upload IPA as Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: PetApp-IPA
         path: ${{ github.workspace }}/output/*.ipa
