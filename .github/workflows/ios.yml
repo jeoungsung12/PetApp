@@ -114,11 +114,30 @@ jobs:
         echo "\nProfile Details for Widget:"
         security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
     
-    # 단일 아카이브 생성
+    # 아카이브 생성
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
+        # xcconfig 파일 생성
+        cat > main.xcconfig << EOL
+        DEVELOPMENT_TEAM = $APPLE_TEAM_ID
+        CODE_SIGN_STYLE = Manual
+        CODE_SIGN_IDENTITY = Apple Distribution
+        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala
+        PROVISIONING_PROFILE_SPECIFIER = Warala_AppStore
+        OTHER_CODE_SIGN_FLAGS = --keychain $RUNNER_TEMP/app-signing.keychain-db
+        EOL
+        
+        cat > widget.xcconfig << EOL
+        DEVELOPMENT_TEAM = $APPLE_TEAM_ID
+        CODE_SIGN_STYLE = Manual
+        CODE_SIGN_IDENTITY = Apple Distribution
+        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala.PetAppWidget
+        PROVISIONING_PROFILE_SPECIFIER = WaralaWidget_AppStore
+        OTHER_CODE_SIGN_FLAGS = --keychain $RUNNER_TEMP/app-signing.keychain-db
+        EOL
+        
         # PetApp 스킴을 사용해 전체 앱 빌드 (위젯 포함)
         xcodebuild archive \
         -project PetApp.xcodeproj \
@@ -128,11 +147,7 @@ jobs:
         -configuration Release \
         -skipPackagePluginValidation \
         -skipMacroValidation \
-        DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-        CODE_SIGN_STYLE="Manual" \
-        CODE_SIGN_IDENTITY="Apple Distribution" \
-        PROVISIONING_PROFILE="${MAIN_PROFILE_UUID}" \
-        "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+        -xcconfig main.xcconfig \
         | tee archivelog.txt
         
         # 아카이브 생성 확인
