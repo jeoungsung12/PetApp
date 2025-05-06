@@ -99,12 +99,18 @@ jobs:
         echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
         echo "App Store Connect API Key setup completed"
     
-    # 아카이브 생성 - 수정된 xcconfig 접근 방식
+    # 디버깅: 프로비저닝 프로파일 및 인증서 확인
+    - name: Verify Provisioning Profiles and Certificates
+      run: |
+        echo "Installed Provisioning Profiles:"
+        ls ~/Library/MobileDevice/Provisioning\ Profiles
+        echo "\nCode Signing Identities:"
+        security find-identity -p codesigning
+    
+    # 아카이브 생성
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
-        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
         echo "Starting archive process..."
         
@@ -126,7 +132,7 @@ jobs:
         echo "xcconfig content:"
         cat build/manual_signing.xcconfig
         
-        # 아카이브 빌드 수행 - 직접 프로비저닝 프로파일 지정
+        # 아카이브 빌드 수행
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
@@ -136,12 +142,10 @@ jobs:
         -xcconfig build/manual_signing.xcconfig \
         -skipPackagePluginValidation \
         -skipMacroValidation \
-        CODE_SIGN_STYLE="Manual" \
-        PROVISIONING_PROFILE="$MAIN_PROFILE_UUID" \
-        "PROVISIONING_PROFILE[sdk=iphoneos*]"="$MAIN_PROFILE_UUID" \
         DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+        CODE_SIGN_STYLE="Manual" \
         CODE_SIGN_IDENTITY="Apple Distribution" \
-        | tee archivelog.txt || { echo "Archive failed. See log below:"; cat archivelog.txt; exit 1; }
+        | tee archivelog.txt || { cat archivelog.txt; exit 1; }
         
         # 아카이브 생성 확인
         if [ ! -d "build/app.xcarchive" ]; then
@@ -163,8 +167,6 @@ jobs:
     - name: Create Export Options Plist
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        MAIN_BUNDLE_ID: ${{ secrets.MAIN_BUNDLE_ID }}
-        WIDGET_BUNDLE_ID: ${{ secrets.WIDGET_BUNDLE_ID }}
       run: |
         cat > ExportOptions.plist << EOL
         <?xml version="1.0" encoding="UTF-8"?>
@@ -179,9 +181,9 @@ jobs:
             <string>${APPLE_TEAM_ID}</string>
             <key>provisioningProfiles</key>
             <dict>
-                <key>${MAIN_BUNDLE_ID}</key>
+                <key>WEDLE.Warala</key>
                 <string>${MAIN_PROFILE_UUID}</string>
-                <key>${WIDGET_BUNDLE_ID}</key>
+                <key>WEDLE.Warala.PetAppWidget</key>
                 <string>${WIDGET_PROFILE_UUID}</string>
             </dict>
             <key>uploadBitcode</key>
