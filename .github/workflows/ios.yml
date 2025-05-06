@@ -100,18 +100,23 @@ jobs:
         echo "App Store Connect API Key setup completed"
     
     # 디버깅: 프로비저닝 프로파일 및 인증서 확인
-    - name: Verify Provisioning Profiles and Certificates
+    - name: Debug Provisioning Profiles
       run: |
-        echo "Installed Provisioning Profiles:"
-        ls ~/Library/MobileDevice/Provisioning\ Profiles
+        echo "Main App Bundle ID: WEDLE.Warala"
+        echo "Widget App Bundle ID: WEDLE.Warala.PetAppWidget"
+        
+        # 인증서 및 프로비저닝 프로파일 상세 정보 출력
         echo "\nCode Signing Identities:"
         security find-identity -p codesigning
         
-        echo "\nProfile Details for Main App:"
-        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
-
-        echo "\nProfile Details for Widget:"
-        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
+        echo "\nInstalled Provisioning Profiles:"
+        ls ~/Library/MobileDevice/Provisioning\ Profiles
+        
+        # 각 프로비저닝 프로파일의 세부 정보 출력
+        for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+          echo "\nProfile: $profile"
+          security cms -D -i "$profile"
+        done
     
     # 아카이브 생성
     - name: Archive App
@@ -130,15 +135,17 @@ jobs:
         // 메인 앱 타겟 설정 - 수정된 형식
         PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = ${MAIN_PROFILE_UUID}
         CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Distribution
+        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala
         
         // 위젯 타겟 설정 - 수정된 형식
         PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = ${WIDGET_PROFILE_UUID}
+        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala.PetAppWidget
         EOL
         
         echo "xcconfig content:"
         cat build/manual_signing.xcconfig
         
-        # 아카이브 빌드 수행
+        # 메인 앱 아카이브 빌드 수행
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
@@ -151,15 +158,29 @@ jobs:
         DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
         CODE_SIGN_STYLE="Manual" \
         CODE_SIGN_IDENTITY="Apple Distribution" \
-        CODE_SIGN_IDENTITY[sdk=iphoneos*]="Apple Distribution" \
+        PRODUCT_BUNDLE_IDENTIFIER="WEDLE.Warala" \
         OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
         | tee archivelog.txt
 
-        # 아카이브 로그 전체 출력
-        cat archivelog.txt
-
+        # 위젯 앱 아카이브 빌드 수행
+        xcodebuild archive \
+        -project PetApp.xcodeproj \
+        -scheme "PetAppWidgetExtension" \
+        -archivePath build/widget.xcarchive \
+        -destination "generic/platform=iOS" \
+        -configuration Release \
+        -xcconfig build/manual_signing.xcconfig \
+        -skipPackagePluginValidation \
+        -skipMacroValidation \
+        DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+        CODE_SIGN_STYLE="Manual" \
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        PRODUCT_BUNDLE_IDENTIFIER="WEDLE.Warala.PetAppWidget" \
+        OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+        | tee widgetarchivelog.txt
+        
         # 아카이브 생성 확인
-        if [ ! -d "build/app.xcarchive" ]; then
+        if [ ! -d "build/app.xcarchive" ] || [ ! -d "build/widget.xcarchive" ]; then
           echo "Archive failed to create."
           echo "Current directory content:"
           ls -la
@@ -173,6 +194,7 @@ jobs:
         echo "Archive completed successfully!"
         echo "Archive content:"
         ls -la build/app.xcarchive
+        ls -la build/widget.xcarchive
     
     # ExportOptions.plist 생성 (수동 서명용)
     - name: Create Export Options Plist
