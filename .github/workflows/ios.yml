@@ -106,6 +106,10 @@ jobs:
         ls ~/Library/MobileDevice/Provisioning\ Profiles
         echo "\nCode Signing Identities:"
         security find-identity -p codesigning
+        echo "\nProfile Details for Main App:"
+        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision | plutil -p
+        echo "\nProfile Details for Widget:"
+        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision | plutil -p
     
     # 아카이브 생성
     - name: Archive App
