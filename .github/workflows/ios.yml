@@ -114,15 +114,16 @@ jobs:
         echo "\nProfile Details for Widget:"
         security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
     
-    # 아카이브 생성
+    # 단일 아카이브 생성
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
+        # PetApp 스킴을 사용해 전체 앱 빌드 (위젯 포함)
         xcodebuild archive \
         -project PetApp.xcodeproj \
         -scheme "PetApp" \
-        -archivePath build/app.xcarchive \
+        -archivePath build/PetApp.xcarchive \
         -destination "generic/platform=iOS" \
         -configuration Release \
         -skipPackagePluginValidation \
@@ -130,29 +131,12 @@ jobs:
         DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
         CODE_SIGN_STYLE="Manual" \
         CODE_SIGN_IDENTITY="Apple Distribution" \
-        PRODUCT_BUNDLE_IDENTIFIER="WEDLE.Warala" \
-        OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
-        OTHER_SWIFT_FLAGS="-suppress-warnings" \
+        PROVISIONING_PROFILE="${MAIN_PROFILE_UUID}" \
+        "OTHER_CODE_SIGN_FLAGS=--keychain $RUNNER_TEMP/app-signing.keychain-db" \
         | tee archivelog.txt
-
-        xcodebuild archive \
-        -project PetApp.xcodeproj \
-        -scheme "PetAppWidgetExtension" \
-        -archivePath build/widget.xcarchive \
-        -destination "generic/platform=iOS" \
-        -configuration Release \
-        -skipPackagePluginValidation \
-        -skipMacroValidation \
-        DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-        CODE_SIGN_STYLE="Manual" \
-        CODE_SIGN_IDENTITY="Apple Distribution" \
-        PRODUCT_BUNDLE_IDENTIFIER="WEDLE.Warala.PetAppWidget" \
-        OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
-        OTHER_SWIFT_FLAGS="-suppress-warnings" \
-        | tee widgetarchivelog.txt
         
         # 아카이브 생성 확인
-        if [ ! -d "build/app.xcarchive" ] || [ ! -d "build/widget.xcarchive" ]; then
+        if [ ! -d "build/PetApp.xcarchive" ]; then
           echo "Archive failed to create."
           echo "Current directory content:"
           ls -la
@@ -165,8 +149,7 @@ jobs:
         
         echo "Archive completed successfully!"
         echo "Archive content:"
-        ls -la build/app.xcarchive
-        ls -la build/widget.xcarchive
+        ls -la build/PetApp.xcarchive
     
     # ExportOptions.plist 생성 (수동 서명용)
     - name: Create Export Options Plist
@@ -195,8 +178,6 @@ jobs:
             <false/>
             <key>uploadBitcode</key>
             <false/>
-            <key>teamID</key>
-            <string>${APPLE_TEAM_ID}</string>
             <key>destination</key>
             <string>upload</string>
         </dict>
@@ -212,8 +193,7 @@ jobs:
         mkdir -p "$GITHUB_WORKSPACE/output"
         
         xcodebuild -exportArchive \
-        -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
-        -archivePath "$GITHUB_WORKSPACE/build/widget.xcarchive" \
+        -archivePath "$GITHUB_WORKSPACE/build/PetApp.xcarchive" \
         -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
         -exportPath "$GITHUB_WORKSPACE/output" \
         -allowProvisioningUpdates \
