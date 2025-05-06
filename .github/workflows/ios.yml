@@ -258,3 +258,47 @@ jobs:
         fi
         
         echo "IPA created successfully!"
+    
+    # 날짜 및 앱 버전 가져오기
+    - name: Get Current Date and App Version
+      run: |
+        # 현재 날짜
+        DATE=$(date +%Y-%m-%d)
+        echo "DATE=$DATE" >> $GITHUB_ENV
+        
+        # 앱 버전 및 빌드 번호 가져오기
+        PLIST_PATH="$GITHUB_WORKSPACE/PetApp/Info.plist"
+        VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
+        BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+        
+        echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "BUILD_NUMBER=$BUILD" >> $GITHUB_ENV
+        
+        # 릴리스 태그 생성
+        RELEASE_TAG="v${VERSION}-build-${BUILD}-${DATE}"
+        echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+    
+    # GitHub Release로 업로드
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ github.workspace }}/output/*.ipa
+        name: PetApp ${{ env.APP_VERSION }} (Build ${{ env.BUILD_NUMBER }})
+        tag_name: ${{ env.RELEASE_TAG }}
+        body: |
+          # PetApp Release - ${{ env.APP_VERSION }} (Build ${{ env.BUILD_NUMBER }})
+          
+          **Release Date:** ${{ env.DATE }}
+          
+          ## Release Notes
+          
+          자동 빌드에 의해 생성된 앱 바이너리입니다.
+          
+          ## 설치 방법
+          
+          1. IPA 파일을 다운로드합니다.
+          2. App Store Connect에 수동으로 업로드하거나 TestFlight에 배포합니다.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
