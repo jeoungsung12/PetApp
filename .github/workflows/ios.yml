@@ -194,7 +194,7 @@ jobs:
         echo "Archive content:"
         ls -la build/PetApp.xcarchive
     
-    # ExportOptions.plist 생성 (수동 서명용)
+    # ExportOptions.plist 생성 (수동 서명용 - 로컬 내보내기만 수행)
     - name: Create Export Options Plist
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -210,7 +210,7 @@ jobs:
         <plist version="1.0">
         <dict>
             <key>method</key>
-            <string>app-store-connect</string>
+            <string>app-store</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>teamID</key>
@@ -230,8 +230,6 @@ jobs:
             <false/>
             <key>stripSwiftSymbols</key>
             <true/>
-            <key>destination</key>
-            <string>upload</string>
         </dict>
         </plist>
         EOL
@@ -239,7 +237,7 @@ jobs:
         echo "ExportOptions.plist content:"
         cat ExportOptions.plist
     
-    # IPA 생성
+    # IPA 생성 (로컬 내보내기만 수행)
     - name: Create IPA
       run: |
         mkdir -p "$GITHUB_WORKSPACE/output"
@@ -248,7 +246,6 @@ jobs:
         -archivePath "$GITHUB_WORKSPACE/build/PetApp.xcarchive" \
         -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
         -exportPath "$GITHUB_WORKSPACE/output" \
-        -allowProvisioningUpdates \
         | tee exportlog.txt || { echo "Export failed. See log below:"; cat exportlog.txt; exit 1; }
         
         # IPA 파일 확인
@@ -261,28 +258,36 @@ jobs:
         fi
         
         echo "IPA created successfully!"
+        
+    # 업로드된 IPA 파일 아티팩트로 저장 (선택 사항)
+    - name: Upload IPA as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: PetApp-IPA
+        path: ${{ github.workspace }}/output/*.ipa
+        retention-days: 5
     
-    # TestFlight에 업로드
-    - name: Upload to TestFlight
-      env:
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-        APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-      run: |
-        # 출력 디렉토리에서 IPA 파일 찾기
-        IPA_PATH=$(find "$GITHUB_WORKSPACE/output" -name "*.ipa" | head -n 1)
-        
-        if [ -z "$IPA_PATH" ]; then
-          echo "IPA file not found."
-          exit 1
-        fi
-        
-        echo "Found IPA: $IPA_PATH"
-        
-        # API 키를 사용하여 TestFlight에 업로드
-        xcrun altool --upload-app --type ios \
-          --file "$IPA_PATH" \
-          --apiKey "$APPSTORE_API_KEY_ID" \
-          --apiIssuer "$APPSTORE_ISSUER_ID" \
-          --show-progress
+    # TestFlight 업로드 (주석 처리)
+    # - name: Upload to TestFlight
+    #   env:
+    #     APPLE_ID: ${{ secrets.APPLE_ID }}
+    #     APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+    #     APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+    #     APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+    #   run: |
+    #     # 출력 디렉토리에서 IPA 파일 찾기
+    #     IPA_PATH=$(find "$GITHUB_WORKSPACE/output" -name "*.ipa" | head -n 1)
+    #     
+    #     if [ -z "$IPA_PATH" ]; then
+    #       echo "IPA file not found."
+    #       exit 1
+    #     fi
+    #     
+    #     echo "Found IPA: $IPA_PATH"
+    #     
+    #     # API 키를 사용하여 TestFlight에 업로드
+    #     xcrun altool --upload-app --type ios \
+    #       --file "$IPA_PATH" \
+    #       --apiKey "$APPSTORE_API_KEY_ID" \
+    #       --apiIssuer "$APPSTORE_ISSUER_ID" \
+    #       --show-progress
