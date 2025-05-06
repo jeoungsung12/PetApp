@@ -259,23 +259,38 @@ jobs:
         
         echo "IPA created successfully!"
     
-    # 날짜 및 앱 버전 가져오기
+    # 날짜 및 앱 버전 가져오기 (수정된 부분)
     - name: Get Current Date and App Version
       run: |
         # 현재 날짜
         DATE=$(date +%Y-%m-%d)
         echo "DATE=$DATE" >> $GITHUB_ENV
         
-        # 앱 버전 및 빌드 번호 가져오기
-        PLIST_PATH="$GITHUB_WORKSPACE/PetApp/Info.plist"
-        VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
-        BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+        # 디버깅용 - 프로젝트 구조 확인
+        echo "프로젝트 디렉토리 구조:"
+        find "$GITHUB_WORKSPACE" -name "Info.plist" -print
         
-        echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
-        echo "BUILD_NUMBER=$BUILD" >> $GITHUB_ENV
+        # 기본 버전 및 빌드 번호 설정
+        echo "APP_VERSION=1.0" >> $GITHUB_ENV
+        echo "BUILD_NUMBER=1" >> $GITHUB_ENV
+        
+        # Info.plist 파일 찾기 및 버전 정보 추출 시도
+        if [ -f "$GITHUB_WORKSPACE/PetApp/Info.plist" ]; then
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$GITHUB_WORKSPACE/PetApp/Info.plist" 2>/dev/null || echo "1.0")
+          BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$GITHUB_WORKSPACE/PetApp/Info.plist" 2>/dev/null || echo "1")
+          
+          # 버전 정보가 성공적으로 추출되었으면 환경변수 업데이트
+          if [ -n "$VERSION" ] && [ -n "$BUILD" ]; then
+            echo "앱 버전 정보 발견: Version=$VERSION, Build=$BUILD"
+            echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+            echo "BUILD_NUMBER=$BUILD" >> $GITHUB_ENV
+          fi
+        else
+          echo "Info.plist 파일을 찾을 수 없습니다. 기본 버전 정보를 사용합니다."
+        fi
         
         # 릴리스 태그 생성
-        RELEASE_TAG="v${VERSION}-build-${BUILD}-${DATE}"
+        RELEASE_TAG="v1.0-build-1-${DATE}"
         echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
     
     # GitHub Release로 업로드
@@ -283,10 +298,10 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: ${{ github.workspace }}/output/*.ipa
-        name: PetApp ${{ env.APP_VERSION }} (Build ${{ env.BUILD_NUMBER }})
-        tag_name: ${{ env.RELEASE_TAG }}
+        name: PetApp Release ${{ env.DATE }}
+        tag_name: release-${{ env.DATE }}
         body: |
-          # PetApp Release - ${{ env.APP_VERSION }} (Build ${{ env.BUILD_NUMBER }})
+          # PetApp Release
           
           **Release Date:** ${{ env.DATE }}
           
