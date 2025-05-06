@@ -6,72 +6,244 @@ jobs:
   deploy-to-testflight:
     name: Build and Deploy to TestFlight
     runs-on: macos-14
+    timeout-minutes: 60 # 빌드 타임아웃 증가
     
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.2'
-      
-      # App Store Connect API 키 설정
-      - name: Setup App Store Connect API Key
-        env:
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
-      
-      # 앱 빌드 및 아카이브 (완전 자동 서명)
-      - name: Build and Archive App
-        run: |
-          xcodebuild archive \
-            -project PetApp.xcodeproj \
-            -scheme "PetApp" \
-            -archivePath build/app.xcarchive \
-            -destination "generic/platform=iOS" \
-            -configuration Release \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration
-      
-      # ExportOptions.plist 생성
-      - name: Create Export Options Plist
-        run: |
-          cat > ExportOptions.plist << EOL
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-          </dict>
-          </plist>
-          EOL
-      
-      # IPA 생성
-      - name: Create IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath build/app.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build \
-            -allowProvisioningUpdates
-      
-      # TestFlight에 업로드
-      - name: Upload to TestFlight
-        uses: apple-actions/upload-testflight-build@v1
-        with:
-          app-path: build/*.ipa
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.2'
+    
+    # 시스템 정보 확인
+    - name: Check System Info
+      run: |
+        echo "macOS Version:"
+        sw_vers
+        echo "Xcode Version:"
+        xcodebuild -version
+        echo "Free Disk Space:"
+        df -h
+        echo "Current Directory:"
+        pwd
+    
+    # 프로젝트 파일 구조 확인
+    - name: Check Project Structure
+      run: |
+        echo "Project Files:"
+        ls -la
+        echo "Xcode Project Info:"
+        xcodebuild -project PetApp.xcodeproj -list
+    
+    # 인증서 및 프로비저닝 프로파일 설정 (수동 서명)
+    - name: Install the Apple certificate and provisioning profile
+      env:
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        MAIN_PROVISIONING_PROFILE_BASE64: ${{ secrets.MAIN_PROVISIONING_PROFILE_BASE64 }}
+        WIDGET_PROVISIONING_PROFILE_BASE64: ${{ secrets.WIDGET_PROVISIONING_PROFILE_BASE64 }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        # Keychain 생성
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+        KEYCHAIN_PASSWORD=$(openssl rand -base64 12)
+        
+        # 인증서 및 프로비저닝 프로파일 파일 경로
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        MAIN_PROFILE_PATH=$RUNNER_TEMP/main_profile.mobileprovision
+        WIDGET_PROFILE_PATH=$RUNNER_TEMP/widget_profile.mobileprovision
+        
+        # 키체인 생성 및 설정
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security default-keychain -s $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        
+        # base64 인코딩된 인증서 및 프로비저닝 프로파일 디코딩
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+        echo -n "$MAIN_PROVISIONING_PROFILE_BASE64" | base64 --decode --output $MAIN_PROFILE_PATH
+        echo -n "$WIDGET_PROVISIONING_PROFILE_BASE64" | base64 --decode --output $WIDGET_PROFILE_PATH
+        
+        # 인증서 가져오기
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        
+        # 프로비저닝 프로파일 설치
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp $MAIN_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
+        cp $WIDGET_PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
+        
+        # 프로비저닝 프로파일 UUID 추출
+        MAIN_PROFILE_UUID=$(security cms -D -i $MAIN_PROFILE_PATH | grep -A1 UUID | grep string | cut -d'>' -f2 | cut -d'<' -f1)
+        WIDGET_PROFILE_UUID=$(security cms -D -i $WIDGET_PROFILE_PATH | grep -A1 UUID | grep string | cut -d'>' -f2 | cut -d'<' -f1)
+        
+        # UUID 출력 (디버깅용)
+        echo "Main Provisioning Profile UUID: $MAIN_PROFILE_UUID"
+        echo "Widget Provisioning Profile UUID: $WIDGET_PROFILE_UUID"
+        
+        # 환경 변수로 저장
+        echo "MAIN_PROFILE_UUID=$MAIN_PROFILE_UUID" >> $GITHUB_ENV
+        echo "WIDGET_PROFILE_UUID=$WIDGET_PROFILE_UUID" >> $GITHUB_ENV
+    
+    # App Store Connect API 키 설정
+    - name: Setup App Store Connect API Key
+      env:
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      run: |
+        mkdir -p ~/.appstoreconnect/private_keys
+        echo -n "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_$APP_STORE_CONNECT_API_KEY_ID.p8
+        echo "App Store Connect API Key setup completed"
+    
+    # 디버깅: 프로비저닝 프로파일 및 인증서 확인
+    - name: Verify Provisioning Profiles and Certificates
+      run: |
+        echo "Installed Provisioning Profiles:"
+        ls ~/Library/MobileDevice/Provisioning\ Profiles
+        echo "\nCode Signing Identities:"
+        security find-identity -p codesigning
+        
+        echo "\nProfile Details for Main App:"
+        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/main.mobileprovision
+
+        echo "\nProfile Details for Widget:"
+        security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
+    
+    # 아카이브 생성
+    - name: Archive App
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        echo "Starting archive process..."
+        
+        mkdir -p build
+        
+        # 수정된 xcconfig 파일 형식
+        cat > build/manual_signing.xcconfig << EOL
+        CODE_SIGN_STYLE = Manual
+        DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}
+        
+        // 메인 앱 타겟 설정 - 수정된 형식
+        PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = ${MAIN_PROFILE_UUID}
+        CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Distribution
+        
+        // 위젯 타겟 설정 - 수정된 형식
+        PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = ${WIDGET_PROFILE_UUID}
+        EOL
+        
+        echo "xcconfig content:"
+        cat build/manual_signing.xcconfig
+        
+        # 아카이브 빌드 수행
+        xcodebuild archive \
+        -project PetApp.xcodeproj \
+        -scheme "PetApp" \
+        -archivePath build/app.xcarchive \
+        -destination "generic/platform=iOS" \
+        -configuration Release \
+        -xcconfig build/manual_signing.xcconfig \
+        -skipPackagePluginValidation \
+        -skipMacroValidation \
+        DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+        CODE_SIGN_STYLE="Manual" \
+        CODE_SIGN_IDENTITY="Apple Distribution" \
+        CODE_SIGN_IDENTITY[sdk=iphoneos*]="Apple Distribution" \
+        OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+        | tee archivelog.txt
+
+        # 아카이브 로그 전체 출력
+        cat archivelog.txt
+
+        # 아카이브 생성 확인
+        if [ ! -d "build/app.xcarchive" ]; then
+          echo "Archive failed to create."
+          echo "Current directory content:"
+          ls -la
+          echo "Build directory content (if exists):"
+          if [ -d "build" ]; then
+            ls -la build
+          fi
+          exit 1
+        fi
+        
+        echo "Archive completed successfully!"
+        echo "Archive content:"
+        ls -la build/app.xcarchive
+    
+    # ExportOptions.plist 생성 (수동 서명용)
+    - name: Create Export Options Plist
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        cat > ExportOptions.plist << EOL
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+                <key>WEDLE.Warala</key>
+                <string>${MAIN_PROFILE_UUID}</string>
+                <key>WEDLE.Warala.PetAppWidget</key>
+                <string>${WIDGET_PROFILE_UUID}</string>
+            </dict>
+            <key>uploadBitcode</key>
+            <false/>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+            <key>destination</key>
+            <string>upload</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>iCloudContainerEnvironment</key>
+            <string>Production</string>
+        </dict>
+        </plist>
+        EOL
+        
+        echo "ExportOptions.plist content:"
+        cat ExportOptions.plist
+    
+    # IPA 생성
+    - name: Create IPA
+      run: |
+        mkdir -p "$GITHUB_WORKSPACE/output"
+        
+        xcodebuild -exportArchive \
+        -archivePath "$GITHUB_WORKSPACE/build/app.xcarchive" \
+        -exportOptionsPlist "$GITHUB_WORKSPACE/ExportOptions.plist" \
+        -exportPath "$GITHUB_WORKSPACE/output" \
+        -allowProvisioningUpdates \
+        | tee exportlog.txt || { echo "Export failed. See log below:"; cat exportlog.txt; exit 1; }
+        
+        # IPA 파일 확인
+        echo "Output directory content:"
+        ls -la "$GITHUB_WORKSPACE/output"
+        
+        if ! ls "$GITHUB_WORKSPACE/output/"*.ipa 1> /dev/null 2>&1; then
+          echo "IPA file creation failed."
+          exit 1
+        fi
+        
+        echo "IPA created successfully!"
+    
+    # TestFlight에 업로드
+    - name: Upload to TestFlight
+      uses: apple-actions/upload-testflight-build@v1
+      with:
+        app-path: ${{ github.workspace }}/output/*.ipa
+        issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+        api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+        api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
