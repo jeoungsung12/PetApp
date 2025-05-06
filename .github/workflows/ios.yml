@@ -114,41 +114,67 @@ jobs:
         echo "\nProfile Details for Widget:"
         security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/widget.mobileprovision
     
-    # 아카이브 생성
+    # 프로젝트 파일 수정 (서명 설정)
+    - name: Update project settings
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        # 프로젝트 파일 수정 스크립트
+        cat > update_project.rb << 'EOL'
+        require 'xcodeproj'
+        
+        project_path = 'PetApp.xcodeproj'
+        project = Xcodeproj::Project.open(project_path)
+        
+        # 메인 앱 타겟
+        main_target = project.targets.find { |t| t.name == 'PetApp' }
+        # 위젯 타겟
+        widget_target = project.targets.find { |t| t.name == 'PetAppWidgetExtension' }
+        
+        # 타겟별 빌드 설정 업데이트
+        [main_target, widget_target].each do |target|
+          target.build_configurations.each do |config|
+            if config.name == 'Release'
+              config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+              config.build_settings['DEVELOPMENT_TEAM'] = ENV['APPLE_TEAM_ID']
+              config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
+              
+              if target.name == 'PetApp'
+                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'WEDLE.Warala'
+                config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'Warala_AppStore'
+              elsif target.name == 'PetAppWidgetExtension'
+                config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'WEDLE.Warala.PetAppWidget'
+                config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'WaralaWidget_AppStore'
+              end
+            end
+          end
+        end
+        
+        # 저장
+        project.save
+        EOL
+        
+        # Ruby 스크립트 실행
+        sudo gem install xcodeproj
+        ruby update_project.rb
+    
+    # 아카이브 생성 (프로젝트 파일 변경 적용)
     - name: Archive App
       env:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
-        # xcconfig 파일 생성
-        cat > main.xcconfig << EOL
-        DEVELOPMENT_TEAM = $APPLE_TEAM_ID
-        CODE_SIGN_STYLE = Manual
-        CODE_SIGN_IDENTITY = Apple Distribution
-        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala
-        PROVISIONING_PROFILE_SPECIFIER = Warala_AppStore
-        OTHER_CODE_SIGN_FLAGS = --keychain $RUNNER_TEMP/app-signing.keychain-db
-        EOL
-        
-        cat > widget.xcconfig << EOL
-        DEVELOPMENT_TEAM = $APPLE_TEAM_ID
-        CODE_SIGN_STYLE = Manual
-        CODE_SIGN_IDENTITY = Apple Distribution
-        PRODUCT_BUNDLE_IDENTIFIER = WEDLE.Warala.PetAppWidget
-        PROVISIONING_PROFILE_SPECIFIER = WaralaWidget_AppStore
-        OTHER_CODE_SIGN_FLAGS = --keychain $RUNNER_TEMP/app-signing.keychain-db
-        EOL
-        
-        # PetApp 스킴을 사용해 전체 앱 빌드 (위젯 포함)
+        # 코드 사이닝 플래그 설정 (프로비저닝 프로파일 적용 없이)
         xcodebuild archive \
-        -project PetApp.xcodeproj \
-        -scheme "PetApp" \
-        -archivePath build/PetApp.xcarchive \
-        -destination "generic/platform=iOS" \
-        -configuration Release \
-        -skipPackagePluginValidation \
-        -skipMacroValidation \
-        -xcconfig main.xcconfig \
-        | tee archivelog.txt
+          -project PetApp.xcodeproj \
+          -scheme "PetApp" \
+          -archivePath build/PetApp.xcarchive \
+          -destination "generic/platform=iOS" \
+          -configuration Release \
+          -skipPackagePluginValidation \
+          -skipMacroValidation \
+          -allowProvisioningUpdates \
+          OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+          | tee archivelog.txt
         
         # 아카이브 생성 확인
         if [ ! -d "build/PetApp.xcarchive" ]; then
